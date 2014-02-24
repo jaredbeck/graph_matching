@@ -43,7 +43,7 @@ module GraphMatching
       # For each stage (until no augmenting path is found)
       stage = 0
       while stage <= MAX_STAGES do
-        puts "begin stage: #{m.inspect}"
+        puts "\nbegin stage #{stage}: #{m.inspect}"
 
         # 0. Clear all labels and marks
         label_t = Set.new
@@ -68,7 +68,7 @@ module GraphMatching
           # 3. Follow the unmatched edges (if any) to vertexes in V
           each_adjacent(start) do |vi|
             puts "  adjacent: #{vi}"
-            if m.any? { |mi| mi.include?(vi) }
+            if m.any? { |mi| mi.include?(vi) && mi.include?(start) }
               puts "  not following matched edge"
             else
               puts "  follow unmatched edge to: #{vi}"
@@ -90,13 +90,12 @@ module GraphMatching
                   puts "  vi_edges is empty, so we found an augmenting path?"
                   augmenting_path = [vi, start]
                   puts "  augmenting path: #{augmenting_path.inspect}"
-                  break
                 else
                   vi_edges.each do |stop|
                     puts "    adjacent: #{stop}"
 
                     # is it matched?
-                    if m.any? { |mi| mi.include?(stop) }
+                    if m.any? { |mi| mi.include?(stop) && mi.include?(vi) }
                       #     i. If so, follow that edge to a vertex in U
                       #       a. Label the U-vertex with R
                       puts "    r-label: #{stop}"
@@ -109,13 +108,19 @@ module GraphMatching
                       #       a. Backtrack to construct an augmenting path
                       #       a. Augment the matching and return to step 1
                       puts "    woot. we found an augmenting path. backtracking .."
-                      path = [stop]
-                      while predecessor.has_key?(path.last)
-                        path.push(predecessor[path.last])
+                      augmenting_path = [vi]
+                      puts "    predecessors: #{predecessor.inspect}"
+                      while predecessor.has_key?(augmenting_path.last)
+                        augmenting_path.push(predecessor[augmenting_path.last])
                       end
-                      puts "    augmenting path: #{path.inspect}"
+                      puts "    augmenting path: #{augmenting_path.inspect}"
+                      break
                     end
                   end
+                end
+
+                if !augmenting_path.nil?
+                  break
                 end
               end
             end
@@ -128,12 +133,13 @@ module GraphMatching
           puts "Unable to find an augmenting path.  We're done!"
           break
         else
+          raise "invalid path" unless augmenting_path.length >= 2
           new_matching = Set.new
           augmenting_path_edges = Set.new
           0.upto(augmenting_path.length - 2).each do |j|
             augmenting_path_edges.add([augmenting_path[j], augmenting_path[j + 1]])
           end
-          puts "Augmenting the matching with #{(augmenting_path_edges - m).inspect}"
+          puts "augmenting the matching with #{(augmenting_path_edges - m).inspect}"
           m.merge(augmenting_path_edges - m)
         end
 

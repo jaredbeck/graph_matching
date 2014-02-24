@@ -32,6 +32,18 @@ describe GraphMatching::BipartiteGraph do
         expect(m.first).to match_array(e)
       end
     end
+
+    context 'non-trivial graph' do
+      it 'returns the expected set' do
+        g.add_edge('u1', 'v1')
+        g.add_edge('u1', 'v2')
+        g.add_edge('u2', 'v1')
+        g.add_edge('u2', 'v2')
+        m = g.maximum_cardinality_matching
+        expect(m.size).to eq(2)
+        expect(m.to_a.flatten).to match_array(%w[u1 u2 v1 v2])
+      end
+    end
   end
 
   describe '#partition' do
