@@ -24,7 +24,13 @@ describe GraphMatching::BipartiteGraph do
     end
 
     context 'single edge' do
-      it 'returns set with one edge'
+      it 'returns set with one edge' do
+        e = ['a', 'b']
+        g.add_edge(*e)
+        m = g.maximum_cardinality_matching
+        expect(m.size).to eq(1)
+        expect(m.first).to match_array(e)
+      end
     end
   end
 
