@@ -48,17 +48,9 @@ module GraphMatching
 
       i.set_examine_edge_event_handler { |from, to|
         if u.include?(from)
-          if u.include?(to)
-            raise NotBipartiteError, "Both %s and %s are in U" % [from, to]
-          else
-            v.add(to)
-          end
+          add_to_set(v, vertex: to, fail_if_in: u)
         elsif v.include?(from)
-          if v.include?(to)
-            raise NotBipartiteError, "Both %s and %s are in V" % [from, to]
-          else
-            u.add(to)
-          end
+          add_to_set(u, vertex: to, fail_if_in: v)
         else
           u.add(from)
           v.add(to)
@@ -69,5 +61,13 @@ module GraphMatching
       raise RuntimeError unless u.disjoint?(v) # sanity check
       [u, v]
     end
+
+  private
+
+    def add_to_set(set, vertex:, fail_if_in:)
+      raise NotBipartiteError if fail_if_in.include?(vertex)
+      set.add(vertex)
+    end
+
   end
 end
