@@ -12,8 +12,6 @@ require 'graph_matching'
 g = GraphMatching::BipartiteGraph.new
 g.add_edge('alice', 'bob')
 g.add_edge('christine', 'don')
-g.maximum_cardinality_matching.class
-#=> GraphMatching::Matching
-g.maximum_cardinality_matching.edges
+g.maximum_cardinality_matching
 #=> #<Set: {['alice', 'don'], ['christine', 'bob']}>
 ```
