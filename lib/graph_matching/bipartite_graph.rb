@@ -37,36 +37,42 @@ module GraphMatching
       Set.new
     end
 
-    # `partition` returns two disjoint proper subsets
-    # or raises a NotBipartiteError
+    # `partition` either returns two disjoint proper subsets
+    # of vertexes or raises a NotBipartiteError
     def partition
       u = Set.new
       v = Set.new
       return [u,v] if empty?
       raise NotBipartiteError unless connected?
       i = RGL::BFSIterator.new(self)
-
-      i.set_examine_edge_event_handler { |from, to|
-        if u.include?(from)
-          add_to_set(v, vertex: to, fail_if_in: u)
-        elsif v.include?(from)
-          add_to_set(u, vertex: to, fail_if_in: v)
-        else
-          u.add(from)
-          v.add(to)
-        end
-      }
-
+      i.set_examine_edge_event_handler do |from, to|
+        examine_edge_for_partition(from, to, u, v)
+      end
       i.set_to_end # does the search
-      raise RuntimeError unless u.disjoint?(v) # sanity check
+      assert_disjoint(u, v) # sanity check
       [u, v]
     end
 
   private
 
+    def examine_edge_for_partition(from, to, u, v)
+      if u.include?(from)
+        add_to_set(v, vertex: to, fail_if_in: u)
+      elsif v.include?(from)
+        add_to_set(u, vertex: to, fail_if_in: v)
+      else
+        u.add(from)
+        v.add(to)
+      end
+    end
+
     def add_to_set(set, vertex:, fail_if_in:)
       raise NotBipartiteError if fail_if_in.include?(vertex)
       set.add(vertex)
+    end
+
+    def assert_disjoint(u, v)
+      raise "Expected sets to be disjoint" unless u.disjoint?(v)
     end
 
   end

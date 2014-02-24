@@ -70,5 +70,14 @@ describe GraphMatching::BipartiteGraph do
         expect(p[1].to_a).to match_array(%w[v1 v2])
       end
     end
+
+    context 'disconnected graph' do
+      it 'raises NotBipartiteError' do
+        g.add_edge('a', 'b')
+        g.add_edge('c', 'd')
+        expect { g.partition }.to \
+          raise_error(GraphMatching::NotBipartiteError)
+      end
+    end
   end
 end
