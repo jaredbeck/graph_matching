@@ -14,26 +14,8 @@ module GraphMatching
     MAX_STAGES = 100
 
     # `maximum_cardinality_matching` returns a `Set` of arrays,
-    # each representing an edge in the matching.
-    #
-    # The Augmenting Path algorithm is used.
-    #
-    # For each stage (until no augmenting path is found)
-    # 0. Clear all labels and marks
-    # 1. Label unmatched vertexes in U with label R
-    # 2. Mark the leftmost unmarked R-vertex
-    # 3. Follow the unmatched edges (if any) to vertexes in V
-    # 4. Does the vertex in V have label T?
-    #   A. If yes, do what?
-    #   B. If no, label with T and mark.  Now, is it matched?
-    #     i. If so, follow that edge to a vertex in U
-    #       a. Label the U-vertex with R
-    #       b. Stop.  Return to step 2
-    #     ii. If not,
-    #       a. Backtrack to construct an augmenting path
-    #       a. Augment the matching and return to step 1
-    # 5. If every U-vertex is labeled and marked, and no augmenting
-    #    path was found, the algorithm halts.
+    # each representing an edge in the matching.  The augmenting
+    # path algorithm is used.
     #
     def maximum_cardinality_matching
       m = Set.new # the matching
@@ -68,10 +50,7 @@ module GraphMatching
           # 3. Follow the unmatched edges (if any) to vertexes in V
           each_adjacent(start) do |vi|
             puts "  adjacent: #{vi}"
-            if m.any? { |mi| mi.include?(vi) && mi.include?(start) }
-              puts "  not following matched edge"
-            else
-              puts "  follow unmatched edge to: #{vi}"
+            if !matched?([start, vi], m)
 
               # 4. Does the vertex in V have label T?
               if label_t.include?(vi)
@@ -95,7 +74,7 @@ module GraphMatching
                     puts "    adjacent: #{stop}"
 
                     # is it matched?
-                    if m.any? { |mi| mi.include?(stop) && mi.include?(vi) }
+                    if matched?([stop, vi], m)
                       #     i. If so, follow that edge to a vertex in U
                       #       a. Label the U-vertex with R
                       puts "    r-label: #{stop}"
@@ -185,6 +164,10 @@ module GraphMatching
 
     def assert_disjoint(u, v)
       raise "Expected sets to be disjoint" unless u.disjoint?(v)
+    end
+
+    def matched?(edge, matching)
+      matching.any? { |e| e.include?(edge[0]) && e.include?(edge[1]) }
     end
 
   end
