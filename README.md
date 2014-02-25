@@ -24,7 +24,7 @@ g.maximum_cardinality_matching
 #=> #<Set: {['alice', 'don'], ['christine', 'bob']}>
 ```
 
-- Videos
+- Videos by [Derrick Stolee][8]
     - [The Augmenting Path Algorithm for Bipartite Matching][1]
     - [The Augmenting Path Algorithm (Example)][2]
 
@@ -42,3 +42,4 @@ Glossary
 [5]: http://en.wikipedia.org/wiki/Matching_%28graph_theory%29#In_unweighted_bipartite_graphs
 [6]: http://en.wikipedia.org/wiki/Matching_%28graph_theory%29
 [7]: http://en.wikipedia.org/wiki/Graph_theory
+[8]: http://www.math.uiuc.edu/~stolee/
