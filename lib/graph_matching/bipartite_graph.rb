@@ -43,7 +43,7 @@ module GraphMatching
         # 2. While there are unmarked R-vertexes
         unmarked_r = label_r
         while augmenting_path.nil? && !unmarked_r.empty?
-          start = unmarked_r.first
+          start = unmarked_r.to_a.sample
           mark_r.add(start)
           puts "r-mark: #{start}"
 
@@ -70,37 +70,39 @@ module GraphMatching
                   augmenting_path = [vi, start]
                   puts "  augmenting path: #{augmenting_path.inspect}"
                 else
-                  vi_edges.each do |stop|
-                    puts "    adjacent: #{stop}"
 
-                    # is it matched?
-                    if matched?([stop, vi], m)
-                      #     i. If so, follow that edge to a vertex in U
-                      #       a. Label the U-vertex with R
-                      puts "    r-label: #{stop}"
-                      label_r.add(stop)
-                      predecessor[stop] = vi
-
-                      #       b. Stop.  Return to step 2
-                    else
-                      #     ii. If not,
-                      #       a. Backtrack to construct an augmenting path
-                      #       a. Augment the matching and return to step 1
-                      puts "    woot. we found an augmenting path. backtracking .."
-                      augmenting_path = [vi]
-                      puts "    predecessors: #{predecessor.inspect}"
-                      while predecessor.has_key?(augmenting_path.last)
-                        augmenting_path.push(predecessor[augmenting_path.last])
-                      end
-                      puts "    augmenting path: #{augmenting_path.inspect}"
-                      break
+                  # is there a matched edge?
+                  matched_edge_found = false
+                  vi_edges.each do |ui|
+                    if matched?([ui, vi], m)
+                      # follow that edge to a vertex in U and label the U-vertex with R
+                      puts "    r-label: #{ui}"
+                      label_r.add(ui)
+                      predecessor[ui] = vi
+                      matched_edge_found = true
                     end
+                  end
+
+                  # If any matched edges were found, return to step 2.
+                  unless matched_edge_found
+                    # No matched edges were found, therefore we have
+                    # found an augmenting path.  Backtrack to construct
+                    # the augmenting path, augment the matching, and
+                    # return to step 1.
+                    puts "    found augmenting path. backtracking .."
+                    augmenting_path = [vi]
+                    puts "    predecessors: #{predecessor.inspect}"
+                    while predecessor.has_key?(augmenting_path.last)
+                      augmenting_path.push(predecessor[augmenting_path.last])
+                    end
+                    puts "    augmenting path: #{augmenting_path.inspect}"
                   end
                 end
 
-                if !augmenting_path.nil?
+                unless augmenting_path.nil?
                   break
                 end
+
               end
             end
           end
@@ -112,20 +114,32 @@ module GraphMatching
           puts "Unable to find an augmenting path.  We're done!"
           break
         else
-          raise "invalid path" unless augmenting_path.length >= 2
-          new_matching = Set.new
-          augmenting_path_edges = Set.new
+          raise "invalid path: must have length of at least two" unless augmenting_path.length >= 2
+          augmenting_path_edges = []
           0.upto(augmenting_path.length - 2).each do |j|
-            augmenting_path_edges.add([augmenting_path[j], augmenting_path[j + 1]])
+            augmenting_path_edges << [augmenting_path[j], augmenting_path[j + 1]]
           end
-          puts "augmenting the matching with #{(augmenting_path_edges - m).inspect}"
-          m.merge(augmenting_path_edges - m)
+          raise "invalid augmenting path: must have odd length" unless augmenting_path_edges.length.odd?
+          puts "augmenting the matching"
+          augmenting_path_edges.each_with_index do |edge, ix|
+            if ix.even?
+              m.add(edge)
+            else
+              m.delete_if { |e| array_match?(e, edge) }
+            end
+          end
         end
 
         stage += 1
       end
 
+      assert_valid_matching(m)
+
       m
+    end
+
+    def array_match?(a, b)
+      a.sort == b.sort
     end
 
     # `partition` either returns two disjoint proper subsets
@@ -164,6 +178,14 @@ module GraphMatching
 
     def assert_disjoint(u, v)
       raise "Expected sets to be disjoint" unless u.disjoint?(v)
+    end
+
+    def assert_valid_matching(m)
+      flat = m.to_a.flatten
+      if flat.length != flat.uniq.length
+        $stderr.puts "Invalid matching: #{m.inspect}"
+        raise "Invalid matching: A vertex appears more than once. "
+      end
     end
 
     def matched?(edge, matching)

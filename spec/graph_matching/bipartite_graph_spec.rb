@@ -33,7 +33,7 @@ describe GraphMatching::BipartiteGraph do
       end
     end
 
-    context 'non-trivial graph' do
+    context 'complete bigraph with four vertexes' do
       it 'returns the expected set' do
         g.add_edge('u1', 'v1')
         g.add_edge('u1', 'v2')
@@ -42,6 +42,46 @@ describe GraphMatching::BipartiteGraph do
         m = g.maximum_cardinality_matching
         expect(m.size).to eq(2)
         expect(m.to_a.flatten).to match_array(%w[u1 u2 v1 v2])
+
+        # It is easy to see that there are two correct results:
+        outcomes = [
+          RGL::AdjacencyGraph['u1','v1', 'u2','v2'],
+          RGL::AdjacencyGraph['u1','v2', 'u2','v1']
+        ]
+        reconstructed = RGL::AdjacencyGraph.new
+        m.each { |edge| reconstructed.add_edge(*edge) }
+        expect(outcomes).to include(reconstructed)
+      end
+    end
+
+    # The following example is by Derrick Stolee
+    # http://www.youtube.com/watch?v=C9c8zEZXboA
+    context 'incomplete bigraph with twelve vertexes' do
+      it 'returns the expected set' do
+        edges = [
+          [1,8],
+          [2,9], [2,10],
+          [3,7], [3,9], [3,12],
+          [4,8], [4,10],
+          [5,10], [5,11],
+          [6,11]
+        ]
+        edges.each { |e| g.add_edge(*e) }
+        m = g.maximum_cardinality_matching
+        puts m.inspect
+        expect(m.size).to eq(5)
+
+        # There are 5 correct results:
+        outcomes = [
+          RGL::AdjacencyGraph[1,8, 2,9, 3,7, 5,10, 6,11],
+          RGL::AdjacencyGraph[1,8, 2,9, 3,7, 4,10, 5,11],
+          RGL::AdjacencyGraph[1,8, 2,9, 3,7, 4,10, 6,11],
+          RGL::AdjacencyGraph[1,8, 2,9, 3,12, 4,10, 5,11],
+          RGL::AdjacencyGraph[2,9, 3,7, 4,8, 5,10, 6,11]
+        ]
+        reconstructed = RGL::AdjacencyGraph.new
+        m.each { |edge| reconstructed.add_edge(*edge) }
+        expect(outcomes).to include(reconstructed)
       end
     end
   end
