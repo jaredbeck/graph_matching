@@ -138,10 +138,6 @@ module GraphMatching
       m
     end
 
-    def array_match?(a, b)
-      a.sort == b.sort
-    end
-
     # `partition` either returns two disjoint proper subsets
     # of vertexes or raises a NotBipartiteError
     def partition
@@ -160,20 +156,13 @@ module GraphMatching
 
   private
 
-    def examine_edge_for_partition(from, to, u, v)
-      if u.include?(from)
-        add_to_set(v, vertex: to, fail_if_in: u)
-      elsif v.include?(from)
-        add_to_set(u, vertex: to, fail_if_in: v)
-      else
-        u.add(from)
-        v.add(to)
-      end
-    end
-
     def add_to_set(set, vertex:, fail_if_in:)
       raise NotBipartiteError if fail_if_in.include?(vertex)
       set.add(vertex)
+    end
+
+    def array_match?(a, b)
+      a.sort == b.sort
     end
 
     def assert_disjoint(u, v)
@@ -185,6 +174,17 @@ module GraphMatching
       if flat.length != flat.uniq.length
         $stderr.puts "Invalid matching: #{m.inspect}"
         raise "Invalid matching: A vertex appears more than once. "
+      end
+    end
+
+    def examine_edge_for_partition(from, to, u, v)
+      if u.include?(from)
+        add_to_set(v, vertex: to, fail_if_in: u)
+      elsif v.include?(from)
+        add_to_set(u, vertex: to, fail_if_in: v)
+      else
+        u.add(from)
+        v.add(to)
       end
     end
 
