@@ -34,19 +34,15 @@ describe GraphMatching::BipartiteGraph do
     end
 
     context 'complete bigraph with four vertexes' do
-      it 'returns the expected set' do
-        g.add_edge('u1', 'v1')
-        g.add_edge('u1', 'v2')
-        g.add_edge('u2', 'v1')
-        g.add_edge('u2', 'v2')
+      let(:edges) { [[1,3], [1,4], [2,3], [2,4]] }
+
+      it 'returns one of the two correct results' do
+        edges.each { |e| g.add_edge(*e) }
         m = g.maximum_cardinality_matching
         expect(m.size).to eq(2)
-        expect(m.to_a.flatten).to match_array(%w[u1 u2 v1 v2])
-
-        # It is easy to see that there are two correct results:
         outcomes = [
-          RGL::AdjacencyGraph['u1','v1', 'u2','v2'],
-          RGL::AdjacencyGraph['u1','v2', 'u2','v1']
+          RGL::AdjacencyGraph[1,3, 2,4],
+          RGL::AdjacencyGraph[1,4, 2,3]
         ]
         reconstructed = RGL::AdjacencyGraph.new
         m.each { |edge| reconstructed.add_edge(*edge) }
@@ -57,8 +53,8 @@ describe GraphMatching::BipartiteGraph do
     # The following example is by Derrick Stolee
     # http://www.youtube.com/watch?v=C9c8zEZXboA
     context 'incomplete bigraph with twelve vertexes' do
-      it 'returns the expected set' do
-        edges = [
+      let(:edges) {
+        [
           [1,8],
           [2,9], [2,10],
           [3,7], [3,9], [3,12],
@@ -66,12 +62,13 @@ describe GraphMatching::BipartiteGraph do
           [5,10], [5,11],
           [6,11]
         ]
+      }
+
+      it 'returns one of the five correct results' do
         edges.each { |e| g.add_edge(*e) }
         m = g.maximum_cardinality_matching
         puts m.inspect
         expect(m.size).to eq(5)
-
-        # There are 5 correct results:
         outcomes = [
           RGL::AdjacencyGraph[1,8, 2,9, 3,7, 5,10, 6,11],
           RGL::AdjacencyGraph[1,8, 2,9, 3,7, 4,10, 5,11],
