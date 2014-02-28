@@ -15,6 +15,10 @@ module GraphMatching
   class BipartiteGraph < Graph
     include Explainable
 
+    def vertices_adjacent_to(vertex, except: [])
+      adjacent_vertices(vertex) - except
+    end
+
     # `maximum_cardinality_matching` returns a `Set` of arrays,
     # each representing an edge in the matching.  The augmenting
     # path algorithm is used.
@@ -49,7 +53,7 @@ module GraphMatching
           t.add(vi)
           predecessors[vi] = start
 
-          adj_u = adjacent_vertices(vi).reject { |vie| vie == start }
+          adj_u = vertices_adjacent_to(vi, except: [start])
           if adj_u.empty?
             log("Vertex #{vi} has no adjacent vertexes, so we found an augmenting path")
             aug_path = [vi, start]
