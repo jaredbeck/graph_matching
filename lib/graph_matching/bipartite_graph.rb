@@ -53,25 +53,23 @@ module GraphMatching
             label_t.add(vi)
             predecessors[vi] = start
 
-            vertexes_adjacent_to_vi = adjacent_vertices(vi).reject { |vie| vie == start }
-            if vertexes_adjacent_to_vi.empty?
+            adjacent_u_vertexes = adjacent_vertices(vi).reject { |vie| vie == start }
+            if adjacent_u_vertexes.empty?
               log("  vi has no adjacent vertexes, so we found an augmenting path")
               augmenting_path = [vi, start]
             else
 
               # Follow each matched edge to a vertex in U
               # and label the U-vertex with R
-              matched_edge_found = false
-              matched_adjacent_to(vi, vertexes_adjacent_to_vi, m).each do |ui|
+              matched_adjacent_u_vertexes = matched_adjacent_to(vi, adjacent_u_vertexes, m).each do |ui|
                 log("    r-label: #{ui}")
                 label_r.add(ui)
                 predecessors[ui] = vi
-                matched_edge_found = true
               end
 
               # If there are no matched edges, backtrack to
               # construct the augmenting path.
-              unless matched_edge_found
+              if matched_adjacent_u_vertexes.empty?
                 augmenting_path = backtrack_from(vi, predecessors)
               end
             end
