@@ -1,4 +1,5 @@
 require_relative 'graph'
+require_relative 'matching'
 require 'rgl/traversal'
 
 module GraphMatching
@@ -18,7 +19,7 @@ module GraphMatching
     # path algorithm is used.
     #
     def maximum_cardinality_matching
-      m = Set.new # the matching
+      m = Matching.new
       u, v = partition # complementary proper subsets of the vertexes
       puts "partitions: #{u.inspect} #{v.inspect}"
 
