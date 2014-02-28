@@ -28,6 +28,15 @@ g.maximum_cardinality_matching
     - [The Augmenting Path Algorithm for Bipartite Matching][1]
     - [The Augmenting Path Algorithm (Example)][2]
 
+Explain
+-------
+
+Set `ENV['EXPLAIN']` for detailed output, tracing the algorithms.
+
+```bash
+EXPLAIN=true bundle exec rspec
+```
+
 Glossary
 --------
 

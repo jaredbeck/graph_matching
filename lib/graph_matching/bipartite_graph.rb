@@ -1,3 +1,4 @@
+require_relative 'explainable'
 require_relative 'graph'
 require_relative 'matching'
 require 'rgl/traversal'
@@ -11,6 +12,7 @@ module GraphMatching
   # be divided into two disjoint sets U and V such that every
   # edge connects a vertex in U to one in V.
   class BipartiteGraph < Graph
+    include Explainable
 
     MAX_STAGES = 100
 
@@ -20,13 +22,13 @@ module GraphMatching
     #
     def maximum_cardinality_matching
       m = Matching.new
-      u, v = partition # complementary proper subsets of the vertexes
-      puts "partitions: #{u.inspect} #{v.inspect}"
+      u, v = partition
+      debug("partitions: #{u.inspect} #{v.inspect}")
 
       # For each stage (until no augmenting path is found)
       stage = 0
       while stage <= MAX_STAGES do
-        puts "\nbegin stage #{stage}: #{m.inspect}"
+        debug("\nbegin stage #{stage}: #{m.inspect}")
 
         # 0. Clear all labels and marks
         label_t = Set.new
@@ -38,18 +40,18 @@ module GraphMatching
         # 1. Label unmatched vertexes in U with label R
         # These R-vertexes are candidates for the start of an augmenting path.
         u.each { |ui| label_r.add(ui) if m.none? { |mi| mi.include?(ui) } }
-        puts "label r: #{label_r.inspect}"
+        debug("label r: #{label_r.inspect}")
 
         # 2. While there are unmarked R-vertexes
         unmarked_r = label_r
         while augmenting_path.nil? && !unmarked_r.empty?
           start = unmarked_r.to_a.sample
           mark_r.add(start)
-          puts "r-mark: #{start}"
+          debug("r-mark: #{start}")
 
           # 3. Follow the unmatched edges (if any) to vertexes in V
           each_adjacent(start) do |vi|
-            puts "  adjacent: #{vi}"
+            debug("  adjacent: #{vi}")
             if !matched?([start, vi], m)
 
               # 4. Does the vertex in V have label T?
@@ -58,15 +60,15 @@ module GraphMatching
                 raise "  Found a T-vertex.  What next?"
               else
                 #   B. If no, label with T.  Now, is it matched?
-                puts "  t-label: #{vi}"
+                debug("  t-label: #{vi}")
                 label_t.add(vi)
                 predecessor[vi] = start
 
                 vi_edges = adjacent_vertices(vi).reject { |vie| vie == start }
                 if vi_edges.empty?
-                  puts "  vi_edges is empty, so we found an augmenting path?"
+                  debug("  vi_edges is empty, so we found an augmenting path?")
                   augmenting_path = [vi, start]
-                  puts "  augmenting path: #{augmenting_path.inspect}"
+                  debug("  augmenting path: #{augmenting_path.inspect}")
                 else
 
                   # is there a matched edge?
@@ -74,7 +76,7 @@ module GraphMatching
                   vi_edges.each do |ui|
                     if matched?([ui, vi], m)
                       # follow that edge to a vertex in U and label the U-vertex with R
-                      puts "    r-label: #{ui}"
+                      debug("    r-label: #{ui}")
                       label_r.add(ui)
                       predecessor[ui] = vi
                       matched_edge_found = true
@@ -87,13 +89,13 @@ module GraphMatching
                     # found an augmenting path.  Backtrack to construct
                     # the augmenting path, augment the matching, and
                     # return to step 1.
-                    puts "    found augmenting path. backtracking .."
+                    debug("    found augmenting path. backtracking ..")
                     augmenting_path = [vi]
-                    puts "    predecessors: #{predecessor.inspect}"
+                    debug("    predecessors: #{predecessor.inspect}")
                     while predecessor.has_key?(augmenting_path.last)
                       augmenting_path.push(predecessor[augmenting_path.last])
                     end
-                    puts "    augmenting path: #{augmenting_path.inspect}"
+                    debug("    augmenting path: #{augmenting_path.inspect}")
                   end
                 end
 
@@ -109,7 +111,7 @@ module GraphMatching
         end
 
         if augmenting_path.nil?
-          puts "Unable to find an augmenting path.  We're done!"
+          debug("Unable to find an augmenting path.  We're done!")
           break
         else
           m.augment(augmenting_path)
@@ -123,8 +125,8 @@ module GraphMatching
       m
     end
 
-    # `partition` either returns two disjoint proper subsets
-    # of vertexes or raises a NotBipartiteError
+    # `partition` either returns two disjoint (complementary)
+    # proper subsets of vertexes or raises a NotBipartiteError
     def partition
       u = Set.new
       v = Set.new

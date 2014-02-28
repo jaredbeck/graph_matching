@@ -67,7 +67,6 @@ describe GraphMatching::BipartiteGraph do
       it 'returns one of the five correct results' do
         edges.each { |e| g.add_edge(*e) }
         m = g.maximum_cardinality_matching
-        puts m.inspect
         expect(m.size).to eq(5)
         outcomes = [
           RGL::AdjacencyGraph[1,8, 2,9, 3,7, 5,10, 6,11],

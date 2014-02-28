@@ -1,7 +1,9 @@
+require_relative 'explainable'
 require 'set'
 
 module GraphMatching
   class Matching < Set
+    include Explainable
 
     def assert_valid
       flat = to_a.flatten
@@ -18,7 +20,7 @@ module GraphMatching
         augmenting_path_edges << [augmenting_path[j], augmenting_path[j + 1]]
       end
       raise "invalid augmenting path: must have odd length" unless augmenting_path_edges.length.odd?
-      puts "augmenting the matching"
+      debug("augmenting the matching")
       augmenting_path_edges.each_with_index do |edge, ix|
         if ix.even?
           add(edge)
