@@ -1,5 +1,6 @@
 require_relative 'explainable'
 require_relative 'graph'
+require_relative 'label_set'
 require_relative 'matching'
 require 'rgl/traversal'
 
@@ -28,41 +29,37 @@ module GraphMatching
     # by clearing all labels and marks
     def mcm_stage(m, u)
       log("\nbegin stage: #{m.inspect}")
-      label_t = Set.new
-      label_r = Set.new
-      mark_r = Set.new
+      label_t = LabelSet.new([], 'T')
+      mark_r = LabelSet.new([], 'mark')
       predecessors = Hash.new
       augmenting_path = nil
 
       # Label unmatched vertexes in U with label R.  These R-vertexes
       # are candidates for the start of an augmenting path.
-      u.each { |ui| label_r.add(ui) if m.none? { |mi| mi.include?(ui) } }
-      log("label r: #{label_r.inspect}")
+      label_r = LabelSet.new(m.unmatched_vertexes_in(u), 'R')
+      log("label R: #{label_r.inspect}")
 
       # While there are unmarked R-vertexes
       unmarked_r = label_r
       while augmenting_path.nil? && !unmarked_r.empty?
         start = unmarked_r.to_a.sample
         mark_r.add(start)
-        log("r-mark: #{start}")
 
         # Follow the unmatched edges (if any) to vertexes in V
         # ignoring any V-vertexes already labeled T
         unmatched_unlabled_adjacent_to(start, m, label_t).each do |vi|
-          log("  t-label: #{vi}")
           label_t.add(vi)
           predecessors[vi] = start
 
           adjacent_u_vertexes = adjacent_vertices(vi).reject { |vie| vie == start }
           if adjacent_u_vertexes.empty?
-            log("  vi has no adjacent vertexes, so we found an augmenting path")
+            log("vi has no adjacent vertexes, so we found an augmenting path")
             augmenting_path = [vi, start]
           else
 
             # Follow each matched edge to a vertex in U
             # and label the U-vertex with R
             matched_adjacent_u_vertexes = matched_adjacent_to(vi, adjacent_u_vertexes, m).each do |ui|
-              log("    r-label: #{ui}")
               label_r.add(ui)
               predecessors[ui] = vi
             end

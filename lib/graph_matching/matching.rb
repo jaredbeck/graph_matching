@@ -30,6 +30,10 @@ module GraphMatching
       any? { |e| array_match?(e, edge) }
     end
 
+    def unmatched_vertexes_in(set)
+      set.select { |v| none? { |edge| edge.include?(v) } }
+    end
+
     # `validate` is a simple sanity check.  If all is
     # well, it returns `self`.
     def validate
