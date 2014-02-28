@@ -29,59 +29,52 @@ module GraphMatching
     # by clearing all labels and marks
     def mcm_stage(m, u)
       log("\nbegin stage: #{m.inspect}")
-      label_t = LabelSet.new([], 'T')
-      mark_r = LabelSet.new([], 'mark')
+      t = LabelSet.new([], 'T')
+      marked = LabelSet.new([], 'mark')
       predecessors = Hash.new
-      augmenting_path = nil
+      aug_path = nil
 
       # Label unmatched vertexes in U with label R.  These R-vertexes
       # are candidates for the start of an augmenting path.
-      label_r = LabelSet.new(m.unmatched_vertexes_in(u), 'R')
-      log("label R: #{label_r.inspect}")
+      unmarked = r = LabelSet.new(m.unmatched_vertexes_in(u), 'R')
+      log("label R: #{r.inspect}")
 
       # While there are unmarked R-vertexes
-      unmarked_r = label_r
-      while augmenting_path.nil? && !unmarked_r.empty?
-        start = unmarked_r.to_a.sample
-        mark_r.add(start)
+      while aug_path.nil? && start = unmarked.to_a.sample
+        marked.add(start)
 
         # Follow the unmatched edges (if any) to vertexes in V
         # ignoring any V-vertexes already labeled T
-        unmatched_unlabled_adjacent_to(start, m, label_t).each do |vi|
-          label_t.add(vi)
+        unmatched_unlabled_adjacent_to(start, m, t).each do |vi|
+          t.add(vi)
           predecessors[vi] = start
 
-          adjacent_u_vertexes = adjacent_vertices(vi).reject { |vie| vie == start }
-          if adjacent_u_vertexes.empty?
-            log("vi has no adjacent vertexes, so we found an augmenting path")
-            augmenting_path = [vi, start]
+          adj_u = adjacent_vertices(vi).reject { |vie| vie == start }
+          if adj_u.empty?
+            log("Vertex #{vi} has no adjacent vertexes, so we found an augmenting path")
+            aug_path = [vi, start]
           else
 
-            # Follow each matched edge to a vertex in U
-            # and label the U-vertex with R
-            matched_adjacent_u_vertexes = matched_adjacent_to(vi, adjacent_u_vertexes, m).each do |ui|
-              label_r.add(ui)
+            # If there are matched edges, follow each to a vertex
+            # in U and label the U-vertex with R.  Otherwise,
+            # backtrack to construct an augmenting path.
+            adj_u_in_m = matched_adjacent_to(vi, adj_u, m).each do |ui|
+              r.add(ui)
               predecessors[ui] = vi
             end
 
-            # If there are no matched edges, backtrack to
-            # construct the augmenting path.
-            if matched_adjacent_u_vertexes.empty?
-              augmenting_path = backtrack_from(vi, predecessors)
+            if adj_u_in_m.empty?
+              aug_path = backtrack_from(vi, predecessors)
             end
           end
 
-          break unless augmenting_path.nil?
+          break unless aug_path.nil?
         end
 
-        unmarked_r = label_r - mark_r
+        unmarked = r - marked
       end
 
-      if augmenting_path.nil?
-        m.validate
-      else
-        mcm_stage(m.augment(augmenting_path), u)
-      end
+      aug_path.nil? ? m.validate : mcm_stage(m.augment(aug_path), u)
     end
 
     # `partition` either returns two disjoint (complementary)
@@ -115,8 +108,8 @@ module GraphMatching
       adjacent_vertices(vertex).reject { |a| matching.matched?([vertex, a]) }
     end
 
-    def unmatched_unlabled_adjacent_to(vertex, matching, label_t)
-      unmatched_adjacent_to(vertex, matching).reject { |v| label_t.include?(v) }
+    def unmatched_unlabled_adjacent_to(vertex, matching, labels)
+      unmatched_adjacent_to(vertex, matching).reject { |v| labels.include?(v) }
     end
 
     def assert_disjoint(u, v)
