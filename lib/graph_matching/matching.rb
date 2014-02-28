@@ -14,13 +14,14 @@ module GraphMatching
     end
 
     def augment(augmenting_path)
+      log("augmenting the matching")
+      log("augmenting path: #{augmenting_path.inspect}")
       raise "invalid path: must have length of at least two" unless augmenting_path.length >= 2
       augmenting_path_edges = []
       0.upto(augmenting_path.length - 2).each do |j|
         augmenting_path_edges << [augmenting_path[j], augmenting_path[j + 1]]
       end
       raise "invalid augmenting path: must have odd length" unless augmenting_path_edges.length.odd?
-      log("augmenting the matching")
       augmenting_path_edges.each_with_index do |edge, ix|
         if ix.even?
           add(edge)

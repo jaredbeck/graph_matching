@@ -53,31 +53,25 @@ module GraphMatching
             label_t.add(vi)
             predecessors[vi] = start
 
-            vi_edges = adjacent_vertices(vi).reject { |vie| vie == start }
-            if vi_edges.empty?
-              log("  vi_edges is empty, so we found an augmenting path?")
+            vertexes_adjacent_to_vi = adjacent_vertices(vi).reject { |vie| vie == start }
+            if vertexes_adjacent_to_vi.empty?
+              log("  vi has no adjacent vertexes, so we found an augmenting path")
               augmenting_path = [vi, start]
-              log("  augmenting path: #{augmenting_path.inspect}")
             else
 
-              # is there a matched edge?
+              # Follow each matched edge to a vertex in U
+              # and label the U-vertex with R
               matched_edge_found = false
-              vi_edges.each do |ui|
-                if m.matched?([ui, vi])
-                  # follow that edge to a vertex in U and label the U-vertex with R
-                  log("    r-label: #{ui}")
-                  label_r.add(ui)
-                  predecessors[ui] = vi
-                  matched_edge_found = true
-                end
+              matched_adjacent_to(vi, vertexes_adjacent_to_vi, m).each do |ui|
+                log("    r-label: #{ui}")
+                label_r.add(ui)
+                predecessors[ui] = vi
+                matched_edge_found = true
               end
 
-              # If any matched edges were found, return to step 2.
+              # If there are no matched edges, backtrack to
+              # construct the augmenting path.
               unless matched_edge_found
-                # No matched edges were found, therefore we have
-                # found an augmenting path.  Backtrack to construct
-                # the augmenting path, augment the matching, and
-                # return to step 1.
                 augmenting_path = backtrack_from(vi, predecessors)
               end
             end
@@ -124,6 +118,10 @@ module GraphMatching
     def add_to_set(set, vertex:, fail_if_in:)
       raise NotBipartiteError if fail_if_in.include?(vertex)
       set.add(vertex)
+    end
+
+    def matched_adjacent_to(vertex, adjacent_vertexes, matching)
+      adjacent_vertexes.select { |x| matching.matched?([x, vertex]) }
     end
 
     def unmatched_adjacent_to(vertex, matching)
