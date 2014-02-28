@@ -47,54 +47,52 @@ module GraphMatching
           log("r-mark: #{start}")
 
           # 3. Follow the unmatched edges (if any) to vertexes in V
-          each_adjacent(start) do |vi|
+          unmatched_adjacent_to(start, m).each do |vi|
             log("  adjacent: #{vi}")
-            if !m.matched?([start, vi])
 
-              # 4. Does the vertex in V have label T?
-              if label_t.include?(vi)
-                #   A. If yes, do what?
-                raise "  Found a T-vertex.  What next?"
+            # 4. Does the vertex in V have label T?
+            if label_t.include?(vi)
+              #   A. If yes, do what?
+              raise "  Found a T-vertex.  What next?"
+            else
+              #   B. If no, label with T.  Now, is it matched?
+              log("  t-label: #{vi}")
+              label_t.add(vi)
+              predecessors[vi] = start
+
+              vi_edges = adjacent_vertices(vi).reject { |vie| vie == start }
+              if vi_edges.empty?
+                log("  vi_edges is empty, so we found an augmenting path?")
+                augmenting_path = [vi, start]
+                log("  augmenting path: #{augmenting_path.inspect}")
               else
-                #   B. If no, label with T.  Now, is it matched?
-                log("  t-label: #{vi}")
-                label_t.add(vi)
-                predecessors[vi] = start
 
-                vi_edges = adjacent_vertices(vi).reject { |vie| vie == start }
-                if vi_edges.empty?
-                  log("  vi_edges is empty, so we found an augmenting path?")
-                  augmenting_path = [vi, start]
-                  log("  augmenting path: #{augmenting_path.inspect}")
-                else
-
-                  # is there a matched edge?
-                  matched_edge_found = false
-                  vi_edges.each do |ui|
-                    if m.matched?([ui, vi])
-                      # follow that edge to a vertex in U and label the U-vertex with R
-                      log("    r-label: #{ui}")
-                      label_r.add(ui)
-                      predecessors[ui] = vi
-                      matched_edge_found = true
-                    end
-                  end
-
-                  # If any matched edges were found, return to step 2.
-                  unless matched_edge_found
-                    # No matched edges were found, therefore we have
-                    # found an augmenting path.  Backtrack to construct
-                    # the augmenting path, augment the matching, and
-                    # return to step 1.
-                    augmenting_path = backtrack_from(vi, predecessors)
+                # is there a matched edge?
+                matched_edge_found = false
+                vi_edges.each do |ui|
+                  if m.matched?([ui, vi])
+                    # follow that edge to a vertex in U and label the U-vertex with R
+                    log("    r-label: #{ui}")
+                    label_r.add(ui)
+                    predecessors[ui] = vi
+                    matched_edge_found = true
                   end
                 end
 
-                unless augmenting_path.nil?
-                  break
+                # If any matched edges were found, return to step 2.
+                unless matched_edge_found
+                  # No matched edges were found, therefore we have
+                  # found an augmenting path.  Backtrack to construct
+                  # the augmenting path, augment the matching, and
+                  # return to step 1.
+                  augmenting_path = backtrack_from(vi, predecessors)
                 end
-
               end
+
+              unless augmenting_path.nil?
+                break
+              end
+
             end
           end
 
@@ -135,6 +133,10 @@ module GraphMatching
     def add_to_set(set, vertex:, fail_if_in:)
       raise NotBipartiteError if fail_if_in.include?(vertex)
       set.add(vertex)
+    end
+
+    def unmatched_adjacent_to(vertex, matching)
+      adjacent_vertices(vertex).reject { |a| matching.matched?([vertex, a]) }
     end
 
     def assert_disjoint(u, v)
