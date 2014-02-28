@@ -31,7 +31,7 @@ module GraphMatching
         label_t = Set.new
         label_r = Set.new
         mark_r = Set.new
-        predecessor = Hash.new
+        predecessors = Hash.new
         augmenting_path = nil
 
         # 1. Label unmatched vertexes in U with label R
@@ -59,7 +59,7 @@ module GraphMatching
                 #   B. If no, label with T.  Now, is it matched?
                 debug("  t-label: #{vi}")
                 label_t.add(vi)
-                predecessor[vi] = start
+                predecessors[vi] = start
 
                 vi_edges = adjacent_vertices(vi).reject { |vie| vie == start }
                 if vi_edges.empty?
@@ -75,7 +75,7 @@ module GraphMatching
                       # follow that edge to a vertex in U and label the U-vertex with R
                       debug("    r-label: #{ui}")
                       label_r.add(ui)
-                      predecessor[ui] = vi
+                      predecessors[ui] = vi
                       matched_edge_found = true
                     end
                   end
@@ -86,13 +86,7 @@ module GraphMatching
                     # found an augmenting path.  Backtrack to construct
                     # the augmenting path, augment the matching, and
                     # return to step 1.
-                    debug("    found augmenting path. backtracking ..")
-                    augmenting_path = [vi]
-                    debug("    predecessors: #{predecessor.inspect}")
-                    while predecessor.has_key?(augmenting_path.last)
-                      augmenting_path.push(predecessor[augmenting_path.last])
-                    end
-                    debug("    augmenting path: #{augmenting_path.inspect}")
+                    augmenting_path = backtrack_from(vi, predecessors)
                   end
                 end
 
@@ -145,6 +139,17 @@ module GraphMatching
 
     def assert_disjoint(u, v)
       raise "Expected sets to be disjoint" unless u.disjoint?(v)
+    end
+
+    def backtrack_from(end_vertex, predecessors)
+      debug("    found augmenting path. backtracking ..")
+      augmenting_path = [end_vertex]
+      debug("    predecessors: #{predecessors.inspect}")
+      while predecessors.has_key?(augmenting_path.last)
+        augmenting_path.push(predecessors[augmenting_path.last])
+      end
+      debug("    augmenting path: #{augmenting_path.inspect}")
+      augmenting_path
     end
 
     def examine_edge_for_partition(from, to, u, v)
