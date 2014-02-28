@@ -21,11 +21,11 @@ module GraphMatching
     def maximum_cardinality_matching
       m = Matching.new
       u, v = partition
-      debug("partitions: #{u.inspect} #{v.inspect}")
+      log("partitions: #{u.inspect} #{v.inspect}")
 
       # For each stage (until no augmenting path is found)
       while true do
-        debug("\nbegin stage: #{m.inspect}")
+        log("\nbegin stage: #{m.inspect}")
 
         # 0. Clear all labels and marks
         label_t = Set.new
@@ -37,18 +37,18 @@ module GraphMatching
         # 1. Label unmatched vertexes in U with label R
         # These R-vertexes are candidates for the start of an augmenting path.
         u.each { |ui| label_r.add(ui) if m.none? { |mi| mi.include?(ui) } }
-        debug("label r: #{label_r.inspect}")
+        log("label r: #{label_r.inspect}")
 
         # 2. While there are unmarked R-vertexes
         unmarked_r = label_r
         while augmenting_path.nil? && !unmarked_r.empty?
           start = unmarked_r.to_a.sample
           mark_r.add(start)
-          debug("r-mark: #{start}")
+          log("r-mark: #{start}")
 
           # 3. Follow the unmatched edges (if any) to vertexes in V
           each_adjacent(start) do |vi|
-            debug("  adjacent: #{vi}")
+            log("  adjacent: #{vi}")
             if !matched?([start, vi], m)
 
               # 4. Does the vertex in V have label T?
@@ -57,15 +57,15 @@ module GraphMatching
                 raise "  Found a T-vertex.  What next?"
               else
                 #   B. If no, label with T.  Now, is it matched?
-                debug("  t-label: #{vi}")
+                log("  t-label: #{vi}")
                 label_t.add(vi)
                 predecessors[vi] = start
 
                 vi_edges = adjacent_vertices(vi).reject { |vie| vie == start }
                 if vi_edges.empty?
-                  debug("  vi_edges is empty, so we found an augmenting path?")
+                  log("  vi_edges is empty, so we found an augmenting path?")
                   augmenting_path = [vi, start]
-                  debug("  augmenting path: #{augmenting_path.inspect}")
+                  log("  augmenting path: #{augmenting_path.inspect}")
                 else
 
                   # is there a matched edge?
@@ -73,7 +73,7 @@ module GraphMatching
                   vi_edges.each do |ui|
                     if matched?([ui, vi], m)
                       # follow that edge to a vertex in U and label the U-vertex with R
-                      debug("    r-label: #{ui}")
+                      log("    r-label: #{ui}")
                       label_r.add(ui)
                       predecessors[ui] = vi
                       matched_edge_found = true
@@ -102,7 +102,7 @@ module GraphMatching
         end
 
         if augmenting_path.nil?
-          debug("Unable to find an augmenting path.  We're done!")
+          log("Unable to find an augmenting path.  We're done!")
           break
         else
           m.augment(augmenting_path)
@@ -142,13 +142,13 @@ module GraphMatching
     end
 
     def backtrack_from(end_vertex, predecessors)
-      debug("    found augmenting path. backtracking ..")
+      log("    found augmenting path. backtracking ..")
       augmenting_path = [end_vertex]
-      debug("    predecessors: #{predecessors.inspect}")
+      log("    predecessors: #{predecessors.inspect}")
       while predecessors.has_key?(augmenting_path.last)
         augmenting_path.push(predecessors[augmenting_path.last])
       end
-      debug("    augmenting path: #{augmenting_path.inspect}")
+      log("    augmenting path: #{augmenting_path.inspect}")
       augmenting_path
     end
 

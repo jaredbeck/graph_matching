@@ -20,7 +20,7 @@ module GraphMatching
         augmenting_path_edges << [augmenting_path[j], augmenting_path[j + 1]]
       end
       raise "invalid augmenting path: must have odd length" unless augmenting_path_edges.length.odd?
-      debug("augmenting the matching")
+      log("augmenting the matching")
       augmenting_path_edges.each_with_index do |edge, ix|
         if ix.even?
           add(edge)

@@ -1,6 +1,6 @@
 module Explainable
 
-  def debug(msg)
+  def log(msg)
     puts msg if ENV['EXPLAIN']
   end
 
