@@ -23,31 +23,30 @@ module GraphMatching
       u, v = partition
       log("partitions: #{u.inspect} #{v.inspect}")
 
-      # For each stage (until no augmenting path is found)
+      # Begin each stage (until no augmenting path is found)
+      # by clearing all labels and marks
       while true do
         log("\nbegin stage: #{m.inspect}")
-
-        # 0. Clear all labels and marks
         label_t = Set.new
         label_r = Set.new
         mark_r = Set.new
         predecessors = Hash.new
         augmenting_path = nil
 
-        # 1. Label unmatched vertexes in U with label R
-        # These R-vertexes are candidates for the start of an augmenting path.
+        # Label unmatched vertexes in U with label R.  These R-vertexes
+        # are candidates for the start of an augmenting path.
         u.each { |ui| label_r.add(ui) if m.none? { |mi| mi.include?(ui) } }
         log("label r: #{label_r.inspect}")
 
-        # 2. While there are unmarked R-vertexes
+        # While there are unmarked R-vertexes
         unmarked_r = label_r
         while augmenting_path.nil? && !unmarked_r.empty?
           start = unmarked_r.to_a.sample
           mark_r.add(start)
           log("r-mark: #{start}")
 
-          # 3. Follow the unmatched edges (if any) to vertexes in V
-          # Ignore V-vertexes already labeled T
+          # Follow the unmatched edges (if any) to vertexes in V
+          # ignoring any V-vertexes already labeled T
           unmatched_unlabled_adjacent_to(start, m, label_t).each do |vi|
             log("  t-label: #{vi}")
             label_t.add(vi)
@@ -90,9 +89,7 @@ module GraphMatching
         end
       end
 
-      m.assert_valid
-
-      m
+      m.validate
     end
 
     # `partition` either returns two disjoint (complementary)

@@ -5,14 +5,6 @@ module GraphMatching
   class Matching < Set
     include Explainable
 
-    def assert_valid
-      flat = to_a.flatten
-      if flat.length != flat.uniq.length
-        $stderr.puts "Invalid matching: #{inspect}"
-        raise "Invalid matching: A vertex appears more than once. "
-      end
-    end
-
     def augment(augmenting_path)
       log("augmenting the matching")
       log("augmenting path: #{augmenting_path.inspect}")
@@ -33,6 +25,17 @@ module GraphMatching
 
     def matched?(edge)
       any? { |e| array_match?(e, edge) }
+    end
+
+    # `validate` is a simple sanity check.  If all is
+    # well, it returns `self`.
+    def validate
+      flat = to_a.flatten
+      if flat.length != flat.uniq.length
+        $stderr.puts "Invalid matching: #{inspect}"
+        raise "Invalid matching: A vertex appears more than once. "
+      end
+      self
     end
 
   private
