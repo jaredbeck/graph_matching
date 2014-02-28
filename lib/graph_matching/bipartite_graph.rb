@@ -134,7 +134,7 @@ module GraphMatching
         stage += 1
       end
 
-      assert_valid_matching(m)
+      m.assert_valid
 
       m
     end
@@ -168,14 +168,6 @@ module GraphMatching
 
     def assert_disjoint(u, v)
       raise "Expected sets to be disjoint" unless u.disjoint?(v)
-    end
-
-    def assert_valid_matching(m)
-      flat = m.to_a.flatten
-      if flat.length != flat.uniq.length
-        $stderr.puts "Invalid matching: #{m.inspect}"
-        raise "Invalid matching: A vertex appears more than once. "
-      end
     end
 
     def examine_edge_for_partition(from, to, u, v)
