@@ -30,6 +30,10 @@ module GraphMatching
       end
     end
 
+    def matched?(edge)
+      any? { |e| array_match?(e, edge) }
+    end
+
   private
 
     def array_match?(a, b)

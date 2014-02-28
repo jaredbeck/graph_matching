@@ -49,7 +49,7 @@ module GraphMatching
           # 3. Follow the unmatched edges (if any) to vertexes in V
           each_adjacent(start) do |vi|
             log("  adjacent: #{vi}")
-            if !matched?([start, vi], m)
+            if !m.matched?([start, vi])
 
               # 4. Does the vertex in V have label T?
               if label_t.include?(vi)
@@ -71,7 +71,7 @@ module GraphMatching
                   # is there a matched edge?
                   matched_edge_found = false
                   vi_edges.each do |ui|
-                    if matched?([ui, vi], m)
+                    if m.matched?([ui, vi])
                       # follow that edge to a vertex in U and label the U-vertex with R
                       log("    r-label: #{ui}")
                       label_r.add(ui)
@@ -161,10 +161,6 @@ module GraphMatching
         u.add(from)
         v.add(to)
       end
-    end
-
-    def matched?(edge, matching)
-      matching.any? { |e| e.include?(edge[0]) && e.include?(edge[1]) }
     end
 
   end
