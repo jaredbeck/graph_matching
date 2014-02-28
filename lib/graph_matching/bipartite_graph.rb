@@ -14,8 +14,6 @@ module GraphMatching
   class BipartiteGraph < Graph
     include Explainable
 
-    MAX_STAGES = 100
-
     # `maximum_cardinality_matching` returns a `Set` of arrays,
     # each representing an edge in the matching.  The augmenting
     # path algorithm is used.
@@ -26,9 +24,8 @@ module GraphMatching
       debug("partitions: #{u.inspect} #{v.inspect}")
 
       # For each stage (until no augmenting path is found)
-      stage = 0
-      while stage <= MAX_STAGES do
-        debug("\nbegin stage #{stage}: #{m.inspect}")
+      while true do
+        debug("\nbegin stage: #{m.inspect}")
 
         # 0. Clear all labels and marks
         label_t = Set.new
@@ -116,8 +113,6 @@ module GraphMatching
         else
           m.augment(augmenting_path)
         end
-
-        stage += 1
       end
 
       m.assert_valid
