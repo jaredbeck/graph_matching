@@ -8,6 +8,7 @@ module GraphMatching
     def augment(augmenting_path)
       log("augmenting the matching")
       log("augmenting path: #{augmenting_path.inspect}")
+
       raise "invalid path: must have length of at least two" unless augmenting_path.length >= 2
       augmenting_path_edges = []
       0.upto(augmenting_path.length - 2).each do |j|
@@ -21,6 +22,8 @@ module GraphMatching
           delete_if { |e| array_match?(e, edge) }
         end
       end
+
+      self
     end
 
     def matched?(edge)
