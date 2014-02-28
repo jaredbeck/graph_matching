@@ -31,7 +31,6 @@ module GraphMatching
         # 0. Clear all labels and marks
         label_t = Set.new
         label_r = Set.new
-        mark_t = Set.new
         mark_r = Set.new
         predecessor = Hash.new
         augmenting_path = nil
@@ -58,11 +57,9 @@ module GraphMatching
                 #   A. If yes, do what?
                 raise "  Found a T-vertex.  What next?"
               else
-                #   B. If no, label with T and mark.  Now, is it matched?
+                #   B. If no, label with T.  Now, is it matched?
                 puts "  t-label: #{vi}"
                 label_t.add(vi)
-                puts "  t-mark: #{vi}"
-                mark_t.add(vi)
                 predecessor[vi] = start
 
                 vi_edges = adjacent_vertices(vi).reject { |vie| vie == start }
