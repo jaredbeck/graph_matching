@@ -11,22 +11,32 @@ Uses data structures and traversal algorithms from the
 Algorithms
 ----------
 
-### Maximum Cardinality Matching in Bipartite Graph
+### Maximum Cardinality Matching in Bipartite Graphs
 
 Uses the [Augmenting Path][5] algorithm.
 
 ```ruby
 require 'graph_matching'
-g = GraphMatching::BipartiteGraph.new
-g.add_edge('alice', 'bob')
-g.add_edge('christine', 'don')
-g.maximum_cardinality_matching
-#=> #<Set: {['alice', 'don'], ['christine', 'bob']}>
+g = GraphMatching::BipartiteGraph[1,3, 1,4, 2,3, 2,4]
+g.maximum_cardinality_matching # two maximum matchings
+#=> #<GraphMatching::Matching: {[3, 1], [4, 2]}>
 ```
 
 - Videos by [Derrick Stolee][8]
     - [The Augmenting Path Algorithm for Bipartite Matching][1]
     - [The Augmenting Path Algorithm (Example)][2]
+
+### Maximum Cardinality Matching in General Graphs
+
+Uses [Edmonds' Blossom][9] algorithm as described in
+[Introduction to Graph Theory][10] (West, 2001, p. 142)
+
+```ruby
+require 'graph_matching'
+g = GraphMatching::Graph[1,2, 1,3, 1,4, 2,3, 2,4, 3,4]
+g.maximum_cardinality_matching # three maximum matchings
+#=> #<GraphMatching::Matching: {[2, 1], [4, 3]}>
+```
 
 Explain
 -------
@@ -44,6 +54,11 @@ Glossary
 - [Graph][7]
 - [Matching][6]
 
+References
+----------
+
+- West, D. B. (2001). Introduction to graph theory. Upper Saddle River, N.J: Prentice Hall.
+
 [1]: http://www.youtube.com/watch?v=ory4WMX0rDU "The Augmenting Path Algorithm for Bipartite Matching"
 [2]: http://www.youtube.com/watch?v=C9c8zEZXboA "The Augmenting Path Algorithm (Example)"
 [3]: http://en.wikipedia.org/wiki/Bipartite_graph
@@ -52,3 +67,4 @@ Glossary
 [6]: http://en.wikipedia.org/wiki/Matching_%28graph_theory%29
 [7]: http://en.wikipedia.org/wiki/Graph_theory
 [8]: http://www.math.uiuc.edu/~stolee/
+[9]: http://en.wikipedia.org/wiki/Blossom_algorithm

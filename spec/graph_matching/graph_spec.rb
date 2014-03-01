@@ -19,4 +19,40 @@ describe GraphMatching::Graph do
       expect(g).to_not be_connected
     end
   end
+
+  describe '#maximum_cardinality_matching' do
+    let(:m) { g.maximum_cardinality_matching }
+
+    context 'empty graph' do
+      it 'returns empty set' do
+        expect(m).to be_empty
+      end
+    end
+
+    context 'single vertex' do
+      it 'returns empty set' do
+        g.add_vertex(double)
+        expect(m).to be_empty
+      end
+    end
+
+    context 'two vertexes' do
+      it 'returns one edge'
+    end
+
+    context 'complete graph with four vertexes' do
+      it 'returns two disjoint edges'
+    end
+
+    context 'non trivial graph' do
+      it 'returns an expected result'
+    end
+
+    context 'disconnected graph' do
+      it 'raises DisconnectedGraphError' do
+        2.times { g.add_vertex(double) }
+        expect { m }.to raise_error(GraphMatching::DisconnectedGraphError)
+      end
+    end
+  end
 end
