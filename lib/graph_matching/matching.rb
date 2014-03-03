@@ -6,8 +6,7 @@ module GraphMatching
     include Explainable
 
     def augment(augmenting_path)
-      log("augmenting the matching")
-      log("augmenting path: #{augmenting_path.inspect}")
+      log("augmenting the matching. path: #{augmenting_path.inspect}")
 
       raise "invalid path: must have length of at least two" unless augmenting_path.length >= 2
       augmenting_path_edges = []
@@ -23,11 +22,25 @@ module GraphMatching
         end
       end
 
-      self
+      # Validating after every augmentation is wasteful and will
+      # be removed when this library is more mature.
+      validate
     end
 
-    def matched?(edge)
+    def edge_from(vertex)
+      find { |edge| edge.include?(vertex) }
+    end
+
+    def has_edge?(edge)
       any? { |e| array_match?(e, edge) }
+    end
+
+    def has_vertex?(v)
+      any? { |e| e.include?(v) }
+    end
+
+    def match(v)
+      (edge_from(v) - [v])[0]
     end
 
     def unmatched_vertexes_in(set)

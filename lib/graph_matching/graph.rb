@@ -7,6 +7,7 @@ module GraphMatching
   end
 
   class Graph < RGL::AdjacencyGraph
+    include Explainable
 
     GRAPHVIZ_EDGE_DELIMITER = '--'
 
@@ -39,24 +40,52 @@ module GraphMatching
       s = LabelSet.new([u], 'S')
       t = LabelSet.new([], 'T')
       mark = LabelSet.new([], 'mark')
+      predecessors = Hash.new
+      aug_path = nil
 
       # If S has no unmarked vertex, stop; there is no M-augmenting
-      # path from u.  Otherwise, select an unmarked v ∈ S.  To
-      # explore from v, successively consider each y ∈ N(v) such
-      # that y ∉ T.
-      #
-      # If y is unsaturated by M, then trace back from y (expanding
-      # blossoms as needed) to report an M-augmenting u, y-path.
-      #
-      # If y ∈ S, then a blossom has been found.  Suspend the
-      # exploration of v and contract the blossom, replacing its
-      # vertices in S and T by a single new vertex in S.  Continue
-      # the search from this vertex in the smaller graph.
-      #
-      # Otherwise, y is matched to some w by M.  Include y in T
-      # (reached from v), and include w in S (reached from y).
-      #
-      # After exploring all such neighbors of v, mark v and iterate.
+      # path from u.  Otherwise, select an unmarked v ∈ S.
+
+      while v = (s - mark).to_a.sample
+        log("v: #{v}")
+
+        # To explore from v, successively consider each y ∈ N(v)
+        # such that y ∉ T.
+        (adjacent_vertices(v) - t.to_a).each do |y|
+          log("y: #{y}")
+          predecessors[y] = v
+
+          # If y is unsaturated by M, then trace back from y (expanding
+          # blossoms as needed) to report an M-augmenting u, y-path.
+          if !m.has_edge?([v, y])
+            log('backtrack')
+            aug_path = backtrack_from(y, predecessors)
+            break
+
+          # If y ∈ S, then a blossom has been found.  Suspend the
+          # exploration of v and contract the blossom, replacing its
+          # vertices in S and T by a single new vertex in S.  Continue
+          # the search from this vertex in the smaller graph.
+          elsif s.include?(y)
+            log('found blossom. contraction not yet implemented')
+
+          # Otherwise, y is matched to some w by M.  Include y in T
+          # (reached from v), and include w in S (reached from y).
+          else
+            w = m.match(y)
+            t.add(y)
+            s.add(w)
+          end
+        end
+
+        break unless aug_path.nil?
+
+        # After exploring all such neighbors of v, mark v and iterate.
+        log('After exploring all such neighbors of v, mark v and iterate.')
+        mark.add(v)
+      end
+
+      aug_path.nil? ? m.validate : mcm_stage(m.augment(aug_path), u)
     end
 
     # `print` writes a ".dot" file and opens it with graphviz

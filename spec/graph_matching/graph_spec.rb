@@ -41,7 +41,12 @@ describe GraphMatching::Graph do
     end
 
     context 'complete graph with four vertexes' do
-      it 'returns two disjoint edges'
+      let(:g) { GraphMatching::Graph[1,2, 1,3, 1,4, 2,3, 2,4, 3,4] }
+
+      it 'returns two disjoint edges' do
+        g.print('v4-1')
+        expect(m.size).to eq(2)
+      end
     end
 
     context 'non trivial graph' do

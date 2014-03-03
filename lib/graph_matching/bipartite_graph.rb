@@ -13,7 +13,6 @@ module GraphMatching
   # be divided into two disjoint sets U and V such that every
   # edge connects a vertex in U to one in V.
   class BipartiteGraph < Graph
-    include Explainable
 
     def vertices_adjacent_to(vertex, except: [])
       adjacent_vertices(vertex) - except
@@ -105,11 +104,11 @@ module GraphMatching
     end
 
     def matched_adjacent_to(vertex, adjacent_vertexes, matching)
-      adjacent_vertexes.select { |x| matching.matched?([x, vertex]) }
+      adjacent_vertexes.select { |x| matching.has_edge?([x, vertex]) }
     end
 
     def unmatched_adjacent_to(vertex, matching)
-      adjacent_vertices(vertex).reject { |a| matching.matched?([vertex, a]) }
+      adjacent_vertices(vertex).reject { |a| matching.has_edge?([vertex, a]) }
     end
 
     def unmatched_unlabled_adjacent_to(vertex, matching, labels)
