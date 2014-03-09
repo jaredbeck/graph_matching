@@ -8,6 +8,8 @@ module GraphMatching
 
   class Graph < RGL::AdjacencyGraph
 
+    GRAPHVIZ_EDGE_DELIMITER = '--'
+
     def backtrack_from(end_vertex, predecessors)
       # log("found augmenting path. backtracking ..")
       augmenting_path = [end_vertex]
@@ -55,6 +57,24 @@ module GraphMatching
       # (reached from v), and include w in S (reached from y).
       #
       # After exploring all such neighbors of v, mark v and iterate.
+    end
+
+    # `print` writes a ".dot" file and opens it with graphviz
+    # TODO: do the same thing, but without the temporary ".dot" file
+    # by opening a graphviz process and writing to its STDIN
+    def print(base_filename)
+      dir = '/tmp/graphviz'
+      Dir.mkdir(dir) unless Dir.exists?(dir)
+      abs_base_path = "#{dir}/#{base_filename}"
+      File.open(abs_base_path + '.dot', 'w') { |file|
+        file.write("strict graph G {\n")
+        each_edge { |u,v|
+          file.write([u,v].join(GRAPHVIZ_EDGE_DELIMITER) + "\n")
+        }
+        file.write("}\n")
+      }
+      system "cat #{abs_base_path}.dot | dot -T png > #{abs_base_path}.png"
+      system "open #{abs_base_path}.png"
     end
 
   end
