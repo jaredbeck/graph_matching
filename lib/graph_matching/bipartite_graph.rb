@@ -120,17 +120,6 @@ module GraphMatching
       raise "Expected sets to be disjoint" unless u.disjoint?(v)
     end
 
-    def backtrack_from(end_vertex, predecessors)
-      log("    found augmenting path. backtracking ..")
-      augmenting_path = [end_vertex]
-      log("    predecessors: #{predecessors.inspect}")
-      while predecessors.has_key?(augmenting_path.last)
-        augmenting_path.push(predecessors[augmenting_path.last])
-      end
-      log("    augmenting path: #{augmenting_path.inspect}")
-      augmenting_path
-    end
-
     def examine_edge_for_partition(from, to, u, v)
       if u.include?(from)
         add_to_set(v, vertex: to, fail_if_in: u)

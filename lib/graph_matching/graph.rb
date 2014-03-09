@@ -8,6 +8,17 @@ module GraphMatching
 
   class Graph < RGL::AdjacencyGraph
 
+    def backtrack_from(end_vertex, predecessors)
+      # log("found augmenting path. backtracking ..")
+      augmenting_path = [end_vertex]
+      # log("predecessors: #{predecessors.inspect}")
+      while predecessors.has_key?(augmenting_path.last)
+        augmenting_path.push(predecessors[augmenting_path.last])
+      end
+      # log("augmenting path: #{augmenting_path.inspect}")
+      augmenting_path
+    end
+
     def connected?
       count = 0
       each_connected_component { |c| count += 1 }
