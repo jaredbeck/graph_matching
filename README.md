@@ -57,7 +57,13 @@ Glossary
 References
 ----------
 
-- West, D. B. (2001). Introduction to graph theory. Upper Saddle River, N.J: Prentice Hall.
+- Edmonds, J. (1965). Paths, trees, and flowers. Canadian Journal of Mathematics.
+- Kusner, M. [Edmonds's Blossom Algorithm (pdf)][12]
+- Gabow, H. J. (1973). Implementation of algorithms for maximum matching on nonbipartite graphs, Stanford Ph.D thesis.
+- Galil, Z. (1986). Efficient algorithms for finding maximum matching in graphs, ACM Computing Surveys.
+- Rantwijk, J. [Maximum Weighted Matching][11]
+- West, D. B. (2001). Introduction to graph theory. Prentice Hall.
+- Zwick, U. (2013). [Lecture notes on: Maximum matching in bipartite and non-bipartite graphs (pdf)][10]
 
 [1]: http://www.youtube.com/watch?v=ory4WMX0rDU "The Augmenting Path Algorithm for Bipartite Matching"
 [2]: http://www.youtube.com/watch?v=C9c8zEZXboA "The Augmenting Path Algorithm (Example)"
@@ -68,3 +74,6 @@ References
 [7]: http://en.wikipedia.org/wiki/Graph_theory
 [8]: http://www.math.uiuc.edu/~stolee/
 [9]: http://en.wikipedia.org/wiki/Blossom_algorithm
+[10]: http://www.cs.tau.ac.il/~zwick/grad-algo-13/match.pdf
+[11]: http://jorisvr.nl/maximummatching.html
+[12]: http://matthewkusner.com/MatthewKusner_BlossomAlgorithmReport.pdf
