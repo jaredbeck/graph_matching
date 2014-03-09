@@ -35,55 +35,69 @@ module GraphMatching
     # `mcm_stage` - Given a matching `m` and an unmatched
     # vertex `u`, returns an augmented matching.
     def mcm_stage(m, u)
-      s = LabelSet.new([u], 'S')
-      t = LabelSet.new([], 'T')
-      mark = LabelSet.new([], 'mark')
-      predecessors = Hash.new
-      aug_path = nil
+      done = false
+      until done do
 
-      # If S has no unmarked vertex, stop; there is no M-augmenting
-      # path from u.  Otherwise, select an unmarked v ∈ S.
+        # Start with a maximal matching M and a queue Q, holding a
+        # single unmatched vertex r1 (u) in graph G. Label r1 EVEN (S).
+        q = [u]
+        s = LabelSet.new([u], 'S')
+        t = LabelSet.new([], 'T')
 
-      while v = (s - mark).to_a.sample
-        log("v: #{v}")
-
-        # To explore from v, successively consider each y ∈ N(v)
-        # such that y ∉ T.
-        (adjacent_vertices(v) - t.to_a).each do |y|
-          log("y: #{y}")
-          predecessors[y] = v
-
-          # If y is unsaturated by M, then trace back from y (expanding
-          # blossoms as needed) to report an M-augmenting u, y-path.
-          if !m.has_edge?([v, y])
-            log('backtrack')
-            aug_path = backtrack_from(y, predecessors)
-            break
-
-          # If y ∈ S, then a blossom has been found.  Suspend the
-          # exploration of v and contract the blossom, replacing its
-          # vertices in S and T by a single new vertex in S.  Continue
-          # the search from this vertex in the smaller graph.
-          elsif s.include?(y)
-            log('found blossom. contraction not yet implemented')
-
-          # Otherwise, y is matched to some w by M.  Include y in T
-          # (reached from v), and include w in S (reached from y).
+        # If Q isn't empty, take vertex v off the head of the queue.
+        # If Q is empty, add a vertex to Q which is unlabeled and
+        # not M-covered r2, if it exists. Go to LIGHTBULB. If no
+        # such vertex exists, then end.
+        if q.empty?
+          r2 = find { |vertex| !s.include?(vertex) && !m.has_vertex?(vertex) }
+          if r2.nil?
+            done = true
           else
-            w = m.match(y)
-            t.add(y)
-            s.add(w)
+            q.push(r2)
+          end
+        else
+          v = q.shift
+
+          # If v is labeled EVEN (S):
+          if s.include?(v)
+
+            #   A) Using breadth-first search, move along all of
+            #      the unmatched edges emanating from v. Call the
+            #      set of vertices on the opposite end of such edges W.
+            w = Set.new
+            i = RGL::BFSIterator.new(self)
+            i.set_examine_edge_event_handler do |from, to|
+
+            end
+            i.set_to_end # does the search
+
+            #   B) Add the vertices in W to the queue.
+            #      For each w ∈ W
+            #        If w is not M-covered:
+            #          BLOSSOM EXPANSION[w]
+            #          Restart entire routine.
+            #        If w is M-covered and is labeled EVEN:
+            #          BLOSSOM SHRINKING[w]
+            #        If w is M-covered and is unlabeled:
+            #          label w ODD
+            #      Take v off of the queue.
+
+          #  If v is labeled ODD:
+          elsif t.include?(v)
+
+            #  A) Move along matched edge to vertex h.
+            #    If h is labeled ODD:
+            #      BLOSSOM SHRINKING[h]
+            #    If h is unlabeled:
+            #      label h EVEN.
+            #  B) Add h to the queue.
+
+
+          else
+            raise RuntimeError, "Expected vertex #{v} to be labeled"
           end
         end
-
-        break unless aug_path.nil?
-
-        # After exploring all such neighbors of v, mark v and iterate.
-        log('After exploring all such neighbors of v, mark v and iterate.')
-        mark.add(v)
       end
-
-      aug_path.nil? ? m.validate : mcm_stage(m.augment(aug_path), u)
     end
 
     def print(base_filename)
