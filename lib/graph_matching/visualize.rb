@@ -10,10 +10,12 @@ module GraphMatching
       @graph = graph
     end
 
+    # `dot` returns a string representing the graph, in .dot format.
+    # http://www.graphviz.org/content/dot-language
     def dot
       s = "strict graph G {\n"
       graph.each_edge { |u, v|
-        s << [u, v].join(GRAPHVIZ_EDGE_DELIMITER) + "\n"
+        s << [u, v].join(GRAPHVIZ_EDGE_DELIMITER) + ";\n"
       }
       s << "}\n"
       s
