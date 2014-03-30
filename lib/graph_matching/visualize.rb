@@ -1,8 +1,12 @@
+require 'open3'
+
 module GraphMatching
 
   class Visualize
 
     GRAPHVIZ_EDGE_DELIMITER = '--'
+    TMP_DIR = '/tmp/graph_matching'
+    USR_BIN_ENV = '/usr/bin/env'
 
     attr_reader :graph
 
@@ -21,18 +25,52 @@ module GraphMatching
       s
     end
 
-    # `png` writes a ".dot" file and opens it with graphviz
-    # TODO: do the same thing, but without the temporary ".dot" file
-    # by opening a graphviz process and writing to its STDIN
+    # `png` writes a ".png" file with graphviz and opens it
     def png(base_filename)
-      dir = '/tmp/graphviz'
-      Dir.mkdir(dir) unless Dir.exists?(dir)
-      abs_base_path = "#{dir}/#{base_filename}"
-      File.open(abs_base_path + '.dot', 'w') { |file|
-        file.write(dot)
-      }
-      system "cat #{abs_base_path}.dot | dot -T png > #{abs_base_path}.png"
-      system "open #{abs_base_path}.png"
+      check_that_dot_is_installed
+      mk_tmp_dir
+      abs_path = "#{TMP_DIR}/#{base_filename}.png"
+      write_png(abs_path)
+      system "open #{abs_path}"
+    end
+
+  private
+
+    def check_that_dot_is_installed
+      unless dot_installed?
+        $stderr.puts "The graphviz executable named dot is not installed"
+        $stderr.puts "Please install graphviz"
+        exit(1)
+      end
+    end
+
+    def check_that_os_is_reasonable
+      unless File.exists?(USR_BIN_ENV)
+        $stderr.puts "File not found: #{USR_BIN_ENV}"
+        $stderr.puts "Please use a reasonable operating system"
+        exit(1)
+      end
+    end
+
+    # `dot_installed?` returns true if `dot` is installed, otherwise
+    # false.  Note that `system` returns true if the command gives
+    # zero exit status, false for non zero exit status.
+    def dot_installed?
+      check_that_os_is_reasonable
+      system "#{USR_BIN_ENV} which dot > /dev/null"
+    end
+
+    def mk_tmp_dir
+      Dir.mkdir(TMP_DIR) unless Dir.exists?(TMP_DIR)
+    end
+
+    def write_png(abs_path)
+      so, se, st = Open3.capture3("dot -T png > #{abs_path}", stdin_data: dot)
+      if st.exitstatus != 0
+        $stderr.puts "Failed to generate .png"
+        $stderr.puts se
+        exit(1)
+      end
     end
 
   end
