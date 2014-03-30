@@ -44,7 +44,7 @@ describe GraphMatching::Graph do
       let(:g) { GraphMatching::Graph[1,2, 1,3, 1,4, 2,3, 2,4, 3,4] }
 
       it 'returns two disjoint edges' do
-        g.print('v4-1')
+        # g.print('v4-1')
         expect(m.size).to eq(2)
       end
     end

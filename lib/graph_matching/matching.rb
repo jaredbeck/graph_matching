@@ -48,9 +48,9 @@ module GraphMatching
     # `validate` is a simple sanity check.  If all is
     # well, it returns `self`.
     def validate
-      flat = to_a.flatten
-      if flat.length != flat.uniq.length
-        $stderr.puts "Invalid matching: #{inspect}"
+      v = vertexes
+      if v.length != v.uniq.length
+        log("Invalid matching: #{inspect}")
         raise "Invalid matching: A vertex appears more than once."
       end
       self
