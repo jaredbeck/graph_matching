@@ -1,4 +1,5 @@
 require_relative 'explainable'
+require_relative 'path'
 require 'set'
 
 module GraphMatching
@@ -7,12 +8,8 @@ module GraphMatching
 
     def augment(augmenting_path)
       log("augmenting the matching. path: #{augmenting_path.inspect}")
-
-      raise "invalid path: must have length of at least two" unless augmenting_path.length >= 2
-      augmenting_path_edges = []
-      0.upto(augmenting_path.length - 2).each do |j|
-        augmenting_path_edges << [augmenting_path[j], augmenting_path[j + 1]]
-      end
+      ap = Path.new(augmenting_path)
+      augmenting_path_edges = ap.edges
       raise "invalid augmenting path: must have odd length" unless augmenting_path_edges.length.odd?
       augmenting_path_edges.each_with_index do |edge, ix|
         if ix.even?

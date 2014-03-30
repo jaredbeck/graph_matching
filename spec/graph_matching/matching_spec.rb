@@ -13,13 +13,6 @@ describe GraphMatching::Matching do
       m.augment([1,2,3,4])
       expect(m).to include(match_array([1,2]), match_array([4,3]))
     end
-
-    it 'raises an error if the path has a length less than two' do
-      invalid_path = [double]
-      expect {
-        described_class.new.augment(invalid_path)
-      }.to raise_error("invalid path: must have length of at least two")
-    end
   end
 
   describe '#has_edge?' do
