@@ -27,10 +27,6 @@ module GraphMatching
       validate
     end
 
-    def edge_from(vertex)
-      find { |edge| edge.include?(vertex) }
-    end
-
     def has_edge?(edge)
       any? { |e| array_match?(e, edge) }
     end
@@ -39,12 +35,14 @@ module GraphMatching
       any? { |e| e.include?(v) }
     end
 
+    # `match` returns the matched vertex (across the edge) or
+    # nil if `v` is not matched
     def match(v)
       (edge_from(v) - [v])[0]
     end
 
     def unmatched_vertexes_in(set)
-      set.select { |v| none? { |edge| edge.include?(v) } }
+      set - vertexes
     end
 
     # `validate` is a simple sanity check.  If all is
@@ -53,7 +51,7 @@ module GraphMatching
       flat = to_a.flatten
       if flat.length != flat.uniq.length
         $stderr.puts "Invalid matching: #{inspect}"
-        raise "Invalid matching: A vertex appears more than once. "
+        raise "Invalid matching: A vertex appears more than once."
       end
       self
     end
@@ -62,6 +60,16 @@ module GraphMatching
 
     def array_match?(a, b)
       a.sort == b.sort
+    end
+
+    # `edge_from` returns the edge that contains `vertex`.  If no
+    # edge contains `vertex`, returns empty array.
+    def edge_from(vertex)
+      find { |edge| edge.include?(vertex) } || []
+    end
+
+    def vertexes
+      to_a.flatten
     end
 
   end
