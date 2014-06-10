@@ -71,7 +71,12 @@ describe GraphMatching::Graph do
     end
 
     context 'two vertexes' do
-      it 'returns one edge'
+      let(:g) { GraphMatching::Graph[1,2] }
+
+      it 'returns one edge' do
+        expect(m.size).to eq(1)
+        expect(m.vertexes).to match_array([1,2])
+      end
     end
 
     context 'complete graph with four vertexes' do
@@ -80,17 +85,40 @@ describe GraphMatching::Graph do
       it 'returns two disjoint edges' do
         # g.print('v4-1')
         expect(m.size).to eq(2)
+        expect(m.vertexes).to match_array([1,2,3,4])
       end
     end
 
-    context 'non trivial graph' do
-      it 'returns an expected result'
+    context 'graph with stem (123) and blossom (456)' do
+      let(:g) { GraphMatching::Graph[1,2, 2,3, 3,4, 4,5, 5,6, 6,4] }
+
+      it 'returns an expected result' do
+        expect(m.size).to eq(3)
+        expect(m.vertexes).to match_array([1,2,3,4,5,6])
+      end
     end
 
     context 'disconnected graph' do
       it 'raises DisconnectedGraphError' do
         2.times { g.add_vertex(double) }
         expect { m }.to raise_error(GraphMatching::DisconnectedGraphError)
+      end
+    end
+  end
+
+  describe '#mcm_stage' do
+    context 'graph with stem (123) and blossom (345)' do
+      let(:g) { GraphMatching::Graph[1,2, 2,3, 3,4, 4,5, 5,3] }
+
+      context 'given a maximul, but not maximum matching' do
+        let(:maximal) { GraphMatching::Matching[[2,3], [4,5]] }
+
+        it 'returns a maximum cardinality matching' do
+          # g.print('blossom')
+          m = g.mcm_stage(maximal, 1)
+          expect(m.size).to eq(2)
+          expect(m.vertexes).to eq(4)
+        end
       end
     end
   end

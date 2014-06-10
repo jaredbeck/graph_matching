@@ -53,20 +53,20 @@ module GraphMatching
       self
     end
 
-  private
+    def vertexes
+      to_a.flatten
+    end
+
+    private
 
     def array_match?(a, b)
       a.sort == b.sort
     end
 
     # `edge_from` returns the edge that contains `vertex`.  If no
-    # edge contains `vertex`, returns empty array.
+    # edge contains `vertex`, returns empty array.  See also `#match`
     def edge_from(vertex)
       find { |edge| edge.include?(vertex) } || []
-    end
-
-    def vertexes
-      to_a.flatten
     end
 
   end
