@@ -14,10 +14,6 @@ module GraphMatching
   # edge connects a vertex in U to one in V.
   class BipartiteGraph < Graph
 
-    def vertices_adjacent_to(vertex, except: [])
-      adjacent_vertices(vertex) - except
-    end
-
     # `maximum_cardinality_matching` returns a `Set` of arrays,
     # each representing an edge in the matching.  The augmenting
     # path algorithm is used.
@@ -128,6 +124,10 @@ module GraphMatching
         u.add(from)
         v.add(to)
       end
+    end
+
+    def vertices_adjacent_to(vertex, except: [])
+      adjacent_vertices(vertex) - except
     end
 
   end
