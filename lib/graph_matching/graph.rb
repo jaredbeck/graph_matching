@@ -26,6 +26,20 @@ module GraphMatching
       count == 1
     end
 
+    # `maximal_matching` - Not to be confused with a *maximum* matching.
+    # > A maximal matching is defined as a matching in which
+    # > no edge in G can be added to the matching.
+    # > (Kusner, Edmonds's Blossom Algorithm, p. 1)
+    def maximal_matching
+      m = Matching.new
+      edges.each do |e|
+        if m.unmatched_vertexes_in(Set.new(e.to_a)).length == 2
+          m.add(e.to_a)
+        end
+      end
+      m.validate
+    end
+
     def maximum_cardinality_matching
       return Matching.new if empty?
       raise DisconnectedGraphError unless connected?
