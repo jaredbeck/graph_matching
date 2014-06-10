@@ -25,8 +25,8 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'rgl', '~> 0.4.0'
 
-  spec.add_development_dependency 'bundler', '~> 1.5'
-  spec.add_development_dependency 'rspec-core', '~> 3.0.0.beta2'
-  spec.add_development_dependency 'rspec-expectations', '~> 3.0.0.beta2'
-  spec.add_development_dependency 'rspec-mocks', '~> 3.0.0.beta2'
+  spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'rspec-core', '~> 3.0.0'
+  spec.add_development_dependency 'rspec-expectations', '~> 3.0.0'
+  spec.add_development_dependency 'rspec-mocks', '~> 3.0.0'
 end
