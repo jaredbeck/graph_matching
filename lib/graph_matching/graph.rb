@@ -107,7 +107,8 @@ module GraphMatching
             #        If w is M-covered and is labeled EVEN (S):
             #          BLOSSOM SHRINKING[w]
               elsif covered && s.include?(wi)
-                fail('TODO: blossom shrinking at vertex: %d' % [wi])
+                log('TODO: blossom shrinking at vertex: %d' % [wi])
+                shrink_blossom(v, wi)
 
             #        If w is M-covered and is unlabeled:
             #          label w ODD
@@ -130,7 +131,8 @@ module GraphMatching
             #    If h is unlabeled:
             #      label h EVEN.
             if t.include?(h)
-              fail('TODO: blossom shrinking at vertex: %d' % [h])
+              log('TODO: blossom shrinking at vertex: %d' % [h])
+              shrink_blossom(v, h)
             else
               s.add(h)
             end
@@ -145,6 +147,31 @@ module GraphMatching
       end
 
       m.validate
+    end
+
+    def shrink_blossom(v, ri)
+      log('shrink_blossom: (v, ri): (%s, %s)' % [v, ri])
+
+      # Let P1 be the path from v to ri, the initial M-uncovered vertex.
+      p1 = []
+      log('shrink_blossom: p1: ' + p1.inspect)
+
+      # Let P2 be the path from z to ri
+      p2 = []
+      log('shrink_blossom: p2: ' + p2.inspect)
+
+      # Shrink the blossom, whose vertices are the symmetric difference
+      # of P1, the path from v to ri, the initial M-uncovered vertex,
+      # and P2, the path from z to ri.
+      #
+      vertices = Set.new(p1) ^ Set.new(p2)
+      log('shrink_blossom: blossom vertices: ' + vertices.inspect)
+      fail('TODO: shrink blossom')
+
+      # To shrink the blossom:
+      # 1. Remove all edges in the blossom.
+      # 2. Reattach edges originally attached to the blossom vertices to vB
+      # Recurse into MAIN ROUTINE, starting at lightbulb
     end
 
     def print(base_filename)
