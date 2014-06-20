@@ -5,16 +5,18 @@ module GraphMatching
   class LabelSet < Set
     include Explainable
 
-    attr_reader :label
+    attr_reader :label, :v
 
     def initialize(enum, label)
       @label = label
+      @v = {}
       super(enum)
     end
 
-    def add(o)
-      log("Label with #{label}: #{o}")
-      super
+    def add(o, v = nil)
+      log("Label #{o} with (#{label}, #{v})")
+      super(o)
+      @v[o] = v
     end
 
   end

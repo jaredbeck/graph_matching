@@ -51,6 +51,9 @@ module GraphMatching
     # `mcm_stage` - Given a matching `m` and an unmatched
     # vertex `u`, returns an augmented matching.
     def mcm_stage(m, u)
+      log('mcm_stage: matching: ' + m.inspect)
+
+      p = [] # path taken, starting at u
 
       # Start with a maximal matching M and a queue Q, holding a
       # single unmatched vertex r1 (u) in graph G. Label r1 EVEN (S).
@@ -76,7 +79,8 @@ module GraphMatching
           end
         else
           v = q.shift
-          log("v = #{v}")
+          p.push(v)
+          log("------\nv = #{v}, p = #{p}")
 
           # If v is labeled EVEN (S):
           if s.include?(v)
@@ -108,12 +112,12 @@ module GraphMatching
             #          BLOSSOM SHRINKING[w]
               elsif covered && s.include?(wi)
                 log('TODO: blossom shrinking at vertex: %d' % [wi])
-                shrink_blossom(v, wi)
+                shrink_blossom(v, wi, p, t)
 
             #        If w is M-covered and is unlabeled:
-            #          label w ODD
+            #          label w ODD (T)
               else
-                t.add(wi)
+                t.add(wi, v)
               end
             end
 
@@ -132,7 +136,8 @@ module GraphMatching
             #      label h EVEN.
             if t.include?(h)
               log('TODO: blossom shrinking at vertex: %d' % [h])
-              shrink_blossom(v, h)
+              log('  (because both %s and %s are labeled T)' % [v, h])
+              shrink_blossom(v, h, p, t)
             else
               s.add(h)
             end
@@ -149,24 +154,17 @@ module GraphMatching
       m.validate
     end
 
-    def shrink_blossom(v, ri)
-      log('shrink_blossom: (v, ri): (%s, %s)' % [v, ri])
+    def shrink_blossom(v, ri, p, label_set)
+      log('shrink_blossom: (v, ri, p): (%s, %s, %s)' % [v, ri, p])
 
-      # Let P1 be the path from v to ri, the initial M-uncovered vertex.
-      p1 = []
-      log('shrink_blossom: p1: ' + p1.inspect)
-
-      # Let P2 be the path from z to ri
-      p2 = []
-      log('shrink_blossom: p2: ' + p2.inspect)
-
-      # Shrink the blossom, whose vertices are the symmetric difference
-      # of P1, the path from v to ri, the initial M-uncovered vertex,
-      # and P2, the path from z to ri.
-      #
-      vertices = Set.new(p1) ^ Set.new(p2)
-      log('shrink_blossom: blossom vertices: ' + vertices.inspect)
-      fail('TODO: shrink blossom')
+      # The vertex which labeled v is the base of the blossom?
+      blossom_base = label_set.v[ri]
+      stem_last_index = p.find_index(blossom_base) - 1
+      stem = p[0..stem_last_index]
+      log('shrink_blossom: stem: ' + stem.inspect)
+      blossom_vertexes = (p + [ri]) - stem
+      log('shrink_blossom: blossom_vertexes: ' + blossom_vertexes.inspect)
+      fail('TODO')
 
       # To shrink the blossom:
       # 1. Remove all edges in the blossom.
