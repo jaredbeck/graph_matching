@@ -12,10 +12,20 @@ describe GraphMatching::LabelSet do
 
   describe '#add' do
     let(:obj) { double }
+    let(:vertex) { double }
 
-    it 'logs' do
-      expect(set).to receive(:log).with("Label with #{label}: #{obj}")
-      set.add(obj)
+    context 'with optional vertex' do
+      it 'logs obj, label, and vertex' do
+        expect(set).to receive(:log).with("Label #{obj} with (#{label}, #{vertex})")
+        set.add(obj, vertex)
+      end
+    end
+
+    context 'without optional vertex' do
+      it 'logs obj and label' do
+        expect(set).to receive(:log).with("Label #{obj} with (#{label}, )")
+        set.add(obj)
+      end
     end
   end
 end
