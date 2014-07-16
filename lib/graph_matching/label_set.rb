@@ -19,5 +19,9 @@ module GraphMatching
       @v[o] = v
     end
 
+    def get(o)
+      @v.fetch(o)
+    end
+
   end
 end

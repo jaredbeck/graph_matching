@@ -49,14 +49,14 @@ module GraphMatching
     end
 
     # `mcm_stage` - Given a matching `m` and an unmatched
-    # vertex `u`, returns an augmented matching.
-    def mcm_stage(m, u)
+    # vertex `ri`, returns an augmented matching.
+    def mcm_stage(m, ri)
       log('mcm_stage: matching: ' + m.inspect)
 
       # Start with a maximal matching M and a queue Q, holding a
-      # single unmatched vertex r1 (u) in graph G. Label r1 EVEN (S).
-      q = [u]
-      s = LabelSet.new([u], 'even')
+      # single unmatched vertex r1 in graph G. Label r1 EVEN (S).
+      q = [ri]
+      s = LabelSet.new([ri], 'even')
       t = LabelSet.new([], 'odd')
 
       done = false
@@ -106,7 +106,7 @@ module GraphMatching
             #          BLOSSOM SHRINKING[w]
               elsif covered && s.include?(wi)
                 log('TODO: blossom shrinking at vertex: %d' % [wi])
-                shrink_blossom(v, wi, t)
+                shrink_blossom(wi, ri, v, s, t)
 
             #        If w is M-covered and is unlabeled:
             #          label w ODD (T)
@@ -130,9 +130,7 @@ module GraphMatching
             #    If h is unlabeled:
             #      label h EVEN.
             if t.include?(h)
-              log('TODO: blossom shrinking at vertex: %d' % [h])
-              log('  (because both %s and %s are labeled T)' % [v, h])
-              shrink_blossom(v, h, t)
+              shrink_blossom(h, ri, v, s, t)
             else
               s.add(h, v)
             end
@@ -149,17 +147,24 @@ module GraphMatching
       m.validate
     end
 
-    def shrink_blossom(v, ri, label_set)
-      fail('shrink_blossom: (v, ri): (%s, %s)' % [v, ri])
+    def shrink_blossom(z, ri, v, s, t)
+      log('shrink_blossom(z = %s, ri = %s, v = %s)' % [z, ri, v])
 
-      # # The vertex which labeled v is the base of the blossom?
-      # blossom_base = label_set.v[ri]
-      # stem_last_index = p.find_index(blossom_base) - 1
-      # stem = p[0..stem_last_index]
-      # log('shrink_blossom: stem: ' + stem.inspect)
-      # blossom_vertexes = (p + [ri]) - stem
-      # log('shrink_blossom: blossom_vertexes: ' + blossom_vertexes.inspect)
-      # fail('TODO')
+      # p1 = path from v to ri
+      p1 = label_path(s, t, from: v, to: ri)
+      log("p1 = #{p1.inspect}")
+
+      # p2 = path from z to ri
+      p2 = label_path(s, t, from: z, to: ri)
+      log("p2 = #{p2.inspect}")
+
+      # blossom = symmetric difference of (p1, p2)
+      blossom_edges = (p1 ^ p2)
+      log("blossom_edges = #{blossom_edges.inspect}")
+      blossom_vertexes = Set.new(blossom_edges.to_a.flatten)
+      log("blossom_vertexes = #{blossom_vertexes.inspect}")
+
+      fail('TODO')
 
       # To shrink the blossom:
       # 1. Remove all edges in the blossom.
@@ -183,6 +188,18 @@ module GraphMatching
 
     def first_unmatched_vertex(m)
       vertices.find { |v| !m.has_vertex?(v) }
+    end
+
+    def label_path(s, t, from:, to:)
+      l = s.v.merge(t.v)
+      v = from
+      p = Set.new
+      until v == to do
+        w = l[v]
+        p.add([v, w])
+        v = w
+      end
+      p
     end
 
   end
