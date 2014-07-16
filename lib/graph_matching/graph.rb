@@ -164,12 +164,35 @@ module GraphMatching
       blossom_vertexes = Set.new(blossom_edges.to_a.flatten)
       log("blossom_vertexes = #{blossom_vertexes.inspect}")
 
-      fail('TODO')
-
       # To shrink the blossom:
       # 1. Remove all edges in the blossom.
       # 2. Reattach edges originally attached to the blossom vertices to vB
       # Recurse into MAIN ROUTINE, starting at lightbulb
+
+      shrink(blossom_edges, blossom_vertexes)
+
+      fail('TODO')
+    end
+
+    def shrink(blossom_edges, blossom_vertexes)
+      new_graph = self.dup
+      subgraph_vertex = new_graph.size + 1
+      new_graph.add_vertex(subgraph_vertex)
+      edges.each do |e|
+        vertexes_in_blossom = blossom_vertexes & e.to_a
+        if vertexes_in_blossom.size == 1
+          vertex_in_blossom = vertexes_in_blossom.first
+          vertex_outside_blossom = (Set.new(e.to_a) - [vertex_in_blossom]).first
+          new_graph.add_edge(subgraph_vertex, vertex_outside_blossom)
+        end
+      end
+      blossom_edges.each do |e|
+        new_graph.remove_edge(*e)
+      end
+      blossom_vertexes.each do |bv|
+        new_graph.remove_vertex(bv)
+      end
+      new_graph.print('shrunken')
     end
 
     def print(base_filename)
