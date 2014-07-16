@@ -53,13 +53,11 @@ module GraphMatching
     def mcm_stage(m, u)
       log('mcm_stage: matching: ' + m.inspect)
 
-      p = [] # path taken, starting at u
-
       # Start with a maximal matching M and a queue Q, holding a
       # single unmatched vertex r1 (u) in graph G. Label r1 EVEN (S).
       q = [u]
-      s = LabelSet.new([u], 'S')
-      t = LabelSet.new([], 'T')
+      s = LabelSet.new([u], 'even')
+      t = LabelSet.new([], 'odd')
 
       done = false
       until done do
@@ -79,22 +77,19 @@ module GraphMatching
           end
         else
           v = q.shift
-          p.push(v)
-          log("------\nv = #{v}, p = #{p}")
+          log("------\nv = #{v}, q = #{q}")
 
           # If v is labeled EVEN (S):
           if s.include?(v)
-            log('v is labeled EVEN (S)')
 
             #   A) Using breadth-first search, move along all of
             #      the unmatched edges emanating from v. Call the
             #      set of vertices on the opposite end of such edges W.
             w = each_adjacent(v).reject { |x| m.has_edge?([v, x]) }
-            log('unmatched vertexes adjacent to v: ' + w.inspect)
 
             #   B) Add the vertices in W to the queue.
             q.concat(w)
-            log('new queue: ' + q.inspect)
+            log('w = %s q = %s' % [w, q])
 
             #      For each w ∈ W
             w.each do |wi|
@@ -104,7 +99,6 @@ module GraphMatching
             #          BLOSSOM EXPANSION[w]
             #          Restart entire routine.
               covered = m.has_vertex?(wi)
-              log("covered = #{covered}")
               if !covered
                 fail('TODO: blossom expansion at vertex: %d' % [wi])
 
@@ -112,7 +106,7 @@ module GraphMatching
             #          BLOSSOM SHRINKING[w]
               elsif covered && s.include?(wi)
                 log('TODO: blossom shrinking at vertex: %d' % [wi])
-                shrink_blossom(v, wi, p, t)
+                shrink_blossom(v, wi, t)
 
             #        If w is M-covered and is unlabeled:
             #          label w ODD (T)
@@ -129,6 +123,7 @@ module GraphMatching
 
             #  A) Move along matched edge to vertex h.
             h = m.match(v)
+            log("h = #{h}")
 
             #    If h is labeled ODD:
             #      BLOSSOM SHRINKING[h]
@@ -137,9 +132,9 @@ module GraphMatching
             if t.include?(h)
               log('TODO: blossom shrinking at vertex: %d' % [h])
               log('  (because both %s and %s are labeled T)' % [v, h])
-              shrink_blossom(v, h, p, t)
+              shrink_blossom(v, h, t)
             else
-              s.add(h)
+              s.add(h, v)
             end
 
             #  B) Add h to the queue.
@@ -154,17 +149,17 @@ module GraphMatching
       m.validate
     end
 
-    def shrink_blossom(v, ri, p, label_set)
-      log('shrink_blossom: (v, ri, p): (%s, %s, %s)' % [v, ri, p])
+    def shrink_blossom(v, ri, label_set)
+      fail('shrink_blossom: (v, ri): (%s, %s)' % [v, ri])
 
-      # The vertex which labeled v is the base of the blossom?
-      blossom_base = label_set.v[ri]
-      stem_last_index = p.find_index(blossom_base) - 1
-      stem = p[0..stem_last_index]
-      log('shrink_blossom: stem: ' + stem.inspect)
-      blossom_vertexes = (p + [ri]) - stem
-      log('shrink_blossom: blossom_vertexes: ' + blossom_vertexes.inspect)
-      fail('TODO')
+      # # The vertex which labeled v is the base of the blossom?
+      # blossom_base = label_set.v[ri]
+      # stem_last_index = p.find_index(blossom_base) - 1
+      # stem = p[0..stem_last_index]
+      # log('shrink_blossom: stem: ' + stem.inspect)
+      # blossom_vertexes = (p + [ri]) - stem
+      # log('shrink_blossom: blossom_vertexes: ' + blossom_vertexes.inspect)
+      # fail('TODO')
 
       # To shrink the blossom:
       # 1. Remove all edges in the blossom.

@@ -108,16 +108,16 @@ describe GraphMatching::Graph do
 
   describe '#mcm_stage' do
     context 'graph with stem (123) and blossom (345)' do
-      let(:g) { GraphMatching::Graph[1,2, 2,3, 3,4, 4,5, 5,3] }
+      let(:g) { GraphMatching::Graph[1,2, 2,3, 2,4, 3,4, 4,5, 5,6] }
 
-      context 'given a maximul, but not maximum matching' do
+      context 'given a maximal, but not maximum matching' do
         let(:maximal) { GraphMatching::Matching[[2,3], [4,5]] }
 
         it 'returns a maximum cardinality matching' do
           # g.print('blossom')
-          m = g.mcm_stage(maximal, 1)
-          expect(m.size).to eq(2)
-          expect(m.vertexes).to eq(4)
+          m = g.mcm_stage(maximal, 6)
+          expect(m.size).to eq(3)
+          expect(m.vertexes).to eq(6)
         end
       end
     end
