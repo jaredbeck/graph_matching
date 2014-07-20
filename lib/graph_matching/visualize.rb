@@ -16,6 +16,7 @@ module GraphMatching
 
     # `dot` returns a string representing the graph, in .dot format.
     # http://www.graphviz.org/content/dot-language
+    # TODO: Try using `rgl-0.4.0/lib/rgl/dot.rb` instead.
     def dot
       s = "strict graph G {\n"
       graph.each_edge { |u, v|

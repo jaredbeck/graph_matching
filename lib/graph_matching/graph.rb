@@ -1,6 +1,9 @@
 require 'rgl/adjacency'
 require 'rgl/connected_components'
 
+# TODO: autoload?
+require_relative 'shrunken_blossom'
+
 module GraphMatching
 
   class DisconnectedGraphError < StandardError
@@ -149,50 +152,16 @@ module GraphMatching
 
     def shrink_blossom(z, ri, v, s, t)
       log('shrink_blossom(z = %s, ri = %s, v = %s)' % [z, ri, v])
-
-      # p1 = path from v to ri
-      p1 = label_path(s, t, from: v, to: ri)
-      log("p1 = #{p1.inspect}")
-
-      # p2 = path from z to ri
-      p2 = label_path(s, t, from: z, to: ri)
-      log("p2 = #{p2.inspect}")
-
-      # blossom = symmetric difference of (p1, p2)
-      blossom_edges = (p1 ^ p2)
-      log("blossom_edges = #{blossom_edges.inspect}")
-      blossom_vertexes = Set.new(blossom_edges.to_a.flatten)
-      log("blossom_vertexes = #{blossom_vertexes.inspect}")
+      b = blossom_vertexes(ri, s, t, v, z)
+      log("blossom_vertexes = #{b.inspect}")
+      shrunken = build_shrunken_blossom(b)
 
       # To shrink the blossom:
       # 1. Remove all edges in the blossom.
       # 2. Reattach edges originally attached to the blossom vertices to vB
       # Recurse into MAIN ROUTINE, starting at lightbulb
 
-      shrink(blossom_edges, blossom_vertexes)
-
       fail('TODO')
-    end
-
-    def shrink(blossom_edges, blossom_vertexes)
-      new_graph = self.dup
-      subgraph_vertex = new_graph.size + 1
-      new_graph.add_vertex(subgraph_vertex)
-      edges.each do |e|
-        vertexes_in_blossom = blossom_vertexes & e.to_a
-        if vertexes_in_blossom.size == 1
-          vertex_in_blossom = vertexes_in_blossom.first
-          vertex_outside_blossom = (Set.new(e.to_a) - [vertex_in_blossom]).first
-          new_graph.add_edge(subgraph_vertex, vertex_outside_blossom)
-        end
-      end
-      blossom_edges.each do |e|
-        new_graph.remove_edge(*e)
-      end
-      blossom_vertexes.each do |bv|
-        new_graph.remove_vertex(bv)
-      end
-      new_graph.print('shrunken')
     end
 
     def print(base_filename)
@@ -200,6 +169,39 @@ module GraphMatching
     end
 
     private
+
+    # `all_blossom_edges` returns edges in a blossom, and those
+    # immediately adjacent.
+    def all_blossom_edges(blossom_vertexes)
+      blossom_vertexes.inject(Set.new) { |a, bv|
+        a.merge adjacent_vertices(bv).map { |bv2|
+          RGL::Edge::UnDirectedEdge.new(bv, bv2)
+        }
+      }
+    end
+
+    # `blossom_vertexes` finds vertexes in the blossom,
+    # identified by taking the symmetric difference of (p1, p2)
+    # where p1 is the path from `v` to `ri`, and p2 is the path
+    # from `z` to `ri`.  These paths are reconstructed by following
+    # the label sets `s` and `t`.
+    def blossom_vertexes(ri, s, t, v, z)
+      p1 = label_path(s, t, from: v, to: ri)
+      p2 = label_path(s, t, from: z, to: ri)
+      Set.new((p1 ^ p2).to_a.flatten)
+    end
+
+    def build_shrunken_blossom(blossom_vertexes)
+      ea = all_blossom_edges(blossom_vertexes)
+      ej = edges_adjacent_to_subgraph(blossom_vertexes)
+      g = self.class.new(ea - ej)
+      ShrunkenBlossom.new(g, ej)
+    end
+
+    # Given a `Set` of `vertexes`, returns adjacent edges.
+    def edges_adjacent_to_subgraph(vertexes)
+      edges.select { |e| (vertexes & e.to_a).size == 1 }
+    end
 
     def first_unlabeled_unmatched_vertex(s, t, m)
       find { |vertex|
