@@ -29,4 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec-core', '~> 3.0.0'
   spec.add_development_dependency 'rspec-expectations', '~> 3.0.0'
   spec.add_development_dependency 'rspec-mocks', '~> 3.0.0'
+  spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'pry-nav'
 end
