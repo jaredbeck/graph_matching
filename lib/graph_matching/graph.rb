@@ -12,6 +12,11 @@ module GraphMatching
   class Graph < RGL::AdjacencyGraph
     include Explainable
 
+    def self.new_from_set_of_edges(edges)
+      edges_flattened = edges.map { |e| e.to_a }.flatten
+      self[*edges_flattened]
+    end
+
     def backtrack_from(end_vertex, predecessors)
       # log("found augmenting path. backtracking ..")
       augmenting_path = [end_vertex]
@@ -155,6 +160,7 @@ module GraphMatching
       b = blossom_vertexes(ri, s, t, v, z)
       log("blossom_vertexes = #{b.inspect}")
       shrunken = build_shrunken_blossom(b)
+      # shrunken.subgraph.print('blossom2')
 
       # To shrink the blossom:
       # 1. Remove all edges in the blossom.
@@ -194,7 +200,7 @@ module GraphMatching
     def build_shrunken_blossom(blossom_vertexes)
       ea = all_blossom_edges(blossom_vertexes)
       ej = edges_adjacent_to_subgraph(blossom_vertexes)
-      g = self.class.new(ea - ej)
+      g = self.class.new_from_set_of_edges(ea - ej)
       ShrunkenBlossom.new(g, ej)
     end
 
