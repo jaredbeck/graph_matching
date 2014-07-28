@@ -159,13 +159,25 @@ module GraphMatching
       log('shrink_blossom(z = %s, ri = %s, v = %s)' % [z, ri, v])
       b = blossom_vertexes(ri, s, t, v, z)
       log("blossom_vertexes = #{b.inspect}")
-      shrunken = build_shrunken_blossom(b)
+      ea = all_blossom_edges(b)
+      shrunken = build_shrunken_blossom(b, ea)
       # shrunken.subgraph.print('blossom2')
 
       # To shrink the blossom:
       # 1. Remove all edges in the blossom.
       # 2. Reattach edges originally attached to the blossom vertices to vB
       # Recurse into MAIN ROUTINE, starting at lightbulb
+
+      add_vertex(shrunken)
+      ea.each do |be|
+        remove_edge(*be.to_a)
+        vertexes_outside_blossom = Set.new(be.to_a) - b
+        if vertexes_outside_blossom.length == 1
+          add_edge(vertexes_outside_blossom.first, shrunken)
+        end
+      end
+      b.each do |bv| remove_vertex(bv) end
+      print('blossom3')
 
       fail('TODO')
     end
@@ -197,10 +209,9 @@ module GraphMatching
       Set.new((p1 ^ p2).to_a.flatten)
     end
 
-    def build_shrunken_blossom(blossom_vertexes)
-      ea = all_blossom_edges(blossom_vertexes)
+    def build_shrunken_blossom(blossom_vertexes, blossom_edges)
       ej = edges_adjacent_to_subgraph(blossom_vertexes)
-      g = self.class.new_from_set_of_edges(ea - ej)
+      g = self.class.new_from_set_of_edges(blossom_edges - ej)
       ShrunkenBlossom.new(g, ej)
     end
 

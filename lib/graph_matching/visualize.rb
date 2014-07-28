@@ -20,7 +20,8 @@ module GraphMatching
     def dot
       s = "strict graph G {\n"
       graph.each_edge { |u, v|
-        s << [u, v].join(GRAPHVIZ_EDGE_DELIMITER) + ";\n"
+        e = [u, v].map { |x| safe_vertex(x) }
+        s << e.join(GRAPHVIZ_EDGE_DELIMITER) + ";\n"
       }
       s << "}\n"
       s
@@ -63,6 +64,16 @@ module GraphMatching
 
     def mk_tmp_dir
       Dir.mkdir(TMP_DIR) unless Dir.exists?(TMP_DIR)
+    end
+
+    def safe_vertex(v)
+      if v.is_a?(Integer)
+        v
+      elsif v.respond_to?(:to_dot)
+        v.to_dot
+      else
+        v.to_s.gsub(/[^a-zA-Z0-9]/, '')
+      end
     end
 
     def write_png(abs_path)
