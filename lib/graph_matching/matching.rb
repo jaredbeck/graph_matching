@@ -24,18 +24,26 @@ module GraphMatching
       validate
     end
 
+    def has_any_vertex?(*v)
+      vertexes.any? { |vi| v.include?(vi) }
+    end
+
     def has_edge?(edge)
       any? { |e| array_match?(e, edge) }
     end
 
     def has_vertex?(v)
-      any? { |e| e.include?(v) }
+      vertexes.include?(v)
     end
 
     # `match` returns the matched vertex (across the edge) or
     # nil if `v` is not matched
     def match(v)
       (edge_from(v) - [v])[0]
+    end
+
+    def delete(edge)
+      delete_if { |e| array_match?(e, edge) }
     end
 
     def unmatched_vertexes_in(set)

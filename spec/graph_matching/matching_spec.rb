@@ -26,6 +26,15 @@ describe GraphMatching::Matching do
     end
   end
 
+  describe '#has_any_vertex?' do
+    it 'returns true if any given vertexes are matched' do
+      m = described_class.new([[2,3,4]])
+      expect(m.has_any_vertex?(2, 3)).to eq(true)
+      expect(m.has_any_vertex?(4)).to eq(true)
+      expect(m.has_any_vertex?(1, 5)).to eq(false)
+    end
+  end
+
   describe '#has_edge?' do
     it 'returns true if edge found' do
       m = described_class.new

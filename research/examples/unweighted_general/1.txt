@@ -1,0 +1,86 @@
+Stage 1
+
+          5 -- 7
+        / ||   ||
+   1 = 3  ||   o
+  /     \ ||
+r        6
+  \     /
+   2 = 4
+  /
+a
+
+S = [ 1 by r, 2 by r, 5 by 3, 6 by 3 ]
+T = [ 3 by 1, 4 by 1 ]
+
+Stage 2
+
+   1 = B -- 7
+  /    |    ||
+r      |    o
+  \    |
+   2 = 4
+  /
+a
+
+S = [ 1 by r, 2 by r, 5 by 3, 6 by 3 ]
+T = [ 3 by 1, 4 by 1 ]
+
+Stage 3
+
+  B -- 7
+ /     ||
+a      o
+
+Find augmenting path from r, *through B* to a
+
+1. AP = (a,B)
+1. expand B
+
+   1 = B -- 7
+  /    |    ||
+r      |    o
+  \    |
+   2 = 4
+  /
+a
+
+1. Kusner says: "propagating the augmenting path through the expansion steps"
+1. AP = (a,2), etc.. but how to find "etc"?  We know we want an
+   alternating path, so starting at 2, find a matched edge.
+1. AP = a2, 24
+1. AP = a2, 24, 4B
+1. B is a blossom.  Expand it.
+
+          5 -- 7
+        / ||   ||
+   1 = 3  ||   o
+  /     \ ||
+r        6
+  \     /
+   2 = 4
+  /
+a
+
+1. AP = a2, 24, 46
+1. AP = a2, 24, 46, 65
+1. Should we follow (5,3) or (5,7), or both?
+1. Following (5,7) doesn't reach r, and if we follow it,
+   either depth-first or breadth-first, we'll learn that.
+1. AP = a2, 24, 46, 65, 53
+1. AP = a2, 24, 46, 65, 53, 31
+1. AP = a2, 24, 46, 65, 53, 31, 1r
+1. Augmenting path: a, 2, 4, 6, 5, 3, 1, r
+
+          5 -- 7
+        //|   ||
+   1 - 3  |   o
+  //     \|
+r        6
+  \     //
+   2 - 4
+  //
+a
+
+1. size of matching = 5.  Decide is maximum cardinality
+   matching.  (How?)

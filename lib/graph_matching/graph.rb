@@ -108,7 +108,9 @@ module GraphMatching
             #          Restart entire routine.
               covered = m.has_vertex?(wi)
               if !covered
-                fail('TODO: blossom expansion at vertex: %s' % [wi])
+                log('blossom expansion at vertex: %s' % [wi])
+                augment_by_expanding_blossom(v, wi, ri, s, t, m)
+                fail('TODO: restart entire routine')
 
             #        If w is M-covered and is labeled EVEN (S):
             #          BLOSSOM SHRINKING[w]
@@ -155,6 +157,53 @@ module GraphMatching
       m.validate
     end
 
+    def augment_by_expanding_blossom(v, wi, ri, s, t, m)
+      log('augment_by_expanding_blossom(wi = %s, ri = %s)' % [wi, ri])
+
+      # Assert: `wi` and `ri` are both m-uncovered vertexes
+      if m.has_any_vertex?(wi, ri)
+        fail('Assertion failed: Expected m-uncovered: both wi and ri')
+      end
+
+      # Set APB equal to the path from y to r1. (aka. wi, ri)
+      #
+      # Expand blossoms in the reverse order in which they were
+      # shrunk, propagating the augmenting path through the
+      # expansion steps.
+      #
+      # To expand a blossom:
+      #
+      # 1. Restore the edges within the blossom.
+      # 1. Reattached edges currently attached to vB back to the
+      #    vertices in the blossom to which they were originally
+      #    attached before shrinking.
+      #
+      # Extend AP through expanded blossom.
+
+      l = s.v.merge(t.v)
+      log('labels: %s' % [l])
+      p = Set[wi]
+      vi = v
+      until vi == ri do
+        log('building path: %s' % [p.to_a])
+        vj = l[vi]
+        fail('unexpected nil') if vj.nil?
+        log('building path: next: %s' % [vj])
+        if vj.is_a?(ShrunkenBlossom)
+          fail('TODO: expand: %s' % [vj])
+        end
+        p.add([vi, vj])
+        vi = vj
+      end
+      log('augmenting path: %s' % [p])
+
+      # Recurse out of MAIN ROUTINE, propogating APB through each expanded blossom.
+      # Upon arriving at G, and concurrently AP, flip the matching of AP.
+      # Go to lightbulb
+      #
+      fail('TODO: expand blossoms')
+    end
+
     def shrink_blossom(z, ri, v, s, t, m)
       log('shrink_blossom(z = %s, ri = %s, v = %s)' % [z, ri, v])
       b = blossom_vertexes(ri, s, t, v, z)
@@ -171,9 +220,17 @@ module GraphMatching
       add_vertex(shrunken)
       ea.each do |be|
         remove_edge(*be.to_a)
+        if m.has_edge?(be.to_a)
+          replacing_matched_edge = true
+          m.delete(be.to_a)
+        else
+          replacing_matched_edge = false
+        end
         vertexes_outside_blossom = Set.new(be.to_a) - b
         if vertexes_outside_blossom.length == 1
-          add_edge(vertexes_outside_blossom.first, shrunken)
+          new_edge = [vertexes_outside_blossom.first, shrunken]
+          add_edge(*new_edge)
+          m.add(new_edge) if replacing_matched_edge
         end
       end
       b.each do |bv| remove_vertex(bv) end
