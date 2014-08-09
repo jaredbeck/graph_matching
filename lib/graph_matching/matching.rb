@@ -70,7 +70,7 @@ module GraphMatching
     # `array_match?` returns true if both arrays have the same
     # elements, irrespective of order.
     def array_match?(a, b)
-      a.group_by { |i| i } == b.group_by { |i| i }
+      a.to_a.group_by { |i| i } == b.to_a.group_by { |i| i }
     end
 
     # `edge_from` returns the edge that contains `vertex`.  If no
