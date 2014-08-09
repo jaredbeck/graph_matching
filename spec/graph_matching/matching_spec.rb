@@ -7,6 +7,17 @@ describe GraphMatching::Matching do
     end
   end
 
+  describe '#array_match?' do
+    it 'returns true if both arrays have same elements, any order' do
+      a = [1,2,2,:three]
+      b = [2,1,:three,2]
+      expect(described_class.new.send(:array_match?, a, b)).to eq(true)
+      a = [1,2,2,:three]
+      b = [2,1,:three]
+      expect(described_class.new.send(:array_match?, a, b)).to eq(false)
+    end
+  end
+
   describe '#augment' do
     it 'augments the matching' do
       m = described_class.new([[2,3]])

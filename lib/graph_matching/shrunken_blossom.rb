@@ -12,8 +12,16 @@ module GraphMatching
       @subgraph = subgraph
     end
 
+    def inspect
+      to_dot
+    end
+
     def to_dot
       'B' + subgraph.vertices.to_a.join
+    end
+
+    def to_s
+      to_dot
     end
 
   end

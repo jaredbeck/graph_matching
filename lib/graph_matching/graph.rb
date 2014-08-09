@@ -108,13 +108,13 @@ module GraphMatching
             #          Restart entire routine.
               covered = m.has_vertex?(wi)
               if !covered
-                fail('TODO: blossom expansion at vertex: %d' % [wi])
+                fail('TODO: blossom expansion at vertex: %s' % [wi])
 
             #        If w is M-covered and is labeled EVEN (S):
             #          BLOSSOM SHRINKING[w]
               elsif covered && s.include?(wi)
-                log('TODO: blossom shrinking at vertex: %d' % [wi])
-                shrink_blossom(wi, ri, v, s, t)
+                log('TODO: blossom shrinking at vertex: %s' % [wi])
+                shrink_blossom(wi, ri, v, s, t, m)
 
             #        If w is M-covered and is unlabeled:
             #          label w ODD (T)
@@ -138,7 +138,7 @@ module GraphMatching
             #    If h is unlabeled:
             #      label h EVEN.
             if t.include?(h)
-              shrink_blossom(h, ri, v, s, t)
+              shrink_blossom(h, ri, v, s, t, m)
             else
               s.add(h, v)
             end
@@ -155,7 +155,7 @@ module GraphMatching
       m.validate
     end
 
-    def shrink_blossom(z, ri, v, s, t)
+    def shrink_blossom(z, ri, v, s, t, m)
       log('shrink_blossom(z = %s, ri = %s, v = %s)' % [z, ri, v])
       b = blossom_vertexes(ri, s, t, v, z)
       log("blossom_vertexes = #{b.inspect}")
@@ -177,9 +177,10 @@ module GraphMatching
         end
       end
       b.each do |bv| remove_vertex(bv) end
-      print('blossom3')
+      # print('blossom3')
 
-      fail('TODO')
+      log('recurse!')
+      mcm_stage(m, first_unmatched_vertex(m))
     end
 
     def print(base_filename)
