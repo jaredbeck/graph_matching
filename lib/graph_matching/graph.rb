@@ -175,17 +175,18 @@ module GraphMatching
 
       l = s.v.merge(t.v)
       log('labels: %s' % [l])
-      p = Set[wi]
+      p = [wi, v]
       vi = v
       until vi == ri do
-        log('building path: %s' % [p.to_a])
+        log('building path: %s, vi: %s' % [p.to_a, vi])
         vj = l[vi]
         fail('unexpected nil') if vj.nil?
         log('building path: next: %s' % [vj])
         if vj.is_a?(ShrunkenBlossom)
           expand_blossom(vj, m)
+          fail('todo')
         end
-        p.add([vi, vj])
+        p.push(vj)
         vi = vj
       end
       log('augmenting path: %s' % [p])
@@ -197,45 +198,24 @@ module GraphMatching
       fail('TODO')
     end
 
+    # `expand_blossom`
+    #
+    # 1. Restore the edges within the blossom.
+    # 2. Reattached edges currently attached to vB back to the
+    #    vertices in the blossom to which they were originally
+    #    attached before shrinking.
+    #
     def expand_blossom(blossom, m)
       log('expand_blossom(%s, %s)' % [blossom, m])
-
-      # To expand a blossom:
-      #
-      # 1. Restore the edges within the blossom.
-      # 1. Reattached edges currently attached to vB back to the
-      #    vertices in the blossom to which they were originally
-      #    attached before shrinking.
-
-      # log('subgraph: %s' % [blossom.subgraph])
-
       add_edges(*blossom.subgraph.edges)
-
-      log('adjacent vertexes before: %s' % [each_adjacent(blossom).to_a])
-
       each_adjacent(blossom) { |v|
-        # which vertex in the subgraph did v connect to?
-        old_edge = blossom.adjacent_edges.find { |e| e.to_a.include?(v) }
-        log('old_edge: %s' % [old_edge])
-        subgraph_vertex = (Set.new(old_edge.to_a) - [v]).to_a.first
-        log('subgraph_vertex: %s' % [subgraph_vertex])
-        new_edge = UnDirectedEdge.new(subgraph_vertex, v)
-        log('new_edge: %s' % [new_edge])
-
-        if m.has_edge?(old_edge)
-          m.add_edge(new_edge)
-        end
-        m.delete(old_edge)
-        add_edge(*new_edge)
+        stashed_edge = blossom.adjacent_edge_including(v)
+        m.replace_if_matched(match: [blossom, v], replacement: stashed_edge)
+        add_edge(*stashed_edge)
       }
-
       remove_vertex(blossom)
-      print('blossom_expanded')
-
-      fail('todo')
-
-      log('adjacent_edges: %s' % [blossom.adjacent_edges])
-
+      # print('blossom_expanded')
+      log('matching after expansion: %s' % [m.to_a.map(&:to_s)])
     end
 
     def shrink_blossom(z, ri, v, s, t, m)

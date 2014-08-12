@@ -24,5 +24,9 @@ module GraphMatching
       to_dot
     end
 
+    def adjacent_edge_including(v)
+      adjacent_edges.find { |e| e.to_a.include?(v) }
+    end
+
   end
 end

@@ -46,6 +46,15 @@ module GraphMatching
       delete_if { |e| array_match?(e, edge) }
     end
 
+    def replace(old:, new:)
+      delete old
+      add new
+    end
+
+    def replace_if_matched(match:, replacement:)
+      replace(old: match, new: replacement) if has_edge?(match)
+    end
+
     def unmatched_vertexes_in(set)
       set - vertexes
     end
