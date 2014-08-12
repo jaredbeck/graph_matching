@@ -39,7 +39,7 @@ module GraphMatching
     # `match` returns the matched vertex (across the edge) or
     # nil if `v` is not matched
     def match(v)
-      (edge_from(v) - [v])[0]
+      (edge_from(v).to_a - [v])[0]
     end
 
     def delete(edge)
@@ -85,7 +85,7 @@ module GraphMatching
     # `edge_from` returns the edge that contains `vertex`.  If no
     # edge contains `vertex`, returns empty array.  See also `#match`
     def edge_from(vertex)
-      find { |edge| edge.include?(vertex) } || []
+      find { |edge| edge.to_a.include?(vertex) } || []
     end
 
   end
