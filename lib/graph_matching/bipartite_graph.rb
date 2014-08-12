@@ -103,10 +103,6 @@ module GraphMatching
       adjacent_vertexes.select { |x| matching.has_edge?([x, vertex]) }
     end
 
-    def unmatched_adjacent_to(vertex, matching)
-      adjacent_vertices(vertex).reject { |a| matching.has_edge?([vertex, a]) }
-    end
-
     def unmatched_unlabled_adjacent_to(vertex, matching, labels)
       unmatched_adjacent_to(vertex, matching).reject { |v| labels.include?(v) }
     end

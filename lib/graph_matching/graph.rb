@@ -93,7 +93,7 @@ module GraphMatching
             #   A) Using breadth-first search, move along all of
             #      the unmatched edges emanating from v. Call the
             #      set of vertices on the opposite end of such edges W.
-            w = each_adjacent(v).reject { |x| m.has_edge?([v, x]) }
+            w = unmatched_adjacent_to(v, m)
 
             #   B) Add the vertices in W to the queue.
             q.concat(w)
@@ -256,6 +256,12 @@ module GraphMatching
 
     def print(base_filename)
       Visualize.new(self).png(base_filename)
+    end
+
+    protected
+
+    def unmatched_adjacent_to(vertex, matching)
+      adjacent_vertices(vertex).reject { |a| matching.has_edge?([vertex, a]) }
     end
 
     private
