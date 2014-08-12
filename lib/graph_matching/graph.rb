@@ -110,7 +110,7 @@ module GraphMatching
               if !covered
                 log('blossom expansion at vertex: %s' % [wi])
                 augment_by_expanding_blossom(v, wi, ri, s, t, m)
-                fail('TODO: restart entire routine')
+                return m # augmented!
 
             #        If w is M-covered and is labeled EVEN (S):
             #          BLOSSOM SHRINKING[w]
@@ -173,29 +173,40 @@ module GraphMatching
       #
       # Extend AP through expanded blossom.
 
-      l = s.v.merge(t.v)
-      log('labels: %s' % [l])
-      p = [wi, v]
-      vi = v
-      until vi == ri do
-        log('building path: %s, vi: %s' % [p.to_a, vi])
-        vj = l[vi]
-        fail('unexpected nil') if vj.nil?
-        log('building path: next: %s' % [vj])
-        if vj.is_a?(ShrunkenBlossom)
-          expand_blossom(vj, m)
-          fail('todo')
-        end
-        p.push(vj)
-        vi = vj
-      end
-      log('augmenting path: %s' % [p])
+      ap = derp(v, true, [wi], ri, m)
+      log('ap: %s' % [ap])
+      m.augment(ap)
+      log("m: #{m}")
+    end
 
-      # Recurse out of MAIN ROUTINE, propogating APB through each expanded blossom.
-      # Upon arriving at G, and concurrently AP, flip the matching of AP.
-      # Go to lightbulb
-      #
-      fail('TODO')
+    def derp(v, odd, path_so_far, ri, m)
+      log('derp(v: %s, odd: %s, path_so_far: %s)' % [v, odd, path_so_far])
+      if v == ri
+        path_so_far + [ri]
+      elsif odd
+        h = m.match(v)
+        while h.is_a?(ShrunkenBlossom)
+          log("h = #{h}")
+          expand_blossom(h, m)
+          h = m.match(v)
+        end
+        fail('Unexpected nil match') if h.nil?
+        derp(h, false, path_so_far.push(v), ri, m)
+      else
+        (unmatched_adjacent_to(v, m) - path_so_far).each do |w|
+          log("w = #{w}")
+          if w == ri
+            return path_so_far.push(v).push(ri)
+          else
+            herp = derp(w, true, path_so_far.push(v), ri, m)
+            if herp.nil?
+              next
+            else
+              return herp
+            end
+          end
+        end
+      end
     end
 
     # `expand_blossom`
@@ -208,6 +219,7 @@ module GraphMatching
     def expand_blossom(blossom, m)
       log('expand_blossom(%s, %s)' % [blossom, m])
       add_edges(*blossom.subgraph.edges)
+      m.merge(blossom.interior_matched_edges)
       each_adjacent(blossom) { |v|
         stashed_edge = blossom.adjacent_edge_including(v)
         m.replace_if_matched(match: [blossom, v], replacement: stashed_edge)
@@ -215,6 +227,7 @@ module GraphMatching
       }
       remove_vertex(blossom)
       # print('blossom_expanded')
+      m.validate
       log('matching after expansion: %s' % [m.to_a.map(&:to_s)])
     end
 
@@ -223,7 +236,7 @@ module GraphMatching
       b = blossom_vertexes(ri, s, t, v, z)
       log("blossom_vertexes = #{b.inspect}")
       ea = all_blossom_edges(b)
-      shrunken = build_shrunken_blossom(b, ea)
+      shrunken = build_shrunken_blossom(b, ea, m)
       # shrunken.subgraph.print('blossom2')
 
       # To shrink the blossom:
@@ -260,6 +273,9 @@ module GraphMatching
 
     protected
 
+    # `unmatched_adjacent_to` is poorly named.  It returns vertexes
+    # across adjacent unmatched edges.  However, vertexes in the
+    # returned array may be matched by non-adjacent edges.
     def unmatched_adjacent_to(vertex, matching)
       adjacent_vertices(vertex).reject { |a| matching.has_edge?([vertex, a]) }
     end
@@ -287,10 +303,11 @@ module GraphMatching
       Set.new((p1 ^ p2).to_a.flatten)
     end
 
-    def build_shrunken_blossom(blossom_vertexes, blossom_edges)
+    def build_shrunken_blossom(blossom_vertexes, blossom_edges, m)
       ej = edges_adjacent_to_subgraph(blossom_vertexes)
       g = self.class.new_from_set_of_edges(blossom_edges - ej)
-      ShrunkenBlossom.new(g, ej)
+      interior_matched_edges = m & g.edges
+      ShrunkenBlossom.new(g, ej, interior_matched_edges)
     end
 
     # Given a `Set` of `vertexes`, returns adjacent edges.

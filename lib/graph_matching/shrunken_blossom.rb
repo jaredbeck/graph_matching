@@ -5,10 +5,11 @@ module GraphMatching
   # will be referenced during expansion.
   class ShrunkenBlossom
 
-    attr_reader :subgraph, :adjacent_edges
+    attr_reader :subgraph, :adjacent_edges, :interior_matched_edges
 
-    def initialize(subgraph, adjacent_edges)
+    def initialize(subgraph, adjacent_edges, interior_matched_edges)
       @adjacent_edges = adjacent_edges
+      @interior_matched_edges = interior_matched_edges
       @subgraph = subgraph
     end
 

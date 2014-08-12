@@ -117,7 +117,7 @@ describe GraphMatching::Graph do
           # g.print('blossom')
           m = g.mcm_stage(maximal, 6)
           expect(m.size).to eq(3)
-          expect(m.vertexes).to eq(6)
+          expect(m.vertexes).to match_array(g.to_a)
         end
       end
     end

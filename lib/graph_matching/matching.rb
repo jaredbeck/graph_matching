@@ -6,6 +6,10 @@ module GraphMatching
   class Matching < Set
     include Explainable
 
+    def add(o)
+      super(to_undirected_edge(o))
+    end
+
     def augment(augmenting_path)
       log("augmenting the matching. path: #{augmenting_path.inspect}")
       ap = Path.new(augmenting_path)
@@ -42,8 +46,16 @@ module GraphMatching
       (edge_from(v).to_a - [v])[0]
     end
 
+    def merge(enum)
+      super(enum.map { |e| to_undirected_edge(e) })
+    end
+
     def delete(edge)
       delete_if { |e| array_match?(e, edge) }
+    end
+
+    def inspect
+      to_s
     end
 
     def replace(old:, new:)
@@ -53,6 +65,10 @@ module GraphMatching
 
     def replace_if_matched(match:, replacement:)
       replace(old: match, new: replacement) if has_edge?(match)
+    end
+
+    def to_s
+      '[' + to_a.map(&:to_s).join(', ') + ']'
     end
 
     def unmatched_vertexes_in(set)
@@ -71,7 +87,7 @@ module GraphMatching
     end
 
     def vertexes
-      to_a.flatten
+      map(&:to_a).flatten
     end
 
     private
@@ -86,6 +102,11 @@ module GraphMatching
     # edge contains `vertex`, returns empty array.  See also `#match`
     def edge_from(vertex)
       find { |edge| edge.to_a.include?(vertex) } || []
+    end
+
+    def to_undirected_edge(o)
+      klass = RGL::Edge::UnDirectedEdge
+      o.is_a?(klass) ? o : klass.new(*o.to_a)
     end
 
   end
