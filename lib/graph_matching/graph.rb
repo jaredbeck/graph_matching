@@ -115,7 +115,6 @@ module GraphMatching
             #        If w is M-covered and is labeled EVEN (S):
             #          BLOSSOM SHRINKING[w]
               elsif covered && s.include?(wi)
-                log('TODO: blossom shrinking at vertex: %s' % [wi])
                 shrink_blossom(wi, ri, v, s, t, m)
 
             #        If w is M-covered and is unlabeled:
@@ -269,6 +268,10 @@ module GraphMatching
 
     def print(base_filename)
       Visualize.new(self).png(base_filename)
+    end
+
+    def vertexes
+      to_a
     end
 
     protected

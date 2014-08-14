@@ -107,6 +107,11 @@ describe GraphMatching::Graph do
   end
 
   describe '#mcm_stage' do
+
+    def edge_str_to_ary(str)
+      str.split(' ').map { |e| [e[0], e[1]] }
+    end
+
     context 'graph with stem (123) and blossom (345)' do
       let(:g) { GraphMatching::Graph[1,2, 2,3, 2,4, 3,4, 4,5, 5,6] }
 
@@ -119,6 +124,22 @@ describe GraphMatching::Graph do
           expect(m.size).to eq(3)
           expect(m.vertexes).to match_array(g.to_a)
         end
+      end
+    end
+
+    context "Example from West's Introduction to Graph Theory, p. 143" do
+      let(:graph_str) { 'ua ac cf fg gh ce ef ub bd de bx' }
+      let(:g) { GraphMatching::Graph[*edge_str_to_ary(graph_str).flatten] }
+      let(:match_str) { 'ac fe gh bd' }
+      let(:m) { GraphMatching::Matching[*edge_str_to_ary(match_str)] }
+
+      it 'returns a maximum cardinality matching' do
+        # g.print('blossom')
+        expect(g.size).to eq(10)
+        expect(g.vertexes).to include('u')
+        mcm = g.mcm_stage(m, 'u')
+        expect(mcm.size).to eq(5)
+        expect(mcm.vertexes).to match_array(g.vertexes)
       end
     end
   end
