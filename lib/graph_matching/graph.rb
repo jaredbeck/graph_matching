@@ -172,15 +172,16 @@ module GraphMatching
       #
       # Extend AP through expanded blossom.
 
-      ap = derp(v, true, [wi], ri, m)
+      ap = path_through_blossoms(v, true, [wi], ri, m)
       log('ap: %s' % [ap])
       m.augment(ap)
       log("m: #{m}")
     end
 
-    def derp(v, odd, path_so_far, ri, m)
-      log('derp(v: %s, odd: %s, path_so_far: %s)' % [v, odd, path_so_far])
+    def path_through_blossoms(v, odd, path_so_far, ri, m)
+      log('path_through_blossoms(v: %s, odd: %s, path_so_far: %s)' % [v, odd, path_so_far])
       if v == ri
+        log('path is complete')
         path_so_far + [ri]
       elsif odd
         h = m.match(v)
@@ -190,19 +191,14 @@ module GraphMatching
           h = m.match(v)
         end
         fail('Unexpected nil match') if h.nil?
-        derp(h, false, path_so_far.push(v), ri, m)
+        path_through_blossoms(h, false, path_so_far.push(v), ri, m)
       else
         (unmatched_adjacent_to(v, m) - path_so_far).each do |w|
           log("w = #{w}")
           if w == ri
             return path_so_far.push(v).push(ri)
           else
-            herp = derp(w, true, path_so_far.push(v), ri, m)
-            if herp.nil?
-              next
-            else
-              return herp
-            end
+            path_through_blossoms(w, true, path_so_far.push(v), ri, m) || next
           end
         end
       end
