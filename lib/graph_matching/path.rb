@@ -5,7 +5,10 @@ module GraphMatching
 
     def initialize(vertexes)
       unless vertexes.length >= 2
-        raise ArgumentError, "Invalid path: Needs at least two vertexes"
+        raise ArgumentError, 'Invalid path: Needs at least two vertexes'
+      end
+      if vertexes.any? { |v| v.is_a?(ShrunkenBlossom) }
+        raise ArgumentError, 'Invalid path: Contains a ShrunkenBlossom'
       end
       @vertexes = vertexes.to_a
     end
