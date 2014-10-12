@@ -77,7 +77,7 @@ module GraphMatching
       label = []
       mate = []
 
-      # E0. [Imtiahze.] Read the graph into adjacency lists,
+      # E0. [Initialize.] Read the graph into adjacency lists,
       # numbering the vertices 1 to V and the edges V + 1 to
       # V + 2W. Create a dummy vertex 0 For 0 <= i <= V, set
       # LABEL(u) <- -1, MATE(i) <- 0 (all vertices are nonouter
