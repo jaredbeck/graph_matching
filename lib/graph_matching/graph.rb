@@ -83,8 +83,8 @@ module GraphMatching
       # LABEL(u) <- -1, MATE(i) <- 0 (all vertices are nonouter
       # and unmatched) Set u <- 0
 
-      label.fill(-1, 0, size)
-      mate.fill(0, 0, size)
+      label.fill(-1, 0, size + 1)
+      mate.fill(0, 0, size + 1)
       u = 0
 
       # El. [Find unmatched vertex ] Set u = u + 1. If u > V,
@@ -104,6 +104,7 @@ module GraphMatching
         if mate[u] != 0
           next # repeat E1
         else
+          log("E1 label #{u} with 0 (indicates 'start' label?)")
           label[u] = first[u] = 0
         end
 
@@ -120,10 +121,14 @@ module GraphMatching
       # vertices, x1, x2, ...)
 
         searching = true
+        visited_nodes = Set.new
         visited_edges = Set.new
-        outer = OrderedSet[u]
-        while searching && !outer.empty?
-          x = outer.deq
+        q = OrderedSet[u]
+        while searching && !q.empty?
+          log('')
+          log("E2 q: #{q.to_a}")
+          x = q.deq
+          visited_nodes.add(x)
           log("E2 x: #{x}")
           adjacent_edges = adjacent_vertices(x).sort.map { |j| DirectedEdge.new(x, j) }
           discovered_edges = Set.new(adjacent_edges) - visited_edges
@@ -133,6 +138,8 @@ module GraphMatching
             visited_edges.add(edge)
             y = edge.target
             log("E2 y: #{y}")
+            log("E2 labels: #{label}")
+            log("E2 mate: #{mate}")
 
       # E3. [Augment the matching.] If y is unmatched and y != u,
       # set MATE(y) = x, call R(x, y): then go to E7 (R
@@ -149,7 +156,7 @@ module GraphMatching
       # E2 (L assigns edge label n(xy) to nonouter vertices in P(x)
       # and P(y))
 
-            elsif outer.include?(y)
+            elsif label[y] >= 0 # outer
               log('E4')
               l(x, y)
 
@@ -162,14 +169,14 @@ module GraphMatching
             else
               v = mate[y]
               log("E5 v: #{v} labels: #{label}")
-              if label[v] == -1 # -1 means nonouter
-                log('E5 set vertex label')
+              if label[v] == -1 # nonouter
+                log("E5 label #{v} with #{x}")
                 label[v] = x
                 first[v] = y
-                outer.enq(x)
-              else
-                log("E6 y: #{y} is nonouter, v: #{v} is outer")
-                outer.enq(v)
+              end
+              unless visited_nodes.include?(v)
+                log("E6 enqueue #{v}")
+                q.enq(v)
               end
             end
 
@@ -190,6 +197,7 @@ module GraphMatching
           end
         end
 
+        log('')
       end # while e0_loop
     end
 
@@ -208,7 +216,7 @@ module GraphMatching
       # +- -n(xy). This way, each invocation of L uses a distinct
       # flag value.)
 
-      fail 'TODO: L0'
+      log 'TODO: L0'
 
       # L1. [Switch paths ] If s ~ 0, interchange r and s, r ~-~s
       # (r is a flagged nonouter vertex, alternately in P(x) and P(y)).
@@ -248,6 +256,7 @@ module GraphMatching
 
       t = mate[v]
       mate[v] = w
+      log("R0 augmented: #{mate}")
       return if mate[t] != v
 
       # R2. [Rematch a path.] If v has a vertex label, set
