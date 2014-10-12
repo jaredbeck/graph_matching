@@ -28,6 +28,18 @@ module GraphMatching
       augmenting_path
     end
 
+    def bfs(from:, visited:)
+      visited.push(from)
+      if visited.length < size
+        adjacent_vertices(from).each do |v|
+          if !visited.include?(v)
+            visited = bfs(from: v, visited: visited)
+          end
+        end
+      end
+      visited
+    end
+
     def connected?
       count = 0
       each_connected_component { |c| count += 1 }
