@@ -144,5 +144,14 @@ describe GraphMatching::Graph do
         expect(mcm.vertexes).to match_array(g.vertexes)
       end
     end
+
+    context 'example from Gabow (1976)' do
+      it 'returns a maximum cardinality matching' do
+        g = GraphMatching::Graph[1,2, 2,3, 1,3, 1,10, 3,9, 3,4, 4,7, 4,8, 7,8, 9,5, 5,6, 6,7]
+        m = g.e
+        expect(m.size).to eq(5)
+        expect(m.vertexes).to match_array([[10,1], [2,3], [4,8], [7,6], [5,9]])
+      end
+    end
   end
 end

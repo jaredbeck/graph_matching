@@ -83,20 +83,20 @@ module GraphMatching
       # LABEL(u) <- -1, MATE(i) <- 0 (all vertices are nonouter
       # and unmatched) Set u <- 0
 
-      e0_loop = true
-      guard = 0
-      while e0_loop && guard < 1000 do
-        guard += 1
-
-        label.fill(-1, 0, size)
-        mate.fill(0, 0, size)
-        u = 0
+      label.fill(-1, 0, size)
+      mate.fill(0, 0, size)
+      u = 0
 
       # El. [Find unmatched vertex ] Set u = u + 1. If u > V,
       # halt; MATE contains a maximum matching Otherwise, if vertex
       # u is matched, repeat step E1 Otherwise (u is unmatched, so
       # assign a start label and begin a new search)
       # set LABEL(u) = FIRST(u) = 0
+
+      e1_loop = true
+      guard = 0
+      while e1_loop && guard < 1000 do
+        guard += 1
 
         u += 1
         break if u > size
@@ -118,31 +118,36 @@ module GraphMatching
       # method requires that Algorithm E maintain a list of outer
       # vertices, x1, x2, ...)
 
-        adjacent_vertices(u).each do |y|
+        searching = true
+        visited_edges = Set.new
+        outer = OrderedSet[u]
+        while searching && !outer.empty?
+          x = outer.deq
+          log("x: #{x}")
+          adjacent_edges = adjacent_vertices(x).map { |j| DirectedEdge.new(x, j) }
+          discovered_edges = Set.new(adjacent_edges) - visited_edges
+          log("discovered_edges: #{discovered_edges.to_a.map { |edge| edge.to_a }}")
+          discovered_edges.each do |edge|
+            visited_edges.add(edge)
 
-      # E3. [Augment the matching.l If y is unmatched and y != u,
+      # E3. [Augment the matching.] If y is unmatched and y != u,
       # set MATE(y) = x, call R(x, y): then go to E7 (R
       # completes the augment along path (y)*P(x))
 
-          if mate[y] == 0
-            if y == u
-              fail 'Un-described algorithm branch'
-            else
-              mate[y] = u
-              mate[u] = y
-              e0_loop = false
+            y = edge.target
+            log("y: #{y}")
+            if mate[y] == 0 && y != u
+              mate[y] = x
+              r(x, y, mate)
+              searching = false # go to E7
               break
-            end
 
       # E4. [Assign edge labels.] If y is outer, call L, then go to
       # E2 (L assigns edge label n(xy) to nonouter vertices in P(x)
       # and P(y))
 
-          else
-            x = mate[y]
-            l(x, y)
-            next
-          end
+            elsif outer.include?(y)
+              l(x, y)
 
       # E5. [Assign a vertex label.] Set v ~-~MATE(y). If v m
       # nonouter, set LABEL(v) ~ x, FIRST(v) <- y, and go to E2
@@ -150,16 +155,27 @@ module GraphMatching
       # E6. [Get next edge.] Go to E2 (y is nonouter and MATE(y) is
       # outer, so edge xy adds nothing).
 
-        end # E2 loop
-      end
+            else
+              v = mate[y]
+              fail 'TODO: E5'
+            end
 
-      fail 'TODO'
+          end
+        end # until outer.empty?
 
       #
-      # E7. [Stop the search] Set LABEL(O) *-- --1. For all outer
-      # vertices % set LABEL(q) e- LABEL (MATE(z)) ~-- --1 Then go
+      # E7. [Stop the search] Set LABEL(O) <- -1. For all outer
+      # vertices i set LABEL(i) <- LABEL(MATE(i)) <- -1 Then go
       # to E1 (now all vertmes are nonouter for the next search).
       #
+
+        log('E7.  All vertices are nonouter for the next search')
+        label[0] = -1
+        outer.each do |i|
+          label[i] = label[mate[i]] = -1
+        end
+
+      end # while e0_loop
     end
 
     # L assigns the edge label n(xy) to nonouter vertices Edge xy
@@ -201,19 +217,27 @@ module GraphMatching
       #
     end
 
-    # R (v, w) rematches edges m the augmenting path. Vertex v is
-    # outer. Part of path (w)*P(v) is in the augmenting path. It
+    # R (v, w) rematches edges in the augmenting path. Vertex v is
+    # outer. Part of path (w) * P(v) is in the augmenting path. It
     # gets rematehed by R(v, w) (Although R sets MATE(v) +- w, it
     # does not set MATE(w) <- v. This is done in step E3 or another
     # call to R.) R is a recursive routine.
-    def r
-      # R1. [Match v to w ] Set t ~-- MATE(v), MATE(v) <- w. If
-      # MATE(t) ~ v, return (the path m com- pletely rematehed)
-      #
+    def r(v, w, mate)
+      log("r(v, w, mate): #{v}, #{w}, #{mate}")
+
+      # R1. [Match v to w ] Set t <- MATE(v), MATE(v) <- w.
+      # If MATE(t) != v, return (the path is completely re-matched)
+
+      t = mate[v]
+      mate[v] = w
+      return if mate[t] != v
+
       # R2. [Rematch a path.] If v has a vertex label, set
       # MATE(t) ~-- LABEL(v), call R(LABEL(v), t) recursivcly, and
       # then return.
-      #
+
+      fail 'TODO'
+
       # R3. [Rematch two paths.] (Vertex v has an edge label ) Set
       # x, y to vertices so LABEL(v) = n(xy), call R(x, y)
       # recurslvely, call R(y, x) recurslvely, and then return.
