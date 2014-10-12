@@ -1,8 +1,6 @@
 require 'rgl/adjacency'
 require 'rgl/connected_components'
-
-# TODO: autoload?
-require_relative 'shrunken_blossom'
+require_relative 'ordered_set'
 
 module GraphMatching
 
@@ -28,16 +26,18 @@ module GraphMatching
       augmenting_path
     end
 
-    def bfs(from:, visited:)
-      visited.push(from)
-      if visited.length < size
-        adjacent_vertices(from).each do |v|
-          if !visited.include?(v)
-            visited = bfs(from: v, visited: visited)
-          end
-        end
+    # `bfs` - Breadth-First Search. Takes a starting point, `from`,
+    # and a block to which visited nodes will be yielded.
+    def bfs(from)
+      visited = Set.new
+      q = OrderedSet[from]
+      until q.empty?
+        v = q.deq
+        yield v
+        visited.add(v)
+        discovered = Set.new(adjacent_vertices(v)) - visited
+        q.push(*discovered)
       end
-      visited
     end
 
     def connected?
