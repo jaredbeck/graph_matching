@@ -99,6 +99,7 @@ module GraphMatching
         guard += 1
 
         u += 1
+        log("E1 u: #{u}")
         break if u > size
         if mate[u] != 0
           next # repeat E1
@@ -123,20 +124,22 @@ module GraphMatching
         outer = OrderedSet[u]
         while searching && !outer.empty?
           x = outer.deq
-          log("x: #{x}")
-          adjacent_edges = adjacent_vertices(x).map { |j| DirectedEdge.new(x, j) }
+          log("E2 x: #{x}")
+          adjacent_edges = adjacent_vertices(x).sort.map { |j| DirectedEdge.new(x, j) }
           discovered_edges = Set.new(adjacent_edges) - visited_edges
-          log("discovered_edges: #{discovered_edges.to_a.map { |edge| edge.to_a }}")
+          log("E2 discovered_edges: #{discovered_edges.to_a.map { |edge| edge.to_a }}")
+
           discovered_edges.each do |edge|
             visited_edges.add(edge)
+            y = edge.target
+            log("E2 y: #{y}")
 
       # E3. [Augment the matching.] If y is unmatched and y != u,
       # set MATE(y) = x, call R(x, y): then go to E7 (R
       # completes the augment along path (y)*P(x))
 
-            y = edge.target
-            log("y: #{y}")
             if mate[y] == 0 && y != u
+              log('E3')
               mate[y] = x
               r(x, y, mate)
               searching = false # go to E7
@@ -147,21 +150,31 @@ module GraphMatching
       # and P(y))
 
             elsif outer.include?(y)
+              log('E4')
               l(x, y)
 
-      # E5. [Assign a vertex label.] Set v ~-~MATE(y). If v m
-      # nonouter, set LABEL(v) ~ x, FIRST(v) <- y, and go to E2
+      # E5. [Assign a vertex label.] Set v <- MATE(y). If v is
+      # nonouter, set LABEL(v) <- x, FIRST(v) <- y, and go to E2
       #
       # E6. [Get next edge.] Go to E2 (y is nonouter and MATE(y) is
       # outer, so edge xy adds nothing).
 
             else
               v = mate[y]
-              fail 'TODO: E5'
+              log("E5 v: #{v} labels: #{label}")
+              if label[v] == -1 # -1 means nonouter
+                log('E5 set vertex label')
+                label[v] = x
+                first[v] = y
+                outer.enq(x)
+              else
+                log("E6 y: #{y} is nonouter, v: #{v} is outer")
+                outer.enq(v)
+              end
             end
 
           end
-        end # until outer.empty?
+        end
 
       #
       # E7. [Stop the search] Set LABEL(O) <- -1. For all outer
@@ -169,10 +182,12 @@ module GraphMatching
       # to E1 (now all vertmes are nonouter for the next search).
       #
 
-        log('E7.  All vertices are nonouter for the next search')
+        log('E7')
         label[0] = -1
-        outer.each do |i|
-          label[i] = label[mate[i]] = -1
+        label.each_with_index do |obj, ix|
+          if ix > 0 && obj != -1
+            label[ix] = label[mate[ix]] = -1
+          end
         end
 
       end # while e0_loop
@@ -183,6 +198,7 @@ module GraphMatching
     # vertex m both P(z) and P(y). Then it labels all nonouter
     # vertices preceding join in P(x) or P(y)
     def l(x, y)
+
       # L0. [Initialize.] Set r ~ FIRST(x), s ~-- FIRST(y).
       # If r = s, return (no vertices can be labeled).
       # Otherwise flag r and s. (Steps L1-L2 find 3oin by advancing
@@ -191,7 +207,9 @@ module GraphMatching
       # setting LABEL(r) to a negative edge number, LABEL(r)
       # +- -n(xy). This way, each invocation of L uses a distinct
       # flag value.)
-      #
+
+      fail 'TODO: L0'
+
       # L1. [Switch paths ] If s ~ 0, interchange r and s, r ~-~s
       # (r is a flagged nonouter vertex, alternately in P(x) and P(y)).
       #
@@ -223,7 +241,7 @@ module GraphMatching
     # does not set MATE(w) <- v. This is done in step E3 or another
     # call to R.) R is a recursive routine.
     def r(v, w, mate)
-      log("r(v, w, mate): #{v}, #{w}, #{mate}")
+      log("R0 (v, w, mate): #{v}, #{w}, #{mate}")
 
       # R1. [Match v to w ] Set t <- MATE(v), MATE(v) <- w.
       # If MATE(t) != v, return (the path is completely re-matched)
