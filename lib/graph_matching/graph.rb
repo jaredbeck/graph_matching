@@ -54,6 +54,10 @@ module GraphMatching
       count == 1
     end
 
+    def edge_label?(label_value)
+      label_value.is_a?(UnDirectedEdge)
+    end
+
     # `maximal_matching` - Not to be confused with a *maximum* matching.
     # > A maximal matching is defined as a matching in which
     # > no edge in G can be added to the matching.
@@ -157,7 +161,7 @@ module GraphMatching
             if mate[y] == 0 && y != u
               log('E3')
               mate[y] = x
-              r(x, y, mate)
+              r(x, y, label, mate)
               searching = false # go to E7
               break
 
@@ -335,31 +339,43 @@ module GraphMatching
       !label_value.is_a?(Integer) || label_value >= 0
     end
 
-    # R (v, w) rematches edges in the augmenting path. Vertex v is
+    # R(v, w) rematches edges in the augmenting path. Vertex v is
     # outer. Part of path (w) * P(v) is in the augmenting path. It
-    # gets rematehed by R(v, w) (Although R sets MATE(v) +- w, it
+    # gets re-matched by R(v, w) (Although R sets MATE(v) <- w, it
     # does not set MATE(w) <- v. This is done in step E3 or another
     # call to R.) R is a recursive routine.
-    def r(v, w, mate)
+    def r(v, w, label, mate)
       log("R0 (v, w, mate): #{v}, #{w}, #{mate}")
 
       # R1. [Match v to w ] Set t <- MATE(v), MATE(v) <- w.
       # If MATE(t) != v, return (the path is completely re-matched)
 
       t = mate[v]
+      log "R1 start. the mate of #{v} is t: #{t}"
+
+      log "R1 (re)match #{v} to #{w}"
       mate[v] = w
-      log("R0 augmented: #{mate}")
       return if mate[t] != v
 
       # R2. [Rematch a path.] If v has a vertex label, set
-      # MATE(t) ~-- LABEL(v), call R(LABEL(v), t) recursivcly, and
+      # MATE(t) <- LABEL(v), call R(LABEL(v), t) recursively, and
       # then return.
 
-      fail 'TODO'
+      if vertex_label?(label[v])
+        mate[t] = label[v]
+        r(label[v], t, label, mate)
 
-      # R3. [Rematch two paths.] (Vertex v has an edge label ) Set
-      # x, y to vertices so LABEL(v) = n(xy), call R(x, y)
-      # recurslvely, call R(y, x) recurslvely, and then return.
+      # R3. [Rematch two paths.] (Vertex v has an edge label)
+      # Set x, y to vertices so LABEL(v) = n(xy), call R(x, y)
+      # recursively, call R(y, x) recursively, and then return.
+
+      elsif edge_label?(label[v])
+        x, y = label[v].to_a
+        r(x, y, label, mate)
+        r(y, x, label, mate)
+      else
+        fail "Vertex #{v} has an unexpected label type"
+      end
     end
 
     def print(base_filename)
@@ -368,6 +384,10 @@ module GraphMatching
 
     def vertexes
       to_a
+    end
+
+    def vertex_label?(label_value)
+      label_value.is_a?(Integer) && label_value > 0
     end
 
     protected
