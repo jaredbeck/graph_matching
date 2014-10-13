@@ -107,6 +107,17 @@ describe GraphMatching::Graph do
   end
 
   describe '#e' do
+
+    def complete_graph(n)
+      g = GraphMatching::Graph.new
+      1.upto(n - 1) do |i|
+        (i + 1).upto(n) do |j|
+          g.add_edge(i, j)
+        end
+      end
+      g
+    end
+
     it 'simple example: graph with stem (123) and blossom (345)' do
       g = GraphMatching::Graph[1,2, 2,3, 2,4, 3,4, 4,5, 5,6]
       m = g.e
@@ -130,6 +141,19 @@ describe GraphMatching::Graph do
       expected.each do |edge|
         expect(m).to have_edge(edge)
       end
+    end
+
+    it 'various complete graphs' do
+      expect(complete_graph(1).e.size).to eq(0)
+      expect(complete_graph(2).e.size).to eq(1)
+      expect(complete_graph(3).e.size).to eq(1)
+      expect(complete_graph(4).e.size).to eq(2)
+      expect(complete_graph(5).e.size).to eq(2)
+      expect(complete_graph(6).e.size).to eq(3)
+      expect(complete_graph(19).e.size).to eq(9)
+      expect(complete_graph(20).e.size).to eq(10)
+      expect(complete_graph(21).e.size).to eq(10)
+      expect(complete_graph(100).e.size).to eq(50)
     end
   end
 end
