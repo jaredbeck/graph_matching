@@ -106,55 +106,29 @@ describe GraphMatching::Graph do
     end
   end
 
-  describe '#mcm_stage' do
-
-    def edge_str_to_ary(str)
-      str.split(' ').map { |e| [e[0], e[1]] }
+  describe '#e' do
+    it 'simple example: graph with stem (123) and blossom (345)' do
+      g = GraphMatching::Graph[1,2, 2,3, 2,4, 3,4, 4,5, 5,6]
+      m = g.e
+      expect(m.size).to eq(3)
+      expect(m.vertexes).to match_array(g.to_a)
     end
 
-    context 'graph with stem (123) and blossom (345)' do
-      let(:g) { GraphMatching::Graph[1,2, 2,3, 2,4, 3,4, 4,5, 5,6] }
-
-      context 'given a maximal, but not maximum matching' do
-        let(:maximal) { GraphMatching::Matching[[2,3], [4,5]] }
-
-        it 'returns a maximum cardinality matching' do
-          skip
-          # g.print('blossom')
-          m = g.mcm_stage(maximal, 6)
-          expect(m.size).to eq(3)
-          expect(m.vertexes).to match_array(g.to_a)
-        end
-      end
+    it 'example from West\'s Introduction to Graph Theory, p. 143' do
+      g = GraphMatching::Graph[1,2, 1,8, 2,3, 3,4, 3,7, 4,5, 5,6, 7,9, 8,9, 10,8]
+      m = g.e
+      expect(m.size).to eq(5)
+      expect(m.vertexes).to match_array(g.vertexes)
     end
 
-    context "Example from West's Introduction to Graph Theory, p. 143" do
-      let(:graph_str) { 'ua ac cf fg gh ce ef ub bd de bx' }
-      let(:g) { GraphMatching::Graph[*edge_str_to_ary(graph_str).flatten] }
-      let(:match_str) { 'ac fe gh bd' }
-      let(:m) { GraphMatching::Matching[*edge_str_to_ary(match_str)] }
-
-      it 'returns a maximum cardinality matching' do
-        skip
-        # g.print('blossom')
-        expect(g.size).to eq(10)
-        expect(g.vertexes).to include('u')
-        mcm = g.mcm_stage(m, 'u')
-        expect(mcm.size).to eq(5)
-        expect(mcm.vertexes).to match_array(g.vertexes)
-      end
-    end
-
-    context 'example from Gabow (1976)' do
-      it 'returns a maximum cardinality matching' do
-        g = GraphMatching::Graph[1,2, 2,3, 1,3, 1,10, 3,9, 3,4, 4,7, 4,8, 7,8, 9,5, 5,6, 6,7]
-        m = g.e
-        expect(m.size).to eq(5)
-        expect(m.vertexes).to match_array(1.upto(10))
-        expected = [[10,1], [2,3], [4,8], [7,6], [5,9]]
-        expected.each do |edge|
-          expect(m).to have_edge(edge)
-        end
+    it 'example from Gabow (1976)' do
+      g = GraphMatching::Graph[1,2, 2,3, 1,3, 1,10, 3,9, 3,4, 4,7, 4,8, 7,8, 9,5, 5,6, 6,7]
+      m = g.e
+      expect(m.size).to eq(5)
+      expect(m.vertexes).to match_array(1.upto(10))
+      expected = [[10,1], [2,3], [4,8], [7,6], [5,9]]
+      expected.each do |edge|
+        expect(m).to have_edge(edge)
       end
     end
   end
