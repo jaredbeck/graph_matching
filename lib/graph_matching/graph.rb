@@ -54,10 +54,6 @@ module GraphMatching
       count == 1
     end
 
-    def edge_label?(label_value)
-      label_value.is_a?(UnDirectedEdge)
-    end
-
     # `maximal_matching` - Not to be confused with a *maximum* matching.
     # > A maximal matching is defined as a matching in which
     # > no edge in G can be added to the matching.
@@ -75,9 +71,21 @@ module GraphMatching
     def maximum_cardinality_matching
       return Matching.new if empty?
       raise DisconnectedGraphError unless connected?
-      m = maximal_matching
-      u = first_unmatched_vertex(m)
-      (u.nil? || m.empty?) ? m : e
+      e
+    end
+
+    def print(base_filename)
+      Visualize.new(self).png(base_filename)
+    end
+
+    def vertexes
+      to_a
+    end
+
+    private
+
+    def edge_label?(label_value)
+      label_value.is_a?(UnDirectedEdge)
     end
 
     # `e` constructs a maximum matching on a graph.  It starts a
@@ -222,6 +230,10 @@ module GraphMatching
         end
       end
       m
+    end
+
+    def first_unmatched_vertex(m)
+      vertices.find { |v| !m.has_vertex?(v) }
     end
 
     # L assigns the edge label n(xy) to nonouter vertices. Edge xy
@@ -378,31 +390,15 @@ module GraphMatching
       end
     end
 
-    def print(base_filename)
-      Visualize.new(self).png(base_filename)
-    end
-
-    def vertexes
-      to_a
-    end
-
     def vertex_label?(label_value)
       label_value.is_a?(Integer) && label_value > 0
     end
-
-    protected
 
     # `unmatched_adjacent_to` is poorly named.  It returns vertexes
     # across adjacent unmatched edges.  However, vertexes in the
     # returned array may be matched by non-adjacent edges.
     def unmatched_adjacent_to(vertex, matching)
       adjacent_vertices(vertex).reject { |a| matching.has_edge?([vertex, a]) }
-    end
-
-    private
-
-    def first_unmatched_vertex(m)
-      vertices.find { |v| !m.has_vertex?(v) }
     end
 
   end
