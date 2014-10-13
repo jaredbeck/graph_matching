@@ -7,6 +7,14 @@ module GraphMatching
   class DisconnectedGraphError < StandardError
   end
 
+  # An LFlag represents a flag on an edge during Gabow's `l` function.
+  class LFlag
+    attr_reader :edge
+    def initialize(edge)
+      @edge = edge
+    end
+  end
+
   class Graph < RGL::AdjacencyGraph
     include Explainable
 
@@ -157,8 +165,8 @@ module GraphMatching
       # and P(y))
 
             elsif label[y] >= 0 # outer
-              log('E4')
-              l(x, y)
+              log("E4 first: #{first}")
+              l(x, y, first, label, mate)
 
       # E5. [Assign a vertex label.] Set v <- MATE(y). If v is
       # nonouter, set LABEL(v) <- x, FIRST(v) <- y, and go to E2
@@ -186,13 +194,13 @@ module GraphMatching
       #
       # E7. [Stop the search] Set LABEL(O) <- -1. For all outer
       # vertices i set LABEL(i) <- LABEL(MATE(i)) <- -1 Then go
-      # to E1 (now all vertmes are nonouter for the next search).
+      # to E1 (now all vertexes are nonouter for the next search).
       #
 
         log('E7')
         label[0] = -1
         label.each_with_index do |obj, ix|
-          if ix > 0 && obj != -1
+          if ix > 0 && outer?(obj, label)
             label[ix] = label[mate[ix]] = -1
           end
         end
@@ -201,46 +209,112 @@ module GraphMatching
       end # while e0_loop
     end
 
-    # L assigns the edge label n(xy) to nonouter vertices Edge xy
+    # L assigns the edge label n(xy) to nonouter vertices. Edge xy
     # joins outer vertices x, y. L sets join to the first nonouter
-    # vertex m both P(z) and P(y). Then it labels all nonouter
-    # vertices preceding join in P(x) or P(y)
-    def l(x, y)
+    # vertex in both P(x) and P(y). Then it labels all nonouter
+    # vertices preceding join in P(x) or P(y).
+    def l(x, y, first, label, mate)
 
-      # L0. [Initialize.] Set r ~ FIRST(x), s ~-- FIRST(y).
+      # L0. [Initialize.] Set r <- FIRST(x), s <= FIRST(y).
       # If r = s, return (no vertices can be labeled).
-      # Otherwise flag r and s. (Steps L1-L2 find 3oin by advancing
+      # Otherwise flag r and s. (Steps L1-L2 find join by advancing
       # alternately along paths P(x) and P(y). Flags are assigned
       # to nonouter vertices r in these paths. This is done by
-      # setting LABEL(r) to a negative edge number, LABEL(r)
-      # +- -n(xy). This way, each invocation of L uses a distinct
-      # flag value.)
+      # setting LABEL(r) to a negative edge number, LABEL(r) <- -n(xy).
+      # This way, each invocation of L uses a distinct flag value.)
 
-      log 'TODO: L0'
+      r = first[x]
+      s = first[y]
+      log("L0 x: #{x} r: #{r}")
+      log("L0 y: #{y} s: #{s}")
 
-      # L1. [Switch paths ] If s ~ 0, interchange r and s, r ~-~s
+      if r == s
+        return # no vertices can be labeled
+      else
+        log "L0 label (flag) #{r} with n(#{x}, #{y})"
+        label[r] = LFlag.new(n(x, y))
+      end
+
+      # L1. [Switch paths ] If s != 0, interchange r and s, r <-> s
       # (r is a flagged nonouter vertex, alternately in P(x) and P(y)).
-      #
-      # L2. [Next nonouter vertex.] Set r +-- FIRST(LABEL(MATE(r)))
-      # (r ]s set to the next nonouter vertex in P(x) or P(y)). If
-      # r is not flagged, flag r and go to L1 Otherwise set3oin ~--
-      # r and go to L3.
-      #
-      # L3. [Label vertices in P(x), P(y).] (All nonouter vertmes
-      # between x and 3o~n, or y and jozn, will be assigned edge
-      # labels. See Figure 4(a).) Set v +- FIRST(x) and do L4. Then
-      # set v +- FIRST(y) and do L4. Then go to L5.
-      #
-      # L4 [Label v]Ifv~ 3oin,setLABEL(v) +-n(xy), FIRST(v) ~-)oln,
-      # v~--FIRST(LABEL(MATE(v))) and repeat step L4
+
+      log "L1"
+      finding_join = true
+      while finding_join
+        if s != 0
+          temp = r
+          r = s
+          s = temp
+        end
+
+      # L2. [Next nonouter vertex.] Set r <- FIRST(LABEL(MATE(r)))
+      # (r is set to the next nonouter vertex in P(x) or P(y)). If
+      # r is not flagged, flag r and go to L1 Otherwise set
+      # join <- r and go to L3.
+
+        log "L2 r: #{r} s: #{s}"
+        r = first[label[mate[r]]]
+        log "L2 r: #{r}"
+        if label[r].is_a?(LFlag)
+          join = r
+          finding_join = false
+        else
+          label[r] = LFlag.new(n(x, y))
+        end
+      end
+
+      # L3. [Label vertices in P(x), P(y).] (All nonouter vertexes
+      # between x and join, or y and join, will be assigned edge
+      # labels. See Figure 4(a).) Set v <- FIRST(x) and do L4. Then
+      # set v <- FIRST(y) and do L4. Then go to L5.
+
+      [first[x], first[y]].each do |v|
+        log "L3 join: #{join} v: #{v}"
+
+      # L4 [Label v] If v != join, set LABEL(v) <- n(xy), FIRST(v) <- join,
+      # v <- FIRST(LABEL(MATE(v))) and repeat step L4
       # Otherwise continue as specified in L3.
-      #
-      # L5 [Update FIRST.] For each outer vertex i, if FIRST(I) is
-      # outer, set FIRST(z) +- 3o~n. (Join is now the first nonouter
-      # vertex in P(i) )
-      #
-      # L6. [Done ] Return
-      #
+
+          until v == join
+            label[v] = n(x, y)
+            first[v] = join
+            v = first[label[mate[v]]]
+            log("L4 v: #{v}")
+          end
+      end
+
+      # L5 [Update FIRST] For each outer vertex i, if FIRST(i) is
+      # outer, set FIRST(i) <- join. (Join is now the first nonouter
+      # vertex in P(i))
+
+      log 'L5'
+      outers = label.select { |l| outer?(l, label) }
+      outers.each do |i|
+        if outers.include?(first[i])
+          first[i] = join
+        end
+      end
+
+      # L6. [Done] Return
+
+      log "L6 label: #{label}"
+    end
+
+    # Gabow (1976) describes a function `n` which returns the number
+    # of the edge from `x` to `y`.  Because we are using RGL, and
+    # not implementing our own adjacency lists, we can simply return
+    # an RGL::UnDirectedEdge.
+    def n(x, y)
+      UnDirectedEdge.new(x, y)
+    end
+
+    def nonouter?(node, labels)
+      l = labels[node]
+      l.is_a?(Integer) && l == -1
+    end
+
+    def outer?(node, labels)
+      !nonouter?(node, labels)
     end
 
     # R (v, w) rematches edges in the augmenting path. Vertex v is
