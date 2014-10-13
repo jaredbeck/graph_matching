@@ -150,7 +150,11 @@ describe GraphMatching::Graph do
         g = GraphMatching::Graph[1,2, 2,3, 1,3, 1,10, 3,9, 3,4, 4,7, 4,8, 7,8, 9,5, 5,6, 6,7]
         m = g.e
         expect(m.size).to eq(5)
-        expect(m.vertexes).to match_array([[10,1], [2,3], [4,8], [7,6], [5,9]])
+        expect(m.vertexes).to match_array(1.upto(10))
+        expected = [[10,1], [2,3], [4,8], [7,6], [5,9]]
+        expected.each do |edge|
+          expect(m).to have_edge(edge)
+        end
       end
     end
   end

@@ -148,6 +148,7 @@ module GraphMatching
             log("E2 y: #{y}")
             log("E2 labels: #{label}")
             log("E2 mate: #{mate}")
+            log("E2 first: #{first}")
 
       # E3. [Augment the matching.] If y is unmatched and y != u,
       # set MATE(y) = x, call R(x, y): then go to E7 (R
@@ -164,9 +165,9 @@ module GraphMatching
       # E2 (L assigns edge label n(xy) to nonouter vertices in P(x)
       # and P(y))
 
-            elsif label[y] >= 0 # outer
-              log("E4 first: #{first}")
-              l(x, y, first, label, mate)
+            elsif outer?(label[y])
+              log("E4 because y: #{y} is outer. first: #{first}")
+              l(x, y, first, label, mate, q, visited_nodes)
 
       # E5. [Assign a vertex label.] Set v <- MATE(y). If v is
       # nonouter, set LABEL(v) <- x, FIRST(v) <- y, and go to E2
@@ -176,7 +177,7 @@ module GraphMatching
 
             else
               v = mate[y]
-              log("E5 v: #{v} labels: #{label}")
+              log("E5 is v: #{v} nonouter? labels: #{label}")
               if label[v] == -1 # nonouter
                 log("E5 label #{v} with #{x}")
                 label[v] = x
@@ -200,20 +201,30 @@ module GraphMatching
         log('E7')
         label[0] = -1
         label.each_with_index do |obj, ix|
-          if ix > 0 && outer?(obj, label)
+          if ix > 0 && outer?(obj)
             label[ix] = label[mate[ix]] = -1
           end
         end
 
         log('')
       end # while e0_loop
+
+      # Populate and return a `Matching` from `mate`
+      m = Matching.new
+      mate.each_with_index do |n1, ix|
+        n2 = mate[n1]
+        if n1 != 0 && n2 == ix
+          m.add([n1, n2])
+        end
+      end
+      m
     end
 
     # L assigns the edge label n(xy) to nonouter vertices. Edge xy
     # joins outer vertices x, y. L sets join to the first nonouter
     # vertex in both P(x) and P(y). Then it labels all nonouter
     # vertices preceding join in P(x) or P(y).
-    def l(x, y, first, label, mate)
+    def l(x, y, first, label, mate, q, visited_nodes)
 
       # L0. [Initialize.] Set r <- FIRST(x), s <= FIRST(y).
       # If r = s, return (no vertices can be labeled).
@@ -275,12 +286,17 @@ module GraphMatching
       # v <- FIRST(LABEL(MATE(v))) and repeat step L4
       # Otherwise continue as specified in L3.
 
-          until v == join
-            label[v] = n(x, y)
-            first[v] = join
-            v = first[label[mate[v]]]
-            log("L4 v: #{v}")
+        until v == join
+          log("L4 edge-label #{v} with #{n(x, y)}")
+          label[v] = n(x, y)
+          unless visited_nodes.include?(v)
+            q.enq(v)
+            log("L4 enqueue #{v}")
           end
+          log "L4 set first[#{v}] = #{join}"
+          first[v] = join
+          v = first[label[mate[v]]]
+        end
       end
 
       # L5 [Update FIRST] For each outer vertex i, if FIRST(i) is
@@ -288,9 +304,16 @@ module GraphMatching
       # vertex in P(i))
 
       log 'L5'
-      outers = label.select { |l| outer?(l, label) }
-      outers.each do |i|
-        if outers.include?(first[i])
+      # outers = label.select { |l| outer?(l) }
+      # outers.each do |i|
+      #   if i.is_a?(Integer) && outer?(first[i])
+      #     log "L5 set first[#{i}] = #{join}"
+      #     first[i] = join
+      #   end
+      # end
+      label.each_with_index do |l, i|
+        if i > 0 && outer?(l) && outer?(label[first[i]])
+          log "L5 set first[#{i}] = #{join}"
           first[i] = join
         end
       end
@@ -308,13 +331,8 @@ module GraphMatching
       UnDirectedEdge.new(x, y)
     end
 
-    def nonouter?(node, labels)
-      l = labels[node]
-      l.is_a?(Integer) && l == -1
-    end
-
-    def outer?(node, labels)
-      !nonouter?(node, labels)
+    def outer?(label_value)
+      !label_value.is_a?(Integer) || label_value >= 0
     end
 
     # R (v, w) rematches edges in the augmenting path. Vertex v is
