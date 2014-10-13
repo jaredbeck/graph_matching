@@ -22,13 +22,14 @@ describe GraphMatching::Matching do
     it 'augments the matching' do
       m = described_class.new([[2,3]])
       m.augment([1,2,3,4])
-      expect(m).to include(match_array([1,2]), match_array([4,3]))
+      expect(m).to include(RGL::Edge::UnDirectedEdge.new(1, 2))
+      expect(m).to include(RGL::Edge::UnDirectedEdge.new(4, 3))
     end
   end
 
   describe '#has_any_vertex?' do
     it 'returns true if any given vertexes are matched' do
-      m = described_class.new([[2,3,4]])
+      m = described_class.new([[2,3], [3,4]])
       expect(m.has_any_vertex?(2, 3)).to eq(true)
       expect(m.has_any_vertex?(4)).to eq(true)
       expect(m.has_any_vertex?(1, 5)).to eq(false)

@@ -29,7 +29,7 @@ describe GraphMatching::BipartiteGraph do
         g.add_edge(*e)
         m = g.maximum_cardinality_matching
         expect(m.size).to eq(1)
-        expect(m.first).to match_array(e)
+        expect(m.first).to eql(RGL::Edge::UnDirectedEdge.new(*e))
       end
     end
 
