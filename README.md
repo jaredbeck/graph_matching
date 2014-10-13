@@ -3,7 +3,7 @@ GraphMatching
 
 Finds maximum [matchings][6] in undirected [graphs][7].
 
-Implements modern algorithms for finding maximum cardinality
+Implements efficient algorithms for finding maximum cardinality
 and maximum weighted matchings in undirected graphs and bigraphs.
 Uses data structures and traversal algorithms from the
 [Ruby Graph Library (RGL)][4].
@@ -28,8 +28,7 @@ g.maximum_cardinality_matching # two maximum matchings
 
 ### Maximum Cardinality Matching in General Graphs
 
-Uses [Edmonds' Blossom][9] algorithm as described in
-[Introduction to Graph Theory][10] (West, 2001, p. 142)
+Uses Gabow (1976) which performs in O(n^3)
 
 ```ruby
 require 'graph_matching'
@@ -37,6 +36,9 @@ g = GraphMatching::Graph[1,2, 1,3, 1,4, 2,3, 2,4, 3,4]
 g.maximum_cardinality_matching # three maximum matchings
 #=> #<GraphMatching::Matching: {[2, 1], [4, 3]}>
 ```
+
+- [Edmonds' blossom algorithm][9]
+    - [Introduction to Graph Theory][10] (West, 2001, p. 142)
 
 Explain
 -------
@@ -60,6 +62,9 @@ References
 - Edmonds, J. (1965). Paths, trees, and flowers. Canadian Journal of Mathematics.
 - Kusner, M. [Edmonds's Blossom Algorithm (pdf)][12]
 - Gabow, H. J. (1973). Implementation of algorithms for maximum matching on nonbipartite graphs, Stanford Ph.D thesis.
+- Gabow, H. N. (1976). An Efficient Implementation of Edmonds'
+Algorithm for Maximum Matching on Graphs. Journal of the Association
+for Computing Machinery, Vol. 23, No. 2, pp. 221-234
 - Galil, Z. (1986). Efficient algorithms for finding maximum matching in graphs, ACM Computing Surveys.
 - Rantwijk, J. [Maximum Weighted Matching][11]
 - West, D. B. (2001). Introduction to graph theory. Prentice Hall.
