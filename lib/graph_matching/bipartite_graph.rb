@@ -13,6 +13,7 @@ module GraphMatching
   # be divided into two disjoint sets U and V such that every
   # edge connects a vertex in U to one in V.
   class BipartiteGraph < Graph
+    include Explainable
 
     # `maximum_cardinality_matching` returns a `Set` of arrays,
     # each representing an edge in the matching.  The augmenting
