@@ -1,9 +1,13 @@
+require_relative '../explainable'
+require_relative '../matching'
+require_relative 'matching_algorithm'
+
 module GraphMatching
   module Algorithm
 
     # `MCMGeneral` implements Maximum Cardinality Matching in
     # general graphs (as opposed to bipartite).
-    class MCMGeneral
+    class MCMGeneral < MatchingAlgorithm
       include Explainable
 
       # An LFlag represents a flag on an edge during Gabow's `l` function.
@@ -12,12 +16,6 @@ module GraphMatching
         def initialize(edge)
           @edge = edge
         end
-      end
-
-      attr_reader :g
-
-      def initialize(graph)
-        @g = graph
       end
 
       def match

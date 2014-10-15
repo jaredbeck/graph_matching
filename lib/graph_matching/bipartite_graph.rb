@@ -1,8 +1,6 @@
-require_relative 'explainable'
-require_relative 'graph'
-require_relative 'label_set'
-require_relative 'matching'
 require 'rgl/traversal'
+require_relative 'algorithm/mcm_bipartite'
+require_relative 'graph'
 
 module GraphMatching
 
@@ -13,68 +11,9 @@ module GraphMatching
   # be divided into two disjoint sets U and V such that every
   # edge connects a vertex in U to one in V.
   class BipartiteGraph < Graph
-    include Explainable
 
-    # `maximum_cardinality_matching` returns a `Set` of arrays,
-    # each representing an edge in the matching.  The augmenting
-    # path algorithm is used.
-    #
     def maximum_cardinality_matching
-      u, v = partition
-      log("partitions: #{u.inspect} #{v.inspect}")
-      mcm_stage(Matching.new, u)
-    end
-
-    # Begin each stage (until no augmenting path is found)
-    # by clearing all labels and marks
-    def mcm_stage(m, u)
-      log("\nbegin stage: #{m.inspect}")
-      t = LabelSet.new([], 'T')
-      marked = LabelSet.new([], 'mark')
-      predecessors = Hash.new
-      aug_path = nil
-
-      # Label unmatched vertexes in U with label R.  These R-vertexes
-      # are candidates for the start of an augmenting path.
-      unmarked = r = LabelSet.new(m.unmatched_vertexes_in(u), 'R')
-      log("label R: #{r.inspect}")
-
-      # While there are unmarked R-vertexes
-      while aug_path.nil? && start = unmarked.to_a.sample
-        marked.add(start)
-
-        # Follow the unmatched edges (if any) to vertexes in V
-        # ignoring any V-vertexes already labeled T
-        unmatched_unlabled_adjacent_to(start, m, t).each do |vi|
-          t.add(vi)
-          predecessors[vi] = start
-
-          adj_u = vertices_adjacent_to(vi, except: [start])
-          if adj_u.empty?
-            log("Vertex #{vi} has no adjacent vertexes, so we found an augmenting path")
-            aug_path = [vi, start]
-          else
-
-            # If there are matched edges, follow each to a vertex
-            # in U and label the U-vertex with R.  Otherwise,
-            # backtrack to construct an augmenting path.
-            adj_u_in_m = matched_adjacent_to(vi, adj_u, m).each do |ui|
-              r.add(ui)
-              predecessors[ui] = vi
-            end
-
-            if adj_u_in_m.empty?
-              aug_path = backtrack_from(vi, predecessors)
-            end
-          end
-
-          break unless aug_path.nil?
-        end
-
-        unmarked = r - marked
-      end
-
-      aug_path.nil? ? m.validate : mcm_stage(m.augment(aug_path), u)
+      Algorithm::MCMBipartite.new(self).match
     end
 
     # `partition` either returns two disjoint (complementary)
@@ -93,7 +32,8 @@ module GraphMatching
       [u, v]
     end
 
-  private
+    # formerly private
+    # ----------------
 
     def add_to_set(set, vertex:, fail_if_in:)
       raise NotBipartiteError if fail_if_in.include?(vertex)
