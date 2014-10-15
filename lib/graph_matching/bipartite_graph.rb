@@ -32,14 +32,6 @@ module GraphMatching
       [u, v]
     end
 
-    # formerly private
-    # ----------------
-
-    def add_to_set(set, vertex:, fail_if_in:)
-      raise NotBipartiteError if fail_if_in.include?(vertex)
-      set.add(vertex)
-    end
-
     def matched_adjacent_to(vertex, adjacent_vertexes, matching)
       adjacent_vertexes.select { |x| matching.has_edge?([x, vertex]) }
     end
@@ -48,8 +40,19 @@ module GraphMatching
       unmatched_adjacent_to(vertex, matching).reject { |v| labels.include?(v) }
     end
 
+    def vertices_adjacent_to(vertex, except: [])
+      adjacent_vertices(vertex) - except
+    end
+
+    private
+
+    def add_to_set(set, vertex:, fail_if_in:)
+      raise NotBipartiteError if fail_if_in.include?(vertex)
+      set.add(vertex)
+    end
+
     def assert_disjoint(u, v)
-      raise "Expected sets to be disjoint" unless u.disjoint?(v)
+      raise 'Expected sets to be disjoint' unless u.disjoint?(v)
     end
 
     def examine_edge_for_partition(from, to, u, v)
@@ -61,10 +64,6 @@ module GraphMatching
         u.add(from)
         v.add(to)
       end
-    end
-
-    def vertices_adjacent_to(vertex, except: [])
-      adjacent_vertices(vertex) - except
     end
 
   end
