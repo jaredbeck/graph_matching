@@ -20,40 +20,6 @@ describe GraphMatching::Graph do
     end
   end
 
-  describe '#maximal_matching' do
-    context 'empty graph' do
-      it 'returns empty set' do
-        expect(g.maximal_matching).to be_empty
-      end
-    end
-
-    context 'single vertex' do
-      it 'returns empty set' do
-        g.add_vertex(double)
-        expect(g.maximal_matching).to be_empty
-      end
-    end
-
-    context 'two vertexes' do
-      let(:g) { GraphMatching::Graph[1,2] }
-
-      it 'returns one edge' do
-        expect(g.maximal_matching.to_a).to \
-          eq([RGL::Edge::UnDirectedEdge.new(1,2)])
-      end
-    end
-
-    context 'complete graph with four vertexes' do
-      let(:g) { GraphMatching::Graph[1,2, 1,3, 1,4, 2,3, 2,4, 3,4] }
-
-      it 'returns two disjoint edges' do
-        m = g.maximal_matching
-        expect(m.size).to eq(2)
-        expect(m.vertexes).to match_array([1,2,3,4])
-      end
-    end
-  end
-
   describe '#maximum_cardinality_matching' do
 
     def complete_graph(n)
