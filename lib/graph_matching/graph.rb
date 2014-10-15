@@ -5,9 +5,6 @@ require_relative 'ordered_set'
 
 module GraphMatching
 
-  class DisconnectedGraphError < StandardError
-  end
-
   class Graph < RGL::AdjacencyGraph
 
     def self.new_from_set_of_edges(edges)
@@ -62,7 +59,7 @@ module GraphMatching
 
     def maximum_cardinality_matching
       return Matching.new if empty?
-      raise DisconnectedGraphError unless connected?
+      raise DisconnectedGraph unless connected?
       Algorithm::MCMGeneral.new(self).match
     end
 

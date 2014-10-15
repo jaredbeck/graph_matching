@@ -4,9 +4,6 @@ require_relative 'graph'
 
 module GraphMatching
 
-  class NotBipartiteError < StandardError
-  end
-
   # A bipartite graph (or bigraph) is a graph whose vertices can
   # be divided into two disjoint sets U and V such that every
   # edge connects a vertex in U to one in V.
@@ -22,7 +19,7 @@ module GraphMatching
       u = Set.new
       v = Set.new
       return [u,v] if empty?
-      raise NotBipartiteError unless connected?
+      raise NotBipartite unless connected?
       i = RGL::BFSIterator.new(self)
       i.set_examine_edge_event_handler do |from, to|
         examine_edge_for_partition(from, to, u, v)
@@ -47,7 +44,7 @@ module GraphMatching
     private
 
     def add_to_set(set, vertex:, fail_if_in:)
-      raise NotBipartiteError if fail_if_in.include?(vertex)
+      raise NotBipartite if fail_if_in.include?(vertex)
       set.add(vertex)
     end
 

@@ -108,9 +108,10 @@ describe GraphMatching::Graph do
     end
 
     context 'disconnected graph' do
-      it 'raises DisconnectedGraphError' do
+      it 'raises a DisconnectedGraph error' do
         2.times { g.add_vertex(double) }
-        expect { g.maximum_cardinality_matching }.to raise_error(GraphMatching::DisconnectedGraphError)
+        expect { g.maximum_cardinality_matching }.to \
+          raise_error(GraphMatching::DisconnectedGraph)
       end
     end
 

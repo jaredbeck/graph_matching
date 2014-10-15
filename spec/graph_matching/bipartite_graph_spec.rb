@@ -104,12 +104,12 @@ describe GraphMatching::BipartiteGraph do
     end
 
     context 'complete graph with three vertexes' do
-      it 'raises NotBipartiteError' do
+      it 'raises a NotBipartite error' do
         g.add_edge('alice', 'bob')
         g.add_edge('bob', 'carol')
         g.add_edge('alice', 'carol')
         expect { g.partition }.to \
-          raise_error(GraphMatching::NotBipartiteError)
+          raise_error(GraphMatching::NotBipartite)
       end
     end
 
@@ -126,11 +126,11 @@ describe GraphMatching::BipartiteGraph do
     end
 
     context 'disconnected graph' do
-      it 'raises NotBipartiteError' do
+      it 'raises a NotBipartite error' do
         g.add_edge('a', 'b')
         g.add_edge('c', 'd')
         expect { g.partition }.to \
-          raise_error(GraphMatching::NotBipartiteError)
+          raise_error(GraphMatching::NotBipartite)
       end
     end
   end
