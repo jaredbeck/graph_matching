@@ -11,6 +11,11 @@ module GraphMatching
     class MCMBipartite < MatchingAlgorithm
       include Explainable
 
+      def initialize(graph)
+        raise ArgumentError unless graph.is_a?(GraphMatching::BipartiteGraph)
+        super
+      end
+
       def match
         u, v = g.partition
         log("partitions: #{u.inspect} #{v.inspect}")

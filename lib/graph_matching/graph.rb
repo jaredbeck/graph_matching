@@ -27,8 +27,6 @@ module GraphMatching
     end
 
     def maximum_cardinality_matching
-      return Matching.new if empty?
-      raise DisconnectedGraph unless connected?
       Algorithm::MCMGeneral.new(self).match
     end
 

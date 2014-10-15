@@ -18,7 +18,14 @@ module GraphMatching
         end
       end
 
+      def initialize(graph)
+        raise ArgumentError unless graph.is_a?(GraphMatching::Graph)
+        super
+      end
+
       def match
+        return Matching.new if g.empty?
+        raise DisconnectedGraph unless g.connected?
         e(g)
       end
 
