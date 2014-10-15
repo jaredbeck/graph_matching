@@ -22,7 +22,7 @@ g.maximum_cardinality_matching
 #=> [(3=2), (4=1)]
 ```
 
-TO DO: This algorithm is inefficient compared to the [Hopcroft–Karp algorithm][13]
+TO DO: This algorithm is inefficient compared to the [Hopcroft-Karp algorithm][13]
 which performs in O(e * sqrt(v)) in the worst case.
 
 ### 2. Maximum Cardinality Matching in General Graphs
@@ -40,13 +40,20 @@ Gabow (1976) is not the fastest algorithm, but it is "one exponent
 faster" than the original, [Edmonds' blossom algorithm][9], which
 performs in O(n^4).
 
+Faster algorithms include Even-Kariv (1975) and Micali-Vazirani (1980).
+Galil (1986) describes the latter as "a simpler approach".
+
 ### 3. Minimum Weighted Matching in Bipartite Graphs
 
 Not yet implemented.
 
+Currently considering Gabow (1983).
+
 ### 4. Minimum Weighted Matching in General Graphs
 
 Not yet implemented.
+
+Currently considering Gabow (1985).
 
 Explain
 -------
@@ -67,21 +74,34 @@ Glossary
 References
 ----------
 
-- Edmonds, J. (1965). Paths, trees, and flowers. Canadian Journal
-of Mathematics.
+- Edmonds, J. (1965). Paths, trees, and flowers. *Canadian Journal
+of Mathematics*.
+- Even, S. and Kariv, O. (1975). An O(n^2.5) Algorithm for Maximum
+Matching in General Graphs. *Proceedings of the 16th Annual IEEE
+Symposium on Foundations of Computer Science*. IEEE, New York, pp. 100-112
 - Kusner, M. [Edmonds's Blossom Algorithm (pdf)][12]
 - Gabow, H. J. (1973). Implementation of algorithms for maximum
 matching on nonbipartite graphs, Stanford Ph.D thesis.
 - Gabow, H. N. (1976). An Efficient Implementation of Edmonds'
-Algorithm for Maximum Matching on Graphs. Journal of the Association
-for Computing Machinery, Vol. 23, No. 2, pp. 221-234
+Algorithm for Maximum Matching on Graphs. *Journal of the Association
+for Computing Machinery*, Vol. 23, No. 2, pp. 221-234
+- Gabow, H. N. (1983). Scaling algorithms for network problems.
+*Proceedings of the 24th Annual IEEE Symposium on Foundations of
+Computer Science*. IEEE, New York, pp. 248-257
+- Gabow, H. N. (1985). A scaling algorithm for weighted matching on
+general graphs. *Proceedings of the 26th Annual IEEE Symposium on
+Foundations of Computer Science*. IEEE, New York, pp. 90-100
 - Galil, Z. (1986). Efficient algorithms for finding maximum
-matching in graphs. ACM Computing Surveys.
+matching in graphs. *ACM Computing Surveys*. Vol. 18, No. 1, pp. 23-38
+- Micali, S., and Vazirani, V. (1980). An O(e * sqrt(v)) Algorithm for
+finding maximal matching in general graphs. *Proceedings of the 21st
+Annual IEEE Symposium on Foundations of Computer Science*.
+IEEE, New York, pp. 17-27
 - Rantwijk, J. [Maximum Weighted Matching][11]
 - [Stolee, D.][8]
     - [The Augmenting Path Algorithm for Bipartite Matching][1]
     - [The Augmenting Path Algorithm (Example)][2]
-- West, D. B. (2001). Introduction to graph theory. Prentice Hall. p. 142
+- West, D. B. (2001). *Introduction to graph theory*. Prentice Hall. p. 142
 - Zwick, U. (2013). [Lecture notes on: Maximum matching in bipartite
 and non-bipartite graphs (pdf)][10]
 
