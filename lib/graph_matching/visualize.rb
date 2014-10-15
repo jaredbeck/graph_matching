@@ -46,19 +46,18 @@ module GraphMatching
       end
     end
 
-    def check_that_os_is_reasonable
+    def assert_usr_bin_env_exists
       unless File.exists?(USR_BIN_ENV)
         $stderr.puts "File not found: #{USR_BIN_ENV}"
-        $stderr.puts "Please use a reasonable operating system"
         exit(1)
       end
     end
 
     # `dot_installed?` returns true if `dot` is installed, otherwise
     # false.  Note that `system` returns true if the command gives
-    # zero exit status, false for non zero exit status.
+    # zero exit status, false for non-zero exit status.
     def dot_installed?
-      check_that_os_is_reasonable
+      assert_usr_bin_env_exists
       system "#{USR_BIN_ENV} which dot > /dev/null"
     end
 
