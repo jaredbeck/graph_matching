@@ -6,6 +6,23 @@ module GraphMatching
   class Matching < Set
     include Explainable
 
+    # Gabow (1976) uses a simple array to store his matching.  It
+    # has one element for each vertex in the graph.  The value of
+    # each element is either the number of another vertex (Gabow
+    # uses sequential integers for vertex numbering) or a zero if
+    # unmatched.  So, `.gabow` returns a `Matching` initialized
+    # from such an array.
+    def self.gabow(mate)
+      m = new
+      mate.each_with_index do |n1, ix|
+        n2 = mate[n1]
+        if n1 != 0 && n2 == ix
+          m.add([n1, n2])
+        end
+      end
+      m
+    end
+
     def add(o)
       super(to_undirected_edge(o))
     end

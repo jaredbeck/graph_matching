@@ -159,15 +159,7 @@ module GraphMatching
           log('')
         end # while e0_loop
 
-        # Populate and return a `Matching` from `mate`
-        m = Matching.new
-        mate.each_with_index do |n1, ix|
-          n2 = mate[n1]
-          if n1 != 0 && n2 == ix
-            m.add([n1, n2])
-          end
-        end
-        m
+        Matching.gabow(mate)
       end
 
       def edge_label?(label_value)
