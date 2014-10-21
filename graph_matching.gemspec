@@ -10,10 +10,10 @@ Gem::Specification.new do |spec|
   spec.email         = ['jared@jaredbeck.com']
   spec.summary       = 'Finds maximum matchings in undirected graphs.'
   spec.description   = <<-EOS
-    Implements modern algorithms for finding maximum cardinality
-    and maximum weighted matchings in undirected graphs and bigraphs.
+    Implements efficient algorithms for maximum cardinality
+    and weighted matchings in undirected graphs.
   EOS
-  spec.homepage      = ''
+  spec.homepage      = 'https://github.com/jaredbeck/graph_matching'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0")
