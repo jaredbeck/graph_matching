@@ -7,11 +7,6 @@ module GraphMatching
 
   class Graph < RGL::AdjacencyGraph
 
-    def self.new_from_set_of_edges(edges)
-      edges_flattened = edges.map { |e| e.to_a }.flatten
-      self[*edges_flattened]
-    end
-
     def backtrack_from(end_vertex, predecessors)
       augmenting_path = [end_vertex]
       while predecessors.has_key?(augmenting_path.last)
