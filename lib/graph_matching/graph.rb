@@ -30,6 +30,12 @@ module GraphMatching
       count == 1
     end
 
+    # TODO: I think the `sort` was for development purposes, and
+    # is no longer needed.
+    def directed_edges_to_adjacent_vertices(v)
+      adjacent_vertices(v).sort.map { |w| RGL::Edge::DirectedEdge.new(v, w) }
+    end
+
     def maximum_cardinality_matching
       Algorithm::MCMGeneral.new(self).match
     end

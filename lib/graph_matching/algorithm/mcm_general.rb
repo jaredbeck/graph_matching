@@ -89,9 +89,7 @@ module GraphMatching
             x = q.deq
             visited_nodes.add(x)
             log("E2 x: #{x}")
-            adjacent_edges = g.adjacent_vertices(x).sort.map { |j|
-              RGL::Edge::DirectedEdge.new(x, j)
-            }
+            adjacent_edges = g.directed_edges_to_adjacent_vertices(x)
             discovered_edges = Set.new(adjacent_edges) - visited_edges
             log("E2 discovered_edges: #{discovered_edges.to_a.map { |edge| edge.to_a }}")
 
