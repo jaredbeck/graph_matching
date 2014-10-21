@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe GraphMatching::Algorithm::MCMGeneral do
+RSpec.describe GraphMatching::Algorithm::MCMGeneral do
   let(:g) { GraphMatching::Graph.new }
 
   describe '#match' do

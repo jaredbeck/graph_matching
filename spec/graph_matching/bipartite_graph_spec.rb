@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe GraphMatching::BipartiteGraph do
+RSpec.describe GraphMatching::BipartiteGraph do
   let(:g) { described_class.new }
 
   it 'is a Graph' do

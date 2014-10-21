@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe GraphMatching::Graph do
+RSpec.describe GraphMatching::Graph do
   let(:g) { described_class.new }
 
   it 'is an RGL::MutableGraph' do

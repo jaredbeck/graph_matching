@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe GraphMatching::Path do
+RSpec.describe GraphMatching::Path do
   describe '.new' do
     it 'raises an error if the path has a length less than two' do
       [[], [1]].each do |ary|

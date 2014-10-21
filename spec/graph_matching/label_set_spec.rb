@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe GraphMatching::LabelSet do
+RSpec.describe GraphMatching::LabelSet do
   let(:label) { double }
   let(:set) { described_class.new([], label) }
 

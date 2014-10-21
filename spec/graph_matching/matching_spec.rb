@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe GraphMatching::Matching do
+RSpec.describe GraphMatching::Matching do
   describe '.new' do
     it 'is a Set' do
       expect(described_class.new).to be_a(Set)

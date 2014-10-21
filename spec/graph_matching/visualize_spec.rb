@@ -1,6 +1,6 @@
 require_relative '../spec_helper'
 
-describe GraphMatching::Visualize do
+RSpec.describe GraphMatching::Visualize do
   describe '.new' do
     it 'initializes with a graph' do
       g = double

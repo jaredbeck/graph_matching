@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe GraphMatching::Algorithm::MCMBipartite do
+RSpec.describe GraphMatching::Algorithm::MCMBipartite do
   let(:g) { GraphMatching::BipartiteGraph.new }
 
   describe '#match' do
