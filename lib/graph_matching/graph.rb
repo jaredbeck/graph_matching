@@ -7,6 +7,15 @@ module GraphMatching
 
   class Graph < RGL::AdjacencyGraph
 
+    def self.[](*args)
+      super.tap(&:vertexes_must_be_integers)
+    end
+
+    def initialize(*args)
+      super
+      vertexes_must_be_integers
+    end
+
     def backtrack_from(end_vertex, predecessors)
       augmenting_path = [end_vertex]
       while predecessors.has_key?(augmenting_path.last)
@@ -31,6 +40,12 @@ module GraphMatching
 
     def vertexes
       to_a
+    end
+
+    def vertexes_must_be_integers
+      if vertices.any? { |v| !v.is_a?(Integer) }
+        raise ArgumentError, 'All vertexes must be integers'
+      end
     end
 
     private

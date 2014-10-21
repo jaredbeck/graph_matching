@@ -55,6 +55,25 @@ Not yet implemented.
 
 Currently considering Gabow (1985).
 
+Limitations
+-----------
+
+All vertexes in a `GraphMatching::Graph` must be integers.  This
+simplifies many algorithms.  For your convenience, a module
+(`GraphMatching::IntegerVertexes`) is provided to convert the
+vertexes of any `RGL::MutableGraph` to integers.
+
+```ruby
+require 'graph_matching'
+require 'graph_matching/integer_vertexes'
+g1 = RGL::AdjacencyGraph['a', 'b']
+g2, legend = GraphMatching::IntegerVertexes.to_integers(g1)
+g2.vertices
+#=> [1, 2]
+legend
+#=> {1=>"a", 2=>"b"}
+```
+
 Explain
 -------
 

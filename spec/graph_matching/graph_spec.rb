@@ -1,10 +1,28 @@
 require 'spec_helper'
 
 RSpec.describe GraphMatching::Graph do
+  ERR_MSG_INT_VERTEXES = 'All vertexes must be integers'
+
   let(:g) { described_class.new }
 
   it 'is an RGL::MutableGraph' do
     expect(g).to be_a(RGL::MutableGraph)
+  end
+
+  describe '.[]' do
+    it 'checks that all vertexes are integers' do
+      expect { described_class['a', 'b'] }.to \
+        raise_error(ArgumentError, ERR_MSG_INT_VERTEXES)
+    end
+  end
+
+  describe '.new' do
+    it 'checks that all vertexes are integers' do
+      g1 = RGL::AdjacencyGraph[1, 'b']
+      g2 = RGL::AdjacencyGraph['a', 2]
+      expect { described_class.new(Set, g1, g2) }.to \
+        raise_error(ArgumentError, ERR_MSG_INT_VERTEXES)
+    end
   end
 
   describe '#connected?' do
