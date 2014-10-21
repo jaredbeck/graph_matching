@@ -56,11 +56,7 @@ module GraphMatching
         # assign a start label and begin a new search)
         # set LABEL(u) = FIRST(u) = 0
 
-        e1_loop = true
-        guard = 0
-        while e1_loop && guard < 1000 do
-          guard += 1
-
+        while true do
           u += 1
           log("E1 u: #{u}")
           break if u > g.size
