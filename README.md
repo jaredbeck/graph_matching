@@ -13,7 +13,7 @@ This library will implement the four algorithms described by Galil (1986).
 ### 1. Maximum Cardinality Matching in Bipartite Graphs
 
 Uses the [Augmenting Path][5] algorithm, which performs in O(e * v)
-where e is the number of edges, and v, the number of vertexes.
+where e is the number of edges, and v, the number of vertexes ([benchmark][14]).
 
 ```ruby
 require 'graph_matching'
@@ -142,3 +142,4 @@ and non-bipartite graphs (pdf)][10]
 [11]: http://jorisvr.nl/maximummatching.html
 [12]: http://matthewkusner.com/MatthewKusner_BlossomAlgorithmReport.pdf
 [13]: http://en.wikipedia.org/wiki/Hopcroft%E2%80%93Karp_algorithm
+[14]: https://github.com/jaredbeck/graph_matching/wiki/Benchmarking-MCM-in-Complete-Bigraphs
