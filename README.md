@@ -55,6 +55,11 @@ Not yet implemented.
 
 Currently considering Gabow (1985).
 
+Benchmarks
+----------
+
+Benchmarks can be found in `/benchmark` and the github wiki.
+
 Limitations
 -----------
 
