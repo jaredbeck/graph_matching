@@ -74,6 +74,14 @@ RSpec.describe GraphMatching::Matching do
     end
   end
 
+  describe '#vertexes' do
+    it 'returns array of matched vertexes' do
+      expect(described_class.new.vertexes).to be_empty
+      expect(described_class.new([[3,4]]).vertexes).to match_array([3, 4])
+      expect(described_class.new([[1,2], [3,4]]).vertexes).to match_array([1, 2, 3, 4])
+    end
+  end
+
   describe '#validate' do
     it 'raises an error if a vertex appears more than once' do
       expect {
