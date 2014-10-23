@@ -36,7 +36,7 @@ module GraphMatching
         if ix.even?
           add(edge)
         else
-          delete_if { |e| array_match?(e, edge) }
+          delete(edge)
         end
       end
 
