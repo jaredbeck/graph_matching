@@ -4,7 +4,7 @@
 require 'benchmark'
 require 'graph_matching'
 
-MAX_SIZE = 100
+MAX_SIZE = 500
 
 def complete_bigraph(n)
   g = GraphMatching::BipartiteGraph.new
