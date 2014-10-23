@@ -21,7 +21,7 @@ RSpec.describe GraphMatching::Algorithm::MCMBipartite do
 
     context 'single edge' do
       it 'returns set with one edge' do
-        e = ['a', 'b']
+        e = [1, 2]
         g.add_edge(*e)
         m = described_class.new(g).match
         expect(m.size).to eq(1)
