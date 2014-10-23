@@ -3,6 +3,8 @@ require_relative 'path'
 require 'set'
 
 module GraphMatching
+
+  # TODO: Stop subclassing `Set` and only use @ary, which is far more efficient.
   class Matching < Set
     include Explainable
 
@@ -23,8 +25,15 @@ module GraphMatching
       m
     end
 
+    def initialize(*args)
+      @ary = [] # An optimized structure (see `.gabow`)
+      super
+    end
+
     def add(o)
-      super(to_undirected_edge(o))
+      super(to_undirected_edge(o)) # TODO: Stop subclassing `Set` and only use @ary
+      @ary[o[0]] = o[1]
+      @ary[o[1]] = o[0]
     end
 
     def augment(augmenting_path)
@@ -49,8 +58,11 @@ module GraphMatching
       vertexes.any? { |vi| v.include?(vi) }
     end
 
-    def has_edge?(edge)
-      any? { |e| array_match?(e, edge) }
+    def has_edge?(e)
+      !@ary[e[0]].nil? &&
+        !@ary[e[1]].nil? &&
+        @ary[e[0]] == e[1] &&
+        @ary[e[1]] == e[0]
     end
 
     def has_vertex?(v)
@@ -68,7 +80,9 @@ module GraphMatching
     end
 
     def delete(edge)
-      delete_if { |e| array_match?(e, edge) }
+      delete_if { |e| array_match?(e, edge) } # TODO: Stop subclassing `Set` and only use @ary
+      @ary[edge[0]] = nil
+      @ary[edge[1]] = nil
     end
 
     def inspect
@@ -104,7 +118,7 @@ module GraphMatching
     end
 
     def vertexes
-      map(&:to_a).flatten
+      @ary.compact
     end
 
     private
