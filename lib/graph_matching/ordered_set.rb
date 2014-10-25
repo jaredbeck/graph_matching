@@ -1,4 +1,9 @@
 module GraphMatching
+
+  # An `OrderedSet` acts like a `Set`, but preserves insertion order.
+  # Internally, a `Hash` is used because, as of Ruby 1.9, it
+  # preserves insertion order.  The Set library happens to be built
+  # upon a Hash currently but this might change in the future.
   class OrderedSet
     include Enumerable
 
@@ -8,9 +13,6 @@ module GraphMatching
       new.merge(args)
     end
 
-    # As of Ruby 1.9, the built-in Hash object preserves insertion order.
-    # The Set library happens to be built upon a Hash currently but
-    # this might change in the future.
     def initialize
       @hash = Hash.new
     end
