@@ -4,7 +4,7 @@
 require 'benchmark'
 require 'graph_matching'
 
-MAX_SIZE = 1_000
+MAX_SIZE = 100
 
 def complete_graph(n)
   g = GraphMatching::Graph.new
@@ -19,5 +19,5 @@ end
 1.upto(MAX_SIZE) do |v|
   print "%5d\t" % [v]
   g = complete_graph(v)
-  puts Benchmark.measure { g.maximum_cardinality_matching }
+  puts Benchmark.realtime { g.maximum_cardinality_matching }
 end

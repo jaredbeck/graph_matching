@@ -16,6 +16,16 @@ module GraphMatching
       vertexes_must_be_integers
     end
 
+    # `adjacent_vertex_set` is the same as `adjacent_vertices`
+    # except it returns a `Set` instead of an `Array`.  This is
+    # an optimization, performing in O(n), whereas passing
+    # `adjacent_vertices` to `Set.new` would be O(2n).
+    def adjacent_vertex_set(v)
+      s = Set.new
+      each_adjacent(v) do |u| s.add(u) end
+      s
+    end
+
     def backtrack_from(end_vertex, predecessors)
       augmenting_path = [end_vertex]
       while predecessors.has_key?(augmenting_path.last)
@@ -28,10 +38,6 @@ module GraphMatching
       count = 0
       each_connected_component { |c| count += 1 }
       count == 1
-    end
-
-    def directed_edges_to_adjacent_vertices(v)
-      adjacent_vertices(v).map { |w| RGL::Edge::DirectedEdge.new(v, w) }
     end
 
     def maximum_cardinality_matching

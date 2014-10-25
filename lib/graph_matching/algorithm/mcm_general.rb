@@ -81,7 +81,14 @@ module GraphMatching
 
           searching = true
           visited_nodes = Set.new
-          visited_edges = Set.new
+
+          # `visited_edges` is a 2D array where the element at index i
+          # is an array representing the vertexes adjacent to i that
+          # have been visited.  After an edge has been visited from
+          # both directions, there will be two entries for that edge.
+          # This is an optimization over the naive `Set` of `DirectedEdge`s.
+          visited_edges = Array.new(g.size + 1) { |_| [] }
+
           q = OrderedSet[u]
           while searching && !q.empty?
             log('')
@@ -89,13 +96,11 @@ module GraphMatching
             x = q.deq
             visited_nodes.add(x)
             log("E2 x: #{x}")
-            adjacent_edges = g.directed_edges_to_adjacent_vertices(x)
-            discovered_edges = Set.new(adjacent_edges) - visited_edges
-            log("E2 discovered_edges: #{discovered_edges.to_a.map { |edge| edge.to_a }}")
+            adjacent = g.adjacent_vertex_set(x)
+            discovered = adjacent - visited_edges[x]
 
-            discovered_edges.each do |edge|
-              visited_edges.add(edge)
-              y = edge.target
+            discovered.each do |y|
+              visited_edges[x] << y
               log("E2 y: #{y}")
               log("E2 labels: #{label}")
               log("E2 mate: #{mate}")
