@@ -6,6 +6,7 @@ set output "/Users/jared/git/jaredbeck/graph_matching/benchmark/mcm_bipartite/co
 set linetype 1 pointtype 7
 set linetype 2 linewidth 3
 
+set xlabel 'Number of Vertexes' tc lt 1
 set ytics autofreq tc lt 1
 set ylabel 'Time (s)' tc lt 1
 set y2tics autofreq tc lt 2
