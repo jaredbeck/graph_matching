@@ -1,5 +1,6 @@
 require 'rgl/adjacency'
 require 'rgl/connected_components'
+require 'set'
 require_relative 'algorithm/mcm_general'
 require_relative 'ordered_set'
 
