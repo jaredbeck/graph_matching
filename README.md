@@ -79,15 +79,6 @@ legend
 #=> {1=>"a", 2=>"b"}
 ```
 
-Explain
--------
-
-Set `ENV['EXPLAIN']` for detailed output, tracing the algorithms.
-
-```bash
-EXPLAIN=true bundle exec rspec
-```
-
 Glossary
 --------
 

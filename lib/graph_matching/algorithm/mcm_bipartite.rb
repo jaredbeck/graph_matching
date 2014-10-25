@@ -9,7 +9,6 @@ module GraphMatching
     # `MCMBipartite` implements Maximum Cardinality Matching in
     # bipartite graphs.
     class MCMBipartite < MatchingAlgorithm
-      include Explainable
 
       def initialize(graph)
         raise ArgumentError unless graph.is_a?(GraphMatching::BipartiteGraph)
@@ -18,7 +17,6 @@ module GraphMatching
 
       def match
         u, v = g.partition
-        log("partitions: #{u.inspect} #{v.inspect}")
         mcm_stage(Matching.new, u)
       end
 
@@ -27,7 +25,6 @@ module GraphMatching
       # Begin each stage (until no augmenting path is found)
       # by clearing all labels and marks
       def mcm_stage(m, u)
-        log("\nbegin stage: #{m.inspect}")
         t = LabelSet.new([], 'T')
         marked = LabelSet.new([], 'mark')
         predecessors = Hash.new
@@ -36,7 +33,6 @@ module GraphMatching
         # Label unmatched vertexes in U with label R.  These R-vertexes
         # are candidates for the start of an augmenting path.
         unmarked = r = LabelSet.new(m.unmatched_vertexes_in(u), 'R')
-        log("label R: #{r.inspect}")
 
         # While there are unmarked R-vertexes
         while aug_path.nil? && start = unmarked.to_a.sample
@@ -50,7 +46,6 @@ module GraphMatching
 
             adj_u = g.vertices_adjacent_to(vi, except: [start])
             if adj_u.empty?
-              log("Vertex #{vi} has no adjacent vertexes, so we found an augmenting path")
               aug_path = [vi, start]
             else
 

@@ -4,8 +4,8 @@
 require 'benchmark'
 require 'graph_matching'
 
-MIN_SIZE = 90
-MAX_SIZE = 100
+MIN_SIZE = 1
+MAX_SIZE = 500
 
 def complete_graph(n)
   g = GraphMatching::Graph.new

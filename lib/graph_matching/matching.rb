@@ -6,7 +6,6 @@ module GraphMatching
 
   # TODO: Stop subclassing `Set` and only use @ary, which is far more efficient.
   class Matching < Set
-    include Explainable
 
     # Gabow (1976) uses a simple array to store his matching.  It
     # has one element for each vertex in the graph.  The value of
@@ -37,7 +36,6 @@ module GraphMatching
     end
 
     def augment(augmenting_path)
-      log("augmenting the matching. path: #{augmenting_path.inspect}")
       ap = Path.new(augmenting_path)
       augmenting_path_edges = ap.edges
       raise "invalid augmenting path: must have odd length" unless augmenting_path_edges.length.odd?
@@ -111,7 +109,6 @@ module GraphMatching
     def validate
       v = vertexes
       if v.length != v.uniq.length
-        log("Invalid matching: #{inspect}")
         raise "Invalid matching: A vertex appears more than once."
       end
       self

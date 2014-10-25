@@ -9,7 +9,6 @@ module GraphMatching
     # `MCMGeneral` implements Maximum Cardinality Matching in
     # general graphs (as opposed to bipartite).
     class MCMGeneral < MatchingAlgorithm
-      include Explainable
 
       # An LFlag represents a flag on an edge during Gabow's `l` function.
       class LFlag
@@ -59,12 +58,10 @@ module GraphMatching
 
         while true do
           u += 1
-          log("E1 u: #{u}")
           break if u > g.size
           if mate[u] != 0
             next # repeat E1
           else
-            log("E1 label #{u} with 0 (indicates 'start' label?)")
             label[u] = first[u] = 0
           end
 
@@ -85,27 +82,19 @@ module GraphMatching
           visited_edges = DirectedEdgeSet.new(g.size)
           q = OrderedSet[u]
           while searching && !q.empty?
-            log('')
-            log("E2 q: #{q.to_a}")
             x = q.deq
             visited_nodes.add(x)
-            log("E2 x: #{x}")
             adjacent = g.adjacent_vertex_set(x)
             discovered = adjacent - visited_edges.adjacent_vertices(x)
 
             discovered.each do |y|
               visited_edges.add(x, y)
-              log("E2 y: #{y}")
-              log("E2 labels: #{label}")
-              log("E2 mate: #{mate}")
-              log("E2 first: #{first}")
 
         # E3. [Augment the matching.] If y is unmatched and y != u,
         # set MATE(y) = x, call R(x, y): then go to E7 (R
         # completes the augment along path (y)*P(x))
 
               if mate[y] == 0 && y != u
-                log('E3')
                 mate[y] = x
                 r(x, y, label, mate)
                 searching = false # go to E7
@@ -116,7 +105,6 @@ module GraphMatching
         # and P(y))
 
               elsif outer?(label[y])
-                log("E4 because y: #{y} is outer. first: #{first}")
                 l(x, y, first, label, mate, q, visited_nodes)
 
         # E5. [Assign a vertex label.] Set v <- MATE(y). If v is
@@ -127,14 +115,11 @@ module GraphMatching
 
               else
                 v = mate[y]
-                log("E5 is v: #{v} nonouter? labels: #{label}")
                 if label[v] == -1 # nonouter
-                  log("E5 label #{v} with #{x}")
                   label[v] = x
                   first[v] = y
                 end
                 unless visited_nodes.include?(v)
-                  log("E6 enqueue #{v}")
                   q.enq(v)
                 end
               end
@@ -148,7 +133,6 @@ module GraphMatching
         # to E1 (now all vertexes are nonouter for the next search).
         #
 
-          log('E7')
           label[0] = -1
           label.each_with_index do |obj, ix|
             if ix > 0 && outer?(obj)
@@ -156,7 +140,6 @@ module GraphMatching
             end
           end
 
-          log('')
         end # while e0_loop
 
         Matching.gabow(mate)
@@ -182,20 +165,16 @@ module GraphMatching
 
         r = first[x]
         s = first[y]
-        log("L0 x: #{x} r: #{r}")
-        log("L0 y: #{y} s: #{s}")
 
         if r == s
           return # no vertices can be labeled
         else
-          log "L0 label (flag) #{r} with n(#{x}, #{y})"
           label[r] = LFlag.new(n(x, y))
         end
 
         # L1. [Switch paths ] If s != 0, interchange r and s, r <-> s
         # (r is a flagged nonouter vertex, alternately in P(x) and P(y)).
 
-        log "L1"
         finding_join = true
         while finding_join
           if s != 0
@@ -209,9 +188,7 @@ module GraphMatching
         # r is not flagged, flag r and go to L1 Otherwise set
         # join <- r and go to L3.
 
-          log "L2 r: #{r} s: #{s}"
           r = first[label[mate[r]]]
-          log "L2 r: #{r}"
           if label[r].is_a?(LFlag)
             join = r
             finding_join = false
@@ -226,20 +203,16 @@ module GraphMatching
         # set v <- FIRST(y) and do L4. Then go to L5.
 
         [first[x], first[y]].each do |v|
-          log "L3 join: #{join} v: #{v}"
 
         # L4 [Label v] If v != join, set LABEL(v) <- n(xy), FIRST(v) <- join,
         # v <- FIRST(LABEL(MATE(v))) and repeat step L4
         # Otherwise continue as specified in L3.
 
           until v == join
-            log("L4 edge-label #{v} with #{n(x, y)}")
             label[v] = n(x, y)
             unless visited_nodes.include?(v)
               q.enq(v)
-              log("L4 enqueue #{v}")
             end
-            log "L4 set first[#{v}] = #{join}"
             first[v] = join
             v = first[label[mate[v]]]
           end
@@ -249,24 +222,13 @@ module GraphMatching
         # outer, set FIRST(i) <- join. (Join is now the first nonouter
         # vertex in P(i))
 
-        log 'L5'
-        # outers = label.select { |l| outer?(l) }
-        # outers.each do |i|
-        #   if i.is_a?(Integer) && outer?(first[i])
-        #     log "L5 set first[#{i}] = #{join}"
-        #     first[i] = join
-        #   end
-        # end
         label.each_with_index do |l, i|
           if i > 0 && outer?(l) && outer?(label[first[i]])
-            log "L5 set first[#{i}] = #{join}"
             first[i] = join
           end
         end
 
         # L6. [Done] Return
-
-        log "L6 label: #{label}"
       end
 
       # Gabow (1976) describes a function `n` which returns the number
@@ -287,15 +249,11 @@ module GraphMatching
       # does not set MATE(w) <- v. This is done in step E3 or another
       # call to R.) R is a recursive routine.
       def r(v, w, label, mate)
-        log("R0 (v, w, mate): #{v}, #{w}, #{mate}")
 
         # R1. [Match v to w ] Set t <- MATE(v), MATE(v) <- w.
         # If MATE(t) != v, return (the path is completely re-matched)
 
         t = mate[v]
-        log "R1 start. the mate of #{v} is t: #{t}"
-
-        log "R1 (re)match #{v} to #{w}"
         mate[v] = w
         return if mate[t] != v
 

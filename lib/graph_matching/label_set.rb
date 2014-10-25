@@ -3,7 +3,6 @@ require 'set'
 
 module GraphMatching
   class LabelSet < Set
-    include Explainable
 
     attr_reader :label, :v
 
@@ -14,7 +13,6 @@ module GraphMatching
     end
 
     def add(o, v = nil)
-      log("Label #{o} with (#{label}, #{v})")
       super(o)
       @v[o] = v
     end
