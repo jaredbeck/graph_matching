@@ -52,6 +52,12 @@ module GraphMatching
       validate
     end
 
+    def delete(edge)
+      delete_if { |e| array_match?(e, edge) } # TODO: Stop subclassing `Set` and only use @ary
+      @ary[edge[0]] = nil
+      @ary[edge[1]] = nil
+    end
+
     def has_any_vertex?(*v)
       vertexes.any? { |vi| v.include?(vi) }
     end
@@ -75,12 +81,6 @@ module GraphMatching
 
     def merge(enum)
       super(enum.map { |e| to_undirected_edge(e) })
-    end
-
-    def delete(edge)
-      delete_if { |e| array_match?(e, edge) } # TODO: Stop subclassing `Set` and only use @ary
-      @ary[edge[0]] = nil
-      @ary[edge[1]] = nil
     end
 
     def inspect
