@@ -27,6 +27,16 @@ RSpec.describe GraphMatching::Matching do
     end
   end
 
+  describe '#delete' do
+    it 'removes edge' do
+      e = [2, 3]
+      m = described_class.new([e])
+      expect(m).to have_edge(e)
+      m.delete(e)
+      expect(m).to_not have_edge(e)
+    end
+  end
+
   describe '#has_any_vertex?' do
     it 'returns true if any given vertexes are matched' do
       m = described_class.new([[2,3], [3,4]])
