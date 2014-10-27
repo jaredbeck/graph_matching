@@ -115,7 +115,7 @@ module GraphMatching
     end
 
     def vertexes
-      @ary.compact
+      map(&:to_a).flatten # TODO: Use @ary
     end
 
     private
