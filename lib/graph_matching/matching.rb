@@ -39,12 +39,12 @@ module GraphMatching
       ap = Path.new(augmenting_path)
       augmenting_path_edges = ap.edges
       raise "invalid augmenting path: must have odd length" unless augmenting_path_edges.length.odd?
+      ap.vertexes.each do |v|
+        w = match(v)
+        delete([v, w]) unless w.nil?
+      end
       augmenting_path_edges.each_with_index do |edge, ix|
-        if ix.even?
-          add(edge)
-        else
-          delete(edge)
-        end
+        add(edge) if ix.even?
       end
 
       # Validating after every augmentation is wasteful and will
