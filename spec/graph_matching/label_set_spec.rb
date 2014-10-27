@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe GraphMatching::LabelSet do
   let(:label) { double }
+  let(:obj) { double }
   let(:set) { described_class.new([], label) }
 
   describe '.new' do
@@ -11,20 +12,21 @@ RSpec.describe GraphMatching::LabelSet do
   end
 
   describe '#add' do
-    let(:obj) { double }
-    let(:vertex) { double }
-
-    context 'with optional vertex' do
-      it 'logs obj, label, and vertex' do
-        expect(set).to receive(:log).with("Label #{obj} with (#{label}, #{vertex})")
-        set.add(obj, vertex)
+    context 'without optional vertex' do
+      it 'includes obj' do
+        set.add(obj)
+        expect(set).to include(obj)
       end
     end
+  end
 
-    context 'without optional vertex' do
-      it 'logs obj and label' do
-        expect(set).to receive(:log).with("Label #{obj} with (#{label}, )")
-        set.add(obj)
+  describe '#get' do
+    let(:vertex) { double }
+
+    context 'add obj with optional vertex' do
+      it 'labels obj with vertex' do
+        set.add(obj, vertex)
+        expect(set.get(obj)).to eq(vertex)
       end
     end
   end
