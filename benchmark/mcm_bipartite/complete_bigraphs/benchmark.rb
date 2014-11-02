@@ -1,10 +1,12 @@
 # No shebang here.  Usage:
-# ruby -I lib benchmark/benchmark.rb
+# ruby -I lib benchmark/mcm_bipartite/complete_bigraphs/benchmark.rb
 
 require 'benchmark'
 require 'graph_matching'
 
 MAX_SIZE = 500
+
+$stdout.sync = true
 
 def complete_bigraph(n)
   g = GraphMatching::BipartiteGraph.new
@@ -21,5 +23,7 @@ end
 1.upto(MAX_SIZE) do |v|
   print "%5d\t" % [v]
   g = complete_bigraph(v)
+  GC.disable
   puts Benchmark.realtime { g.maximum_cardinality_matching }
+  GC.enable
 end

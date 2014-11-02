@@ -1,11 +1,13 @@
 # No shebang here.  Usage:
-# ruby -I lib benchmark/benchmark.rb
+# ruby -I lib benchmark/mcm_general/complete_graphs/benchmark.rb
 
 require 'benchmark'
 require 'graph_matching'
 
 MIN_SIZE = 1
 MAX_SIZE = 500
+
+$stdout.sync = true
 
 def complete_graph(n)
   g = GraphMatching::Graph.new
@@ -20,5 +22,7 @@ end
 MIN_SIZE.upto(MAX_SIZE) do |v|
   print "%5d\t" % [v]
   g = complete_graph(v)
+  GC.disable
   puts Benchmark.realtime { g.maximum_cardinality_matching }
+  GC.enable
 end
