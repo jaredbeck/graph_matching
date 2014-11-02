@@ -48,9 +48,7 @@ module GraphMatching
         add(edge) if ix.even?
       end
 
-      # Validating after every augmentation is wasteful and will
-      # be removed when this library is more mature.
-      validate
+      self
     end
 
     def delete(edge)
@@ -129,16 +127,6 @@ module GraphMatching
 
     def unmatched_vertexes_in(set)
       set - vertexes
-    end
-
-    # `validate` is a simple sanity check.  If all is
-    # well, it returns `self`.
-    def validate
-      v = vertexes
-      if v.length != v.uniq.length
-        raise "Invalid matching: A vertex appears more than once."
-      end
-      self
     end
 
     def vertexes

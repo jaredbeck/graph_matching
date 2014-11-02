@@ -68,7 +68,7 @@ module GraphMatching
           unmarked = r - marked
         end
 
-        aug_path.nil? ? m.validate : mcm_stage(m.augment(aug_path), u)
+        aug_path.nil? ? m : mcm_stage(m.augment(aug_path), u)
       end
     end
   end

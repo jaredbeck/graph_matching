@@ -101,16 +101,4 @@ RSpec.describe GraphMatching::Matching do
       expect(described_class[[1,2], [3,4]].vertexes).to match_array([1, 2, 3, 4])
     end
   end
-
-  describe '#validate' do
-    it 'raises an error if a vertex appears more than once' do
-      expect {
-        described_class[[1,2], [3,4]].validate
-      }.to_not raise_error
-      expect {
-        described_class[[1,2], [3,2]].validate
-      }.to raise_error("Invalid matching: A vertex appears more than once.")
-    end
-  end
-
 end
