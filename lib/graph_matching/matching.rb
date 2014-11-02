@@ -4,8 +4,7 @@ require 'set'
 
 module GraphMatching
 
-  # TODO: Stop subclassing `Set` and only use @ary, which is far more efficient.
-  class Matching < Set
+  class Matching
 
     # Gabow (1976) uses a simple array to store his matching.  It
     # has one element for each vertex in the graph.  The value of
@@ -24,13 +23,15 @@ module GraphMatching
       m
     end
 
-    def initialize(*args)
-      @ary = [] # An optimized structure (see `.gabow`)
-      super
+    def self.[](*edges)
+      new.tap { |m| edges.each { |e| m.add(e) } }
+    end
+
+    def initialize
+      @ary = []
     end
 
     def add(o)
-      super(to_undirected_edge(o)) # TODO: Stop subclassing `Set` and only use @ary
       @ary[o[0]] = o[1]
       @ary[o[1]] = o[0]
     end
@@ -53,9 +54,18 @@ module GraphMatching
     end
 
     def delete(edge)
-      delete_if { |e| array_match?(e, edge) } # TODO: Stop subclassing `Set` and only use @ary
       @ary[edge[0]] = nil
       @ary[edge[1]] = nil
+    end
+
+    def empty?
+      @ary.all?(&:nil?)
+    end
+
+    # `first` returns the first edge
+    def first
+      j = @ary.find { |e| !e.nil? }
+      [@ary[j], j]
     end
 
     def has_any_vertex?(*v)
@@ -76,7 +86,7 @@ module GraphMatching
     # `match` returns the matched vertex (across the edge) or
     # nil if `v` is not matched
     def match(v)
-      (edge_from(v).to_a - [v])[0]
+      @ary[v]
     end
 
     def merge(enum)
@@ -94,6 +104,23 @@ module GraphMatching
 
     def replace_if_matched(match:, replacement:)
       replace(old: match, new: replacement) if has_edge?(match)
+    end
+
+    # `size` returns number of edges
+    def size
+      @ary.compact.size / 2
+    end
+
+    def to_a
+      result = []
+      skip = []
+      @ary.each_with_index { |e, i|
+        unless e.nil? || skip.include?(i)
+          result << [i, e]
+          skip << e
+        end
+      }
+      result
     end
 
     def to_s
@@ -115,22 +142,10 @@ module GraphMatching
     end
 
     def vertexes
-      map(&:to_a).flatten # TODO: Use @ary
+      @ary.compact
     end
 
     private
-
-    # `array_match?` returns true if both arrays have the same
-    # elements, irrespective of order.
-    def array_match?(a, b)
-      a.to_a.group_by { |i| i } == b.to_a.group_by { |i| i }
-    end
-
-    # `edge_from` returns the edge that contains `vertex`.  If no
-    # edge contains `vertex`, returns empty array.  See also `#match`
-    def edge_from(vertex)
-      find { |edge| edge.to_a.include?(vertex) } || []
-    end
 
     def to_undirected_edge(o)
       klass = RGL::Edge::UnDirectedEdge

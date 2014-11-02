@@ -7,7 +7,6 @@ RSpec.describe GraphMatching::Algorithm::MCMBipartite do
     context 'empty graph' do
       it 'returns empty set' do
         m = described_class.new(g).match
-        expect(m).to be_a(Set)
         expect(m).to be_empty
       end
     end
@@ -25,7 +24,7 @@ RSpec.describe GraphMatching::Algorithm::MCMBipartite do
         g.add_edge(*e)
         m = described_class.new(g).match
         expect(m.size).to eq(1)
-        expect(m.first).to eql(RGL::Edge::UnDirectedEdge.new(*e))
+        expect(m.first).to eq(e)
       end
     end
 
@@ -41,7 +40,7 @@ RSpec.describe GraphMatching::Algorithm::MCMBipartite do
           RGL::AdjacencyGraph[1,4, 2,3]
         ]
         reconstructed = RGL::AdjacencyGraph.new
-        m.each { |edge| reconstructed.add_edge(*edge) }
+        m.to_a.each { |edge| reconstructed.add_edge(*edge) }
         expect(outcomes).to include(reconstructed)
       end
     end
@@ -72,7 +71,7 @@ RSpec.describe GraphMatching::Algorithm::MCMBipartite do
           RGL::AdjacencyGraph[2,9, 3,7, 4,8, 5,10, 6,11]
         ]
         reconstructed = RGL::AdjacencyGraph.new
-        m.each { |edge| reconstructed.add_edge(*edge) }
+        m.to_a.each { |edge| reconstructed.add_edge(*edge) }
         expect(outcomes).to include(reconstructed)
       end
     end
