@@ -51,9 +51,8 @@ module GraphMatching
 
               if adj_u_in_m.empty?
                 aug_path = backtrack_from(vi, predecessors)
+                break
               end
-
-              break unless aug_path.nil?
             end
 
             unmarked = r - marked
