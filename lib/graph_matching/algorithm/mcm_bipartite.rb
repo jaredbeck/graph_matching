@@ -40,21 +40,17 @@ module GraphMatching
               predecessors[vi] = start
 
               adj_u = g.adjacent_vertices(vi) - [start]
-              if adj_u.empty?
-                aug_path = [vi, start]
-              else
 
-                # If there are matched edges, follow each to a vertex
-                # in U and label the U-vertex with R.  Otherwise,
-                # backtrack to construct an augmenting path.
-                adj_u_in_m = adj_u.select { |i| m[vi] == i }.each do |ui|
-                  r << ui
-                  predecessors[ui] = vi
-                end
+              # If there are matched edges, follow each to a vertex
+              # in U and label the U-vertex with R.  Otherwise,
+              # backtrack to construct an augmenting path.
+              adj_u_in_m = adj_u.select { |i| m[vi] == i }.each do |ui|
+                r << ui
+                predecessors[ui] = vi
+              end
 
-                if adj_u_in_m.empty?
-                  aug_path = backtrack_from(vi, predecessors)
-                end
+              if adj_u_in_m.empty?
+                aug_path = backtrack_from(vi, predecessors)
               end
 
               break unless aug_path.nil?
