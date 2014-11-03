@@ -85,10 +85,6 @@ module GraphMatching
       @ary[v]
     end
 
-    def merge(enum)
-      super(enum.map { |e| to_undirected_edge(e) })
-    end
-
     def inspect
       to_s
     end
