@@ -21,7 +21,6 @@ module GraphMatching
 
           # Begin each stage by clearing all labels and marks
           t = []
-          marked = []
           predecessors = {}
           aug_path = nil
 
@@ -31,7 +30,7 @@ module GraphMatching
 
           # While there are unmarked R-vertexes
           while aug_path.nil? && start = unmarked.sample
-            marked << start
+            unmarked.delete(start)
 
             # Follow the unmatched edges (if any) to vertexes in V
             # ignoring any V-vertexes already labeled T
@@ -54,8 +53,6 @@ module GraphMatching
                 break
               end
             end
-
-            unmarked = r - marked
           end
 
           if aug_path.nil?
