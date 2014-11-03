@@ -71,14 +71,12 @@ module GraphMatching
     end
 
     def has_edge?(e)
-      !@ary[e[0]].nil? &&
-        !@ary[e[1]].nil? &&
-        @ary[e[0]] == e[1] &&
-        @ary[e[1]] == e[0]
+      i, j = e
+      !@ary[i].nil? && @ary[i] == j && @ary[j] == i
     end
 
     def has_vertex?(v)
-      vertexes.include?(v)
+      @ary.include?(v)
     end
 
     # `match` returns the matched vertex (across the edge) or
