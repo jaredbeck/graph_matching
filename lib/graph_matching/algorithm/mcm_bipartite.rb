@@ -68,7 +68,7 @@ module GraphMatching
             t.add(vi)
             predecessors[vi] = start
 
-            adj_u = g.vertices_adjacent_to(vi, except: [start])
+            adj_u = g.adjacent_vertices(vi) - [start]
             if adj_u.empty?
               aug_path = [vi, start]
             else

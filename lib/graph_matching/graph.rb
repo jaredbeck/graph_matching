@@ -59,14 +59,5 @@ module GraphMatching
       end
     end
 
-    private
-
-    # `unmatched_adjacent_to` is poorly named.  It returns vertexes
-    # across adjacent unmatched edges.  However, vertexes in the
-    # returned array may be matched by non-adjacent edges.
-    def unmatched_adjacent_to(vertex, matching)
-      adjacent_vertices(vertex).reject { |a| matching.has_edge?([vertex, a]) }
-    end
-
   end
 end

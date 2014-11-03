@@ -29,14 +29,6 @@ module GraphMatching
       [u, v]
     end
 
-    def matched_adjacent_to(vertex, adjacent_vertexes, matching)
-      adjacent_vertexes.select { |x| matching.has_edge?([x, vertex]) }
-    end
-
-    def unmatched_unlabled_adjacent_to(vertex, matching, labels)
-      unmatched_adjacent_to(vertex, matching).reject { |v| labels.include?(v) }
-    end
-
     def vertices_adjacent_to(vertex, except: [])
       adjacent_vertices(vertex) - except
     end
