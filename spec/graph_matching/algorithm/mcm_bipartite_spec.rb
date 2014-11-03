@@ -6,14 +6,11 @@ RSpec.describe GraphMatching::Algorithm::MCMBipartite do
   describe '#augment' do
     it 'augments the matching' do
       mcm = described_class.new(g)
-      m = GraphMatching::Matching[[2,3]]
+      m = [nil, nil, 3, 2]
       m = mcm.send(:augment, m, [1,2,3,4])
-      expect(m).to have_edge([1,2])
-      expect(m).to have_edge([4,3])
+      expect(m).to eq([nil, 2, 1, 4, 3])
       m = mcm.send(:augment, m, [1,2,4,5,6,7])
-      expect(m).to have_edge([1,2])
-      expect(m).to have_edge([4,5])
-      expect(m).to have_edge([6,7])
+      expect(m).to eq([nil, 2, 1, nil, 5, 4, 7, 6])
     end
   end
 

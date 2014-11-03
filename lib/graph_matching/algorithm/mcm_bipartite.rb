@@ -16,7 +16,8 @@ module GraphMatching
 
       def match
         u, v = g.partition
-        mcm_stage(Matching.new, u)
+        m = mcm_stage([], u)
+        Matching.gabow(m)
       end
 
       private
@@ -27,10 +28,17 @@ module GraphMatching
         raise "invalid augmenting path: must have odd length" unless augmenting_path_edges.length.odd?
         ap.vertexes.each do |v|
           w = m[v]
-          m.delete([v, w]) unless w.nil?
+          unless w.nil?
+            m[v] = nil
+            m[w] = nil
+          end
         end
         augmenting_path_edges.each_with_index do |edge, ix|
-          m.add(edge) if ix.even?
+          if ix.even?
+            i, j = edge
+            m[i] = j
+            m[j] = i
+          end
         end
         m
       end
@@ -45,7 +53,8 @@ module GraphMatching
 
         # Label unmatched vertexes in U with label R.  These R-vertexes
         # are candidates for the start of an augmenting path.
-        unmarked = r = LabelSet.new(m.unmatched_vertexes_in(u), 'R')
+        r_vertexes = u.select { |i| m[i].nil? }
+        unmarked = r = LabelSet.new(r_vertexes, 'R')
 
         # While there are unmarked R-vertexes
         while aug_path.nil? && start = unmarked.to_a.sample
@@ -53,7 +62,9 @@ module GraphMatching
 
           # Follow the unmatched edges (if any) to vertexes in V
           # ignoring any V-vertexes already labeled T
-          g.unmatched_unlabled_adjacent_to(start, m, t).each do |vi|
+          g.adjacent_vertices(start).select { |i|
+            m[start] != i && !t.include?(i)
+          }.each do |vi|
             t.add(vi)
             predecessors[vi] = start
 
@@ -65,7 +76,7 @@ module GraphMatching
               # If there are matched edges, follow each to a vertex
               # in U and label the U-vertex with R.  Otherwise,
               # backtrack to construct an augmenting path.
-              adj_u_in_m = g.matched_adjacent_to(vi, adj_u, m).each do |ui|
+              adj_u_in_m = adj_u.select { |i| m[vi] == i }.each do |ui|
                 r.add(ui)
                 predecessors[ui] = vi
               end

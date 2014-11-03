@@ -4,6 +4,7 @@
 require 'benchmark'
 require 'graph_matching'
 
+MIN_SIZE = 450
 MAX_SIZE = 500
 
 $stdout.sync = true
@@ -20,7 +21,7 @@ def complete_bigraph(n)
   g
 end
 
-1.upto(MAX_SIZE) do |v|
+MIN_SIZE.upto(MAX_SIZE) do |v|
   print "%5d\t" % [v]
   g = complete_bigraph(v)
   GC.disable
