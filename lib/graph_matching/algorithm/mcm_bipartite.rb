@@ -18,6 +18,8 @@ module GraphMatching
         m = []
 
         while true
+
+          # Begin each stage by clearing all labels and marks
           t = []
           marked = []
           predecessors = {}
@@ -98,9 +100,6 @@ module GraphMatching
         end
         augmenting_path
       end
-
-      # Begin each stage (until no augmenting path is found)
-      # by clearing all labels and marks
 
       def matched_adjacent(from:, except:, g:, m:)
         g.adjacent_vertices(from).select { |i| i != except && m[from] == i }
