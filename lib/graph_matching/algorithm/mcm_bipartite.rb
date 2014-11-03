@@ -43,6 +43,14 @@ module GraphMatching
         m
       end
 
+      def backtrack_from(end_vertex, predecessors)
+        augmenting_path = [end_vertex]
+        while predecessors.has_key?(augmenting_path.last)
+          augmenting_path.push(predecessors[augmenting_path.last])
+        end
+        augmenting_path
+      end
+
       # Begin each stage (until no augmenting path is found)
       # by clearing all labels and marks
       def mcm_stage(m, u)
@@ -82,7 +90,7 @@ module GraphMatching
               end
 
               if adj_u_in_m.empty?
-                aug_path = g.backtrack_from(vi, predecessors)
+                aug_path = backtrack_from(vi, predecessors)
               end
             end
 

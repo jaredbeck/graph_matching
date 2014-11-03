@@ -27,14 +27,6 @@ module GraphMatching
       s
     end
 
-    def backtrack_from(end_vertex, predecessors)
-      augmenting_path = [end_vertex]
-      while predecessors.has_key?(augmenting_path.last)
-        augmenting_path.push(predecessors[augmenting_path.last])
-      end
-      augmenting_path
-    end
-
     def connected?
       count = 0
       each_connected_component { |c| count += 1 }
