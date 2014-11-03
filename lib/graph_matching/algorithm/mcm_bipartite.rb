@@ -1,4 +1,3 @@
-require_relative '../label_set'
 require_relative '../matching'
 require_relative 'matching_algorithm'
 
@@ -54,26 +53,25 @@ module GraphMatching
       # Begin each stage (until no augmenting path is found)
       # by clearing all labels and marks
       def mcm_stage(m, u)
-        t = LabelSet.new([], 'T')
-        marked = LabelSet.new([], 'mark')
-        predecessors = Hash.new
+        t = []
+        marked = []
+        predecessors = {}
         aug_path = nil
 
         # Label unmatched vertexes in U with label R.  These R-vertexes
         # are candidates for the start of an augmenting path.
-        r_vertexes = u.select { |i| m[i].nil? }
-        unmarked = r = LabelSet.new(r_vertexes, 'R')
+        unmarked = r = u.select { |i| m[i].nil? }
 
         # While there are unmarked R-vertexes
-        while aug_path.nil? && start = unmarked.to_a.sample
-          marked.add(start)
+        while aug_path.nil? && start = unmarked.sample
+          marked << start
 
           # Follow the unmatched edges (if any) to vertexes in V
           # ignoring any V-vertexes already labeled T
           g.adjacent_vertices(start).select { |i|
             m[start] != i && !t.include?(i)
           }.each do |vi|
-            t.add(vi)
+            t << vi
             predecessors[vi] = start
 
             adj_u = g.adjacent_vertices(vi) - [start]
@@ -85,7 +83,7 @@ module GraphMatching
               # in U and label the U-vertex with R.  Otherwise,
               # backtrack to construct an augmenting path.
               adj_u_in_m = adj_u.select { |i| m[vi] == i }.each do |ui|
-                r.add(ui)
+                r << ui
                 predecessors[ui] = vi
               end
 
