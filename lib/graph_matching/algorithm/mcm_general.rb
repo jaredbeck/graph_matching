@@ -1,5 +1,4 @@
 require_relative '../directed_edge_set'
-require_relative '../explainable'
 require_relative '../matching'
 require_relative 'matching_algorithm'
 

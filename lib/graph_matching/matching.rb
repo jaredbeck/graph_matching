@@ -1,6 +1,4 @@
-require_relative 'explainable'
 require_relative 'path'
-require 'set'
 
 module GraphMatching
 

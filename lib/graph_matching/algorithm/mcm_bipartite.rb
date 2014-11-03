@@ -1,4 +1,3 @@
-require_relative '../explainable'
 require_relative '../label_set'
 require_relative '../matching'
 require_relative 'matching_algorithm'
