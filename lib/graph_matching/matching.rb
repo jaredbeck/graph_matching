@@ -29,25 +29,14 @@ module GraphMatching
       @ary = []
     end
 
+    def [](i)
+      @ary[i]
+    end
+
     def add(e)
       i, j = e
       @ary[i] = j
       @ary[j] = i
-    end
-
-    def augment(augmenting_path)
-      ap = Path.new(augmenting_path)
-      augmenting_path_edges = ap.edges
-      raise "invalid augmenting path: must have odd length" unless augmenting_path_edges.length.odd?
-      ap.vertexes.each do |v|
-        w = @ary[v]
-        delete([v, w]) unless w.nil?
-      end
-      augmenting_path_edges.each_with_index do |edge, ix|
-        add(edge) if ix.even?
-      end
-
-      self
     end
 
     def delete(e)

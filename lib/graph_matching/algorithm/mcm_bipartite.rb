@@ -21,6 +21,20 @@ module GraphMatching
 
       private
 
+      def augment(m, path)
+        ap = Path.new(path)
+        augmenting_path_edges = ap.edges
+        raise "invalid augmenting path: must have odd length" unless augmenting_path_edges.length.odd?
+        ap.vertexes.each do |v|
+          w = m[v]
+          m.delete([v, w]) unless w.nil?
+        end
+        augmenting_path_edges.each_with_index do |edge, ix|
+          m.add(edge) if ix.even?
+        end
+        m
+      end
+
       # Begin each stage (until no augmenting path is found)
       # by clearing all labels and marks
       def mcm_stage(m, u)
@@ -67,7 +81,7 @@ module GraphMatching
           unmarked = r - marked
         end
 
-        aug_path.nil? ? m : mcm_stage(m.augment(aug_path), u)
+        aug_path.nil? ? m : mcm_stage(augment(m, aug_path), u)
       end
     end
   end

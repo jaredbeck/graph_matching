@@ -2,19 +2,6 @@ require 'spec_helper'
 
 RSpec.describe GraphMatching::Matching do
 
-  describe '#augment' do
-    it 'augments the matching' do
-      m = described_class[[2,3]]
-      m.augment([1,2,3,4])
-      expect(m).to have_edge([1,2])
-      expect(m).to have_edge([4,3])
-      m.augment([1,2,4,5,6,7])
-      expect(m).to have_edge([1,2])
-      expect(m).to have_edge([4,5])
-      expect(m).to have_edge([6,7])
-    end
-  end
-
   describe '#delete' do
     it 'removes edge' do
       e = [2, 3]

@@ -3,6 +3,20 @@ require 'spec_helper'
 RSpec.describe GraphMatching::Algorithm::MCMBipartite do
   let(:g) { GraphMatching::BipartiteGraph.new }
 
+  describe '#augment' do
+    it 'augments the matching' do
+      mcm = described_class.new(g)
+      m = GraphMatching::Matching[[2,3]]
+      m = mcm.send(:augment, m, [1,2,3,4])
+      expect(m).to have_edge([1,2])
+      expect(m).to have_edge([4,3])
+      m = mcm.send(:augment, m, [1,2,4,5,6,7])
+      expect(m).to have_edge([1,2])
+      expect(m).to have_edge([4,5])
+      expect(m).to have_edge([6,7])
+    end
+  end
+
   describe '#match' do
     context 'empty graph' do
       it 'returns empty set' do
