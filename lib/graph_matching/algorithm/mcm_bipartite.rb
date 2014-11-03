@@ -35,9 +35,7 @@ module GraphMatching
 
             # Follow the unmatched edges (if any) to vertexes in V
             # ignoring any V-vertexes already labeled T
-            g.adjacent_vertices(start).select { |i|
-              m[start] != i && !t.include?(i)
-            }.each do |vi|
+            unlabeled_across_unmatched_edges_from(start, g, m ,t).each do |vi|
               t << vi
               predecessors[vi] = start
 
@@ -103,6 +101,12 @@ module GraphMatching
 
       def matched_adjacent(from:, except:, g:, m:)
         g.adjacent_vertices(from).select { |i| i != except && m[from] == i }
+      end
+
+      # `unlabeled_across_unmatched_edges_from` simply looks across
+      # unmatched edges from `v` to find vertexes not labeled by `t`.
+      def unlabeled_across_unmatched_edges_from(v, g, m, t)
+        g.adjacent_vertices(v).select { |i| m[v] != i && !t.include?(i) }
       end
 
     end
