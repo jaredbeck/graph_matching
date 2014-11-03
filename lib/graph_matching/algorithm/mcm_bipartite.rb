@@ -15,7 +15,61 @@ module GraphMatching
 
       def match
         u, v = g.partition
-        m = mcm_stage([], u)
+        m = []
+
+        while true
+          t = []
+          marked = []
+          predecessors = {}
+          aug_path = nil
+
+          # Label unmatched vertexes in U with label R.  These R-vertexes
+          # are candidates for the start of an augmenting path.
+          unmarked = r = u.select { |i| m[i].nil? }
+
+          # While there are unmarked R-vertexes
+          while aug_path.nil? && start = unmarked.sample
+            marked << start
+
+            # Follow the unmatched edges (if any) to vertexes in V
+            # ignoring any V-vertexes already labeled T
+            g.adjacent_vertices(start).select { |i|
+              m[start] != i && !t.include?(i)
+            }.each do |vi|
+              t << vi
+              predecessors[vi] = start
+
+              adj_u = g.adjacent_vertices(vi) - [start]
+              if adj_u.empty?
+                aug_path = [vi, start]
+              else
+
+                # If there are matched edges, follow each to a vertex
+                # in U and label the U-vertex with R.  Otherwise,
+                # backtrack to construct an augmenting path.
+                adj_u_in_m = adj_u.select { |i| m[vi] == i }.each do |ui|
+                  r << ui
+                  predecessors[ui] = vi
+                end
+
+                if adj_u_in_m.empty?
+                  aug_path = backtrack_from(vi, predecessors)
+                end
+              end
+
+              break unless aug_path.nil?
+            end
+
+            unmarked = r - marked
+          end
+
+          if aug_path.nil?
+            break
+          else
+            m = augment(m, aug_path)
+          end
+        end
+
         Matching.gabow(m)
       end
 
@@ -52,54 +106,7 @@ module GraphMatching
 
       # Begin each stage (until no augmenting path is found)
       # by clearing all labels and marks
-      def mcm_stage(m, u)
-        t = []
-        marked = []
-        predecessors = {}
-        aug_path = nil
 
-        # Label unmatched vertexes in U with label R.  These R-vertexes
-        # are candidates for the start of an augmenting path.
-        unmarked = r = u.select { |i| m[i].nil? }
-
-        # While there are unmarked R-vertexes
-        while aug_path.nil? && start = unmarked.sample
-          marked << start
-
-          # Follow the unmatched edges (if any) to vertexes in V
-          # ignoring any V-vertexes already labeled T
-          g.adjacent_vertices(start).select { |i|
-            m[start] != i && !t.include?(i)
-          }.each do |vi|
-            t << vi
-            predecessors[vi] = start
-
-            adj_u = g.adjacent_vertices(vi) - [start]
-            if adj_u.empty?
-              aug_path = [vi, start]
-            else
-
-              # If there are matched edges, follow each to a vertex
-              # in U and label the U-vertex with R.  Otherwise,
-              # backtrack to construct an augmenting path.
-              adj_u_in_m = adj_u.select { |i| m[vi] == i }.each do |ui|
-                r << ui
-                predecessors[ui] = vi
-              end
-
-              if adj_u_in_m.empty?
-                aug_path = backtrack_from(vi, predecessors)
-              end
-            end
-
-            break unless aug_path.nil?
-          end
-
-          unmarked = r - marked
-        end
-
-        aug_path.nil? ? m : mcm_stage(augment(m, aug_path), u)
-      end
     end
   end
 end
