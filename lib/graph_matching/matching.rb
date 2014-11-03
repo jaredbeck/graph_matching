@@ -31,9 +31,10 @@ module GraphMatching
       @ary = []
     end
 
-    def add(o)
-      @ary[o[0]] = o[1]
-      @ary[o[1]] = o[0]
+    def add(e)
+      i, j = e
+      @ary[i] = j
+      @ary[j] = i
     end
 
     def augment(augmenting_path)
@@ -51,9 +52,10 @@ module GraphMatching
       self
     end
 
-    def delete(edge)
-      @ary[edge[0]] = nil
-      @ary[edge[1]] = nil
+    def delete(e)
+      i, j = e
+      @ary[i] = nil
+      @ary[j] = nil
     end
 
     def empty?
