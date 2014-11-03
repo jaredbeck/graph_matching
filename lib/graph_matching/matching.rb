@@ -41,7 +41,7 @@ module GraphMatching
       augmenting_path_edges = ap.edges
       raise "invalid augmenting path: must have odd length" unless augmenting_path_edges.length.odd?
       ap.vertexes.each do |v|
-        w = match(v)
+        w = @ary[v]
         delete([v, w]) unless w.nil?
       end
       augmenting_path_edges.each_with_index do |edge, ix|
@@ -77,12 +77,6 @@ module GraphMatching
 
     def has_vertex?(v)
       @ary.include?(v)
-    end
-
-    # `match` returns the matched vertex (across the edge) or
-    # nil if `v` is not matched
-    def match(v)
-      @ary[v]
     end
 
     def inspect

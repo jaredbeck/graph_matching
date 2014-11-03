@@ -70,15 +70,6 @@ RSpec.describe GraphMatching::Matching do
     end
   end
 
-  describe '#match' do
-    it 'returns the matched vertex (across the edge) or nil if not matched' do
-      m = described_class.new
-      expect(m.match(1)).to be_nil
-      m.add([1,2])
-      expect(m.match(1)).to eq(2)
-    end
-  end
-
   describe '#to_a' do
     it 'returns edges' do
       edges = [[1,2], [3,4]]
