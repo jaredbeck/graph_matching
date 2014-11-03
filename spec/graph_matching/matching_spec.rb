@@ -47,15 +47,6 @@ RSpec.describe GraphMatching::Matching do
     end
   end
 
-  describe '#has_any_vertex?' do
-    it 'returns true if any given vertexes are matched' do
-      m = described_class[[2,3], [3,4]]
-      expect(m.has_any_vertex?(2, 3)).to eq(true)
-      expect(m.has_any_vertex?(4)).to eq(true)
-      expect(m.has_any_vertex?(1, 5)).to eq(false)
-    end
-  end
-
   describe '#has_edge?' do
     it 'returns true if edge found' do
       m = described_class.new
@@ -83,13 +74,6 @@ RSpec.describe GraphMatching::Matching do
       edges = [[1,2], [3,4]]
       m = described_class[*edges]
       expect(m.to_a).to eq(edges)
-    end
-  end
-
-  describe '#unmatched_vertexes_in' do
-    it 'returns unmatched vertexes in the given set' do
-      m = described_class[[1,2], [3,4]]
-      expect(m.unmatched_vertexes_in(Set[1,4,5])).to eq(Set[5])
     end
   end
 

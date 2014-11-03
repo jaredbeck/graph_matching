@@ -51,16 +51,6 @@ module GraphMatching
       @ary.all?(&:nil?)
     end
 
-    # `first` returns the first edge
-    def first
-      j = @ary.find { |e| !e.nil? }
-      [@ary[j], j]
-    end
-
-    def has_any_vertex?(*v)
-      vertexes.any? { |vi| v.include?(vi) }
-    end
-
     def has_edge?(e)
       i, j = e
       !@ary[i].nil? && @ary[i] == j && @ary[j] == i
@@ -68,19 +58,6 @@ module GraphMatching
 
     def has_vertex?(v)
       @ary.include?(v)
-    end
-
-    def inspect
-      to_s
-    end
-
-    def replace(old:, new:)
-      delete old
-      add new
-    end
-
-    def replace_if_matched(match:, replacement:)
-      replace(old: match, new: replacement) if has_edge?(match)
     end
 
     # `size` returns number of edges
@@ -100,23 +77,8 @@ module GraphMatching
       result
     end
 
-    def to_s
-      '[' + to_a.map(&:to_s).join(', ') + ']'
-    end
-
-    def unmatched_vertexes_in(set)
-      set - vertexes
-    end
-
     def vertexes
       @ary.compact
-    end
-
-    private
-
-    def to_undirected_edge(o)
-      klass = RGL::Edge::UnDirectedEdge
-      o.is_a?(klass) ? o : klass.new(*o.to_a)
     end
 
   end

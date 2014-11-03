@@ -35,7 +35,7 @@ RSpec.describe GraphMatching::Algorithm::MCMBipartite do
         g.add_edge(*e)
         m = described_class.new(g).match
         expect(m.size).to eq(1)
-        expect(m.first).to eq(e)
+        expect(m).to have_edge(e)
       end
     end
 
