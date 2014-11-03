@@ -2,6 +2,27 @@ require 'spec_helper'
 
 RSpec.describe GraphMatching::Matching do
 
+  describe '.gabow' do
+    context 'when nil is used as a placeholder' do
+      it 'returns a Matching' do
+        a = [nil, 2, 1, nil, 5, 4]
+        m = described_class.gabow(a)
+        expect(m).to have_edge([1, 2])
+        expect(m).to have_edge([4, 5])
+        expect(m).to_not have_vertex(3)
+      end
+    end
+
+    context 'when 0 is used as a placeholder' do
+      it 'returns a Matching' do
+        a = [0, 2, 1]
+        m = described_class.gabow(a)
+        expect(m).to have_edge([1, 2])
+        expect(m).to_not have_vertex(3)
+      end
+    end
+  end
+
   describe '#delete' do
     it 'removes edge' do
       e = [2, 3]

@@ -13,9 +13,11 @@ module GraphMatching
     def self.gabow(mate)
       m = new
       mate.each_with_index do |n1, ix|
-        n2 = mate[n1]
-        if n1 != 0 && n2 == ix
-          m.add([n1, n2])
+        if !n1.nil? && n1 != 0
+          n2 = mate[n1]
+          if n2 == ix
+            m.add([n1, n2])
+          end
         end
       end
       m
