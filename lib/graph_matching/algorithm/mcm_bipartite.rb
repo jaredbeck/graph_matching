@@ -29,8 +29,7 @@ module GraphMatching
           unmarked = r = u.select { |i| m[i].nil? }
 
           # While there are unmarked R-vertexes
-          while aug_path.nil? && start = unmarked.sample
-            unmarked.delete(start)
+          while aug_path.nil? && start = unmarked.pop
 
             # Follow the unmatched edges (if any) to vertexes in V
             # ignoring any V-vertexes already labeled T
