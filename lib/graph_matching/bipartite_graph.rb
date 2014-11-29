@@ -14,17 +14,19 @@ module GraphMatching
     end
 
     # `partition` either returns two disjoint (complementary)
-    # proper subsets of vertexes or raises a NotBipartiteError
+    # proper subsets of vertexes or raises a NotBipartiteError.
+    # The bigraph can be disconnected. (http://bit.ly/1rEOgEi)
     def partition
       u = Set.new
       v = Set.new
       return [u,v] if empty?
-      raise NotBipartite unless connected?
-      i = RGL::BFSIterator.new(self)
-      i.set_examine_edge_event_handler do |from, to|
-        examine_edge_for_partition(from, to, u, v)
+      each_connected_component do |component|
+        i = RGL::BFSIterator.new(self, component.first)
+        i.set_examine_edge_event_handler do |from, to|
+          examine_edge_for_partition(from, to, u, v)
+        end
+        i.set_to_end # does the search
       end
-      i.set_to_end # does the search
       assert_disjoint(u, v) # sanity check
       [u, v]
     end
