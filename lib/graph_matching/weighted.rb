@@ -6,14 +6,18 @@ module GraphMatching
   # Data Structure
   # --------------
   #
-  # If directed graphs were supported, a 2D array
-  # would be an obvious choice of data structure.  However, because
-  # directed graphs are not supported, one might argue that
-  # using a 2D array wastes memory; a symmetrical matrix can
-  # be stored in a 1D array to save memory. (http://bit.ly/1DMfLM3)
+  # Weights are stored in a 2D array.  The weight of an edge i,j
+  # is stored twice, at `[i][j]` and `[j][i]`.
+  #
+  # Storing the weight twice wastes memory.  A symmetrical matrix
+  # can be stored in a 1D array (http://bit.ly/1DMfLM3)
   # However, translating the 2D coordinates into a 1D index
   # marginally increases the cost of access, and this is a read-heavy
   # structure, so maybe the extra memory is an acceptable trade-off.
+  # It's also conceptually simpler, for what that's worth.
+  #
+  # If directed graphs were supported (they are not) this 2D array
+  # would be an obvious choice.
   #
   module Weighted
     def initialize
