@@ -20,9 +20,22 @@ module GraphMatching
   # would be an obvious choice.
   #
   module Weighted
+
+    def self.extended(host)
+      host.init_weights
+    end
+
     def initialize
       super
+      init_weights
+    end
+
+    def init_weights
       @weight = Array.new(num_vertices) { |_| Array.new(num_vertices) }
+    end
+
+    def max_w
+      edges.map { |edge| w(edge.to_a) }.max
     end
 
     def w(edge)

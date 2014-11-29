@@ -43,13 +43,13 @@ performs in O(n^4).
 Faster algorithms include Even-Kariv (1975) and Micali-Vazirani (1980).
 Galil (1986) describes the latter as "a simpler approach".
 
-### 3. Minimum Weighted Matching in Bipartite Graphs
+### 3. Maximum Weighted Matching in Bipartite Graphs
 
 Not yet implemented.
 
-Currently considering Gabow (1983).
+Currently considering Gabow (1983) and Galil (1986).
 
-### 4. Minimum Weighted Matching in General Graphs
+### 4. Maximum Weighted Matching in General Graphs
 
 Not yet implemented.
 

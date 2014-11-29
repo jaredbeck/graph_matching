@@ -1,5 +1,6 @@
 require 'rgl/traversal'
 require_relative 'algorithm/mcm_bipartite'
+require_relative 'algorithm/mwm_bipartite'
 require_relative 'graph'
 
 module GraphMatching
