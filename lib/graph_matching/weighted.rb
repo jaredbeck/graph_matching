@@ -40,6 +40,7 @@ module GraphMatching
 
     def w(edge)
       i, j = edge
+      raise ArgumentError, "Invalid edge: #{edge}" if i.nil? || j.nil?
       @weight[i - 1][j - 1]
     end
 

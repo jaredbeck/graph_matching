@@ -45,9 +45,11 @@ Galil (1986) describes the latter as "a simpler approach".
 
 ### 3. Maximum Weighted Matching in Bipartite Graphs
 
-Not yet implemented.
+Uses the [Augmenting Path][5] algorithm from Maximum Cardinality
+Matching, with the "scaling" approach described by Gabow (1983)
+and Galil (1986).
 
-Currently considering Gabow (1983) and Galil (1986).
+Not yet benchmarked or well tested.
 
 ### 4. Maximum Weighted Matching in General Graphs
 

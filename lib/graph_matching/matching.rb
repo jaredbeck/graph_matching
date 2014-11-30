@@ -47,6 +47,12 @@ module GraphMatching
       @ary[j] = nil
     end
 
+    # `edges` returns an array of undirected edges, represented as
+    # two-element arrays.
+    def edges
+      undirected_edges.map(&:to_a)
+    end
+
     def empty?
       @ary.all?(&:nil?)
     end
@@ -77,8 +83,21 @@ module GraphMatching
       result
     end
 
+    # Given a `Weighted` graph `g`, returns the sum of edge weights.
+    def weight(g)
+      edges.map { |e| g.w(e) }.reduce(0, :+)
+    end
+
     def vertexes
       @ary.compact
+    end
+
+    private
+
+    def undirected_edges
+      @ary.each_with_index.inject(Set.new) { |set, (el, ix)|
+        el.nil? ? set : set.add(RGL::Edge::UnDirectedEdge.new(el, ix))
+      }
     end
 
   end
