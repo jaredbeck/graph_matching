@@ -17,9 +17,10 @@ where e is the number of edges, and v, the number of vertexes ([benchmark][14]).
 
 ```ruby
 require 'graph_matching'
-g = GraphMatching::BipartiteGraph[1,3, 1,4, 2,3, 2,4]
-g.maximum_cardinality_matching
-#=> [(3=2), (4=1)]
+g = GraphMatching::BipartiteGraph[1,3, 1,4, 2,3]
+m = g.maximum_cardinality_matching
+m.edges
+#=> [[4, 1], [3, 2]]
 ```
 
 TO DO: This algorithm is inefficient compared to the [Hopcroft-Karp algorithm][13]
@@ -32,8 +33,9 @@ Uses Gabow (1976) which performs in O(n^3).
 ```ruby
 require 'graph_matching'
 g = GraphMatching::Graph[1,2, 1,3, 1,4, 2,3, 2,4, 3,4]
-g.maximum_cardinality_matching
-#=> [(2=1), (4=3)]
+m = g.maximum_cardinality_matching
+m.edges
+#=> [[2, 1], [4, 3]]
 ```
 
 Gabow (1976) is not the fastest algorithm, but it is "one exponent
@@ -50,6 +52,19 @@ Matching, with the "scaling" approach described by Gabow (1983)
 and Galil (1986).
 
 Not yet benchmarked or well tested.
+
+```ruby
+require 'graph_matching'
+g = GraphMatching::BipartiteGraph[1,2, 1,3]
+g.extend(GraphMatching::Weighted)
+g.set_w([1,2], 100)
+g.set_w([1,3], 101)
+m = g.maximum_weighted_matching
+m.edges
+#=> [[3, 1]]
+m.weight(g)
+#=> 101
+```
 
 ### 4. Maximum Weighted Matching in General Graphs
 
