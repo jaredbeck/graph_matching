@@ -14,6 +14,10 @@ module GraphMatching
       Algorithm::MCMBipartite.new(self).match
     end
 
+    def maximum_weighted_matching
+      Algorithm::MWMBipartite.new(self).match
+    end
+
     # `partition` either returns two disjoint (complementary)
     # proper subsets of vertexes or raises a NotBipartiteError.
     # The bigraph can be disconnected. (http://bit.ly/1rEOgEi)
