@@ -10,7 +10,7 @@ RSpec.describe GraphMatching::Visualize do
   end
 
   describe '#dot' do
-    let(:g) { GraphMatching::Graph.new }
+    let(:g) { GraphMatching::Graph::Graph.new }
 
     def normalize_ws(str)
       str.gsub(/\s+/, ' ').strip

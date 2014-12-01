@@ -9,7 +9,7 @@ module GraphMatching
     class MCMBipartite < MatchingAlgorithm
 
       def initialize(graph)
-        raise ArgumentError unless graph.is_a?(GraphMatching::BipartiteGraph)
+        raise ArgumentError unless graph.is_a?(GraphMatching::Graph::Bigraph)
         super
       end
 

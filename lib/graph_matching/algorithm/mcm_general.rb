@@ -18,7 +18,7 @@ module GraphMatching
       end
 
       def initialize(graph)
-        raise ArgumentError unless graph.is_a?(GraphMatching::Graph)
+        raise ArgumentError unless graph.is_a?(GraphMatching::Graph::Graph)
         super
       end
 

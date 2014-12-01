@@ -10,7 +10,7 @@ MAX_SIZE = 500
 $stdout.sync = true
 
 def complete_graph(n)
-  g = GraphMatching::Graph.new
+  g = GraphMatching::Graph::Graph.new
   1.upto(n - 1) do |i|
     (i + 1).upto(n) do |j|
       g.add_edge(i, j)

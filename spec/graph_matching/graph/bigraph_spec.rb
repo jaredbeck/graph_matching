@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-RSpec.describe GraphMatching::BipartiteGraph do
+RSpec.describe GraphMatching::Graph::Bigraph do
   let(:g) { described_class.new }
 
   it 'is a Graph' do
-    expect(g).to be_a(GraphMatching::Graph)
+    expect(g).to be_a(GraphMatching::Graph::Graph)
   end
 
   describe '#partition' do

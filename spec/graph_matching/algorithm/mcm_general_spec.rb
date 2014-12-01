@@ -1,12 +1,13 @@
 require 'spec_helper'
 
 RSpec.describe GraphMatching::Algorithm::MCMGeneral do
-  let(:g) { GraphMatching::Graph.new }
+  let(:graph_class) { GraphMatching::Graph::Graph }
+  let(:g) { graph_class.new }
 
   describe '#match' do
 
     def complete_graph(n)
-      g = GraphMatching::Graph.new
+      g = graph_class.new
       1.upto(n - 1) do |i|
         (i + 1).upto(n) do |j|
           g.add_edge(i, j)
@@ -29,7 +30,7 @@ RSpec.describe GraphMatching::Algorithm::MCMGeneral do
     end
 
     context 'two vertexes' do
-      let(:g) { GraphMatching::Graph[1,2] }
+      let(:g) { graph_class[1,2] }
 
       it 'returns one edge' do
         m = described_class.new(g).match
@@ -39,7 +40,7 @@ RSpec.describe GraphMatching::Algorithm::MCMGeneral do
     end
 
     context 'complete graph with four vertexes' do
-      let(:g) { GraphMatching::Graph[1,2, 1,3, 1,4, 2,3, 2,4, 3,4] }
+      let(:g) { graph_class[1,2, 1,3, 1,4, 2,3, 2,4, 3,4] }
 
       it 'returns two disjoint edges' do
         m = described_class.new(g).match
@@ -49,7 +50,7 @@ RSpec.describe GraphMatching::Algorithm::MCMGeneral do
     end
 
     context 'graph with stem (123) and blossom (456)' do
-      let(:g) { GraphMatching::Graph[1,2, 2,3, 3,4, 4,5, 5,6, 6,4] }
+      let(:g) { graph_class[1,2, 2,3, 3,4, 4,5, 5,6, 6,4] }
 
       it 'returns an expected result' do
         m = described_class.new(g).match
@@ -67,21 +68,21 @@ RSpec.describe GraphMatching::Algorithm::MCMGeneral do
     end
 
     it 'simple example: graph with stem (123) and blossom (345)' do
-      g = GraphMatching::Graph[1,2, 2,3, 2,4, 3,4, 4,5, 5,6]
+      g = graph_class[1,2, 2,3, 2,4, 3,4, 4,5, 5,6]
       m = described_class.new(g).match
       expect(m.size).to eq(3)
       expect(m.vertexes).to match_array(g.to_a)
     end
 
     it 'example from West\'s Introduction to Graph Theory, p. 143' do
-      g = GraphMatching::Graph[1,2, 1,8, 2,3, 3,4, 3,7, 4,5, 5,6, 7,9, 8,9, 10,8]
+      g = graph_class[1,2, 1,8, 2,3, 3,4, 3,7, 4,5, 5,6, 7,9, 8,9, 10,8]
       m = described_class.new(g).match
       expect(m.size).to eq(5)
       expect(m.vertexes).to match_array(g.vertexes)
     end
 
     it 'example from Gabow (1976)' do
-      g = GraphMatching::Graph[1,2, 2,3, 1,3, 1,10, 3,9, 3,4, 4,7, 4,8, 7,8, 9,5, 5,6, 6,7]
+      g = graph_class[1,2, 2,3, 1,3, 1,10, 3,9, 3,4, 4,7, 4,8, 7,8, 9,5, 5,6, 6,7]
       m = described_class.new(g).match
       expect(m.size).to eq(5)
       expect(m.vertexes).to match_array(1.upto(10))

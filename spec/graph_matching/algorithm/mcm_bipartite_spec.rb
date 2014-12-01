@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe GraphMatching::Algorithm::MCMBipartite do
-  let(:g) { GraphMatching::BipartiteGraph.new }
+  let(:g) { GraphMatching::Graph::Bigraph.new }
 
   describe '#augment' do
     it 'augments the matching' do

@@ -17,7 +17,7 @@ where e is the number of edges, and v, the number of vertexes ([benchmark][14]).
 
 ```ruby
 require 'graph_matching'
-g = GraphMatching::BipartiteGraph[1,3, 1,4, 2,3]
+g = GraphMatching::Graph::Bigraph[1,3, 1,4, 2,3]
 m = g.maximum_cardinality_matching
 m.edges
 #=> [[4, 1], [3, 2]]
@@ -32,7 +32,7 @@ Uses Gabow (1976) which performs in O(n^3).
 
 ```ruby
 require 'graph_matching'
-g = GraphMatching::Graph[1,2, 1,3, 1,4, 2,3, 2,4, 3,4]
+g = GraphMatching::Graph::Graph[1,2, 1,3, 1,4, 2,3, 2,4, 3,4]
 m = g.maximum_cardinality_matching
 m.edges
 #=> [[2, 1], [4, 3]]
@@ -55,8 +55,7 @@ Not yet benchmarked or well tested.
 
 ```ruby
 require 'graph_matching'
-g = GraphMatching::BipartiteGraph[1,2, 1,3]
-g.extend(GraphMatching::Weighted)
+g = GraphMatching::Graph::WeightedBigraph[1,2, 1,3]
 g.set_w([1,2], 100)
 g.set_w([1,3], 101)
 m = g.maximum_weighted_matching
@@ -80,10 +79,10 @@ Benchmarks can be found in `/benchmark` and the github wiki.
 Limitations
 -----------
 
-All vertexes in a `GraphMatching::Graph` must be integers.  This
-simplifies many algorithms.  For your convenience, a module
-(`GraphMatching::IntegerVertexes`) is provided to convert the
-vertexes of any `RGL::MutableGraph` to integers.
+All vertexes in a `Graph` must be consecutive positive nonzero
+integers.  This simplifies many algorithms.  For your convenience,
+a module (`GraphMatching::IntegerVertexes`) is provided to convert
+the vertexes of any `RGL::MutableGraph` to integers.
 
 ```ruby
 require 'graph_matching'
