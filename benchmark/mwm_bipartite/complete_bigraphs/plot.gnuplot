@@ -15,7 +15,7 @@ set y2tics autofreq tc lt 2
 set y2label 'n ** (3/4) m log N' tc lt 2
 
 plot \
-data_dir."/time.data" every 1:1:1::449 \
+data_dir."/time.data" every 1:1:1::299 \
 using 1:2 title "Time (s)" lt 1 axes x1y1, \
-data_dir."/nmN.data" every 1:1:1::449 \
+data_dir."/nmN.data" every 1:1:1::299 \
 using 1:8 title "n ** (3/4) m log N" with lines lt 2 axes x1y2

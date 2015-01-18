@@ -4,8 +4,8 @@
 require 'benchmark'
 require 'graph_matching'
 
-MIN_SIZE = 300
-MAX_SIZE = 303
+MIN_SIZE = 2
+MAX_SIZE = 300
 
 $stdout.sync = true
 

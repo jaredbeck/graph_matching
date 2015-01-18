@@ -12,6 +12,11 @@ module GraphMatching
       def initialize(graph)
         assert_weighted_bipartite graph
         super
+
+        # Optimization: Keeping a reference to the graph's weights
+        # in the instance, instead of calling `Weighted#w`
+        # thousands of times, is twice as fast.
+        @weight = graph.weight
       end
 
       def match
@@ -36,7 +41,7 @@ module GraphMatching
             # Follow the unmatched edges (if any) to free (unlabeled)
             # cats.  Only consider edges with slack (π) of 0.
             unlabeled_across_unmatched_edges_from(i, g, m ,t).each do |j|
-              if π(g, u, i, j) == 0
+              if π(u, i, j) == 0
                 t << j
                 predecessors[j] = i
 
@@ -108,7 +113,7 @@ module GraphMatching
         s.each do |s_dog|
           g.each_adjacent(s_dog) do |cat|
             unless t.include?(cat)
-              slacks.push π(g, u, s_dog, cat)
+              slacks.push π(u, s_dog, cat)
             end
           end
         end
@@ -128,11 +133,10 @@ module GraphMatching
         graph.respond_to?(:partition) && graph.respond_to?(:w)
       end
 
-      # `π` returns the "slack" of an edge (Galil, 1986, p.30)
-      # Think of "slack" as the difference between the duals of an
-      # edge and its weight.
-      def π(g, u, i, j)
-        u[i] + u[j] - g.w([i, j])
+      # Returns the "slack" of an edge (Galil, 1986, p.30), the
+      # difference between an edge's duals and its weight.
+      def π(u, i, j)
+        u[i] + u[j] - @weight[i - 1][j - 1]
       end
 
     end

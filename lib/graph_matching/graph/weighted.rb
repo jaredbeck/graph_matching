@@ -20,6 +20,9 @@ module GraphMatching
     # If directed graphs were supported (they are not) this 2D array
     # would be an obvious choice.
     #
+    # Algorithms which operate on weighted graphs are tightly
+    # coupled to this data structure due to optimizations.
+    #
     module Weighted
 
       def self.included(base)
@@ -73,9 +76,9 @@ module GraphMatching
         edges.map { |edge| w(edge.to_a) }.max
       end
 
-      # Note: Accessing `#weight` (attr_accessor) will be a lot
-      # faster, so when it comes time to optimize, this method may
-      # be deprecated.
+      # Returns the weight of an edge.  Accessing `#weight` is much
+      # faster, so this method should only be used where
+      # clarity outweighs performance.
       def w(edge)
         i, j = edge
         raise ArgumentError, "Invalid edge: #{edge}" if i.nil? || j.nil?
