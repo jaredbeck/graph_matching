@@ -23,6 +23,10 @@ m.edges
 #=> [[4, 1], [3, 2]]
 ```
 
+![MCM in Complete Bigraph is O(e * v)][17]
+
+See [Benchmarking MCM in Complete Bigraphs][14]
+
 TO DO: This algorithm is inefficient compared to the [Hopcroft-Karp algorithm][13]
 which performs in O(e * sqrt(v)) in the worst case.
 
@@ -38,6 +42,11 @@ m.edges
 #=> [[2, 1], [4, 3]]
 ```
 
+
+![MCM in Complete Graph is O(v ^ 3)][18]
+
+See [Benchmarking MCM in Complete Graphs][15]
+
 Gabow (1976) is not the fastest algorithm, but it is "one exponent
 faster" than the original, [Edmonds' blossom algorithm][9], which
 performs in O(n^4).
@@ -49,9 +58,7 @@ Galil (1986) describes the latter as "a simpler approach".
 
 Uses the [Augmenting Path][5] algorithm from Maximum Cardinality
 Matching, with the "scaling" approach described by Gabow (1983)
-and Galil (1986).
-
-Not yet benchmarked or well tested.
+and Galil (1986), which performs in O(n ^ (3/4) m log N).
 
 ```ruby
 require 'graph_matching'
@@ -64,6 +71,10 @@ m.edges
 m.weight(g)
 #=> 101
 ```
+
+![MWM in Complete Bigraph is O(n ^ (3/4) m log N)][19]
+
+See [Benchmarking MWM in Complete Bigraphs][16]
 
 ### 4. Maximum Weighted Matching in General Graphs
 
@@ -150,3 +161,8 @@ and non-bipartite graphs (pdf)][10]
 [12]: http://matthewkusner.com/MatthewKusner_BlossomAlgorithmReport.pdf
 [13]: http://en.wikipedia.org/wiki/Hopcroft%E2%80%93Karp_algorithm
 [14]: https://github.com/jaredbeck/graph_matching/wiki/Benchmarking-MCM-in-Complete-Bigraphs
+[15]: https://github.com/jaredbeck/graph_matching/wiki/Benchmarking-MCM-in-Complete-Graphs
+[16]: https://github.com/jaredbeck/graph_matching/wiki/Benchmarking-MWM-in-Complete-Bigraphs
+[17]: https://github.com/jaredbeck/graph_matching/blob/master/benchmark/mcm_bipartite/complete_bigraphs/plot.png
+[18]: https://github.com/jaredbeck/graph_matching/blob/master/benchmark/mcm_general/complete_graphs/plot.png
+[19]: https://github.com/jaredbeck/graph_matching/blob/master/benchmark/mwm_bipartite/complete_bigraphs/plot.png
