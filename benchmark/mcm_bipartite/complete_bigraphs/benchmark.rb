@@ -4,13 +4,13 @@
 require 'benchmark'
 require 'graph_matching'
 
-MIN_SIZE = 1
+MIN_SIZE = 2
 MAX_SIZE = 500
 
 $stdout.sync = true
 
 def complete_bigraph(n)
-  g = GraphMatching::BipartiteGraph.new
+  g = GraphMatching::Graph::Bigraph.new
   max_u = (n.to_f / 2).ceil
   min_v = max_u + 1
   1.upto(max_u) do |i|
