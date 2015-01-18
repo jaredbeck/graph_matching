@@ -93,6 +93,8 @@ module GraphMatching
         init_weights if @weight.nil?
         i, j = edge[0] - 1, edge[1] - 1
         raise "Edge not found: #{edge}" unless has_edge?(*edge)
+        @weight[i] ||= []
+        @weight[j] ||= []
         @weight[i][j] = weight
         @weight[j][i] = weight
       end
