@@ -17,12 +17,7 @@ module GraphMatching
       def match
         m = []
         dogs, cats = g.partition
-
-        # Initialize the "dual" values
-        u = []
-        ui = g.max_w
-        dogs.each do |i| u[i] = ui end
-        cats.each do |j| u[j] = 0 end
+        u = init_duals(cats, dogs)
 
         # For each stage
         while true do
@@ -67,16 +62,8 @@ module GraphMatching
           # If no `aug_path` was found, the search failed.
           # Adjust the duals and search again.
           if aug_path.nil?
-
-            # d1 = min of S-dog duals
-            d1 = u.values_at(*s).min
-
-            # d2 = min of S-dog, free-cat slacks
-            d2 = s.inject([]) { |slacks, s_dog|
-              free_cats = g.adjacent_vertices(s_dog).reject { |cat| t.include?(cat) }
-              slacks.concat free_cats.map { |free_cat| π(g, u, s_dog, free_cat) }
-            }.min
-
+            d1 = calc_d1(s, u)
+            d2 = calc_d2(s, t, u)
             d = [d1, d2].compact.min
 
             # If d == d1, then the smallest dual is equal to the
@@ -102,21 +89,50 @@ module GraphMatching
 
       private
 
-      # `π` returns the "slack" of an edge (Galil, 1986, p.30)
-      # Think of "slack" as the difference between the duals of an
-      # edge and its weight.
-      def π(g, u, i, j)
-        u[i] + u[j] - g.w([i, j])
-      end
-
       def assert_weighted_bipartite(graph)
         unless weighted_bipartite?(graph)
           raise ArgumentError, 'Expected a weighted bipartite graph'
         end
       end
 
+      # Returns d1, min of S-dog duals
+      def calc_d1(s, u)
+        u.values_at(*s).min
+      end
+
+      # Returns d2, the smallest slack between S-dogs and free
+      # cats.  This is a fairly expensive method, due to the
+      # nested loop.
+      def calc_d2(s, t, u)
+        slacks = []
+        s.each do |s_dog|
+          g.each_adjacent(s_dog) do |cat|
+            unless t.include?(cat)
+              slacks.push π(g, u, s_dog, cat)
+            end
+          end
+        end
+        slacks.min
+      end
+
+      # Initialize the "dual" values
+      def init_duals(cats, dogs)
+        u = []
+        ui = g.max_w
+        dogs.each do |i| u[i] = ui end
+        cats.each do |j| u[j] = 0 end
+        u
+      end
+
       def weighted_bipartite?(graph)
         graph.respond_to?(:partition) && graph.respond_to?(:w)
+      end
+
+      # `π` returns the "slack" of an edge (Galil, 1986, p.30)
+      # Think of "slack" as the difference between the duals of an
+      # edge and its weight.
+      def π(g, u, i, j)
+        u[i] + u[j] - g.w([i, j])
       end
 
     end
