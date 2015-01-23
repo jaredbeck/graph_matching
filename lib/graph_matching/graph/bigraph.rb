@@ -32,10 +32,6 @@ module GraphMatching
         [u, v]
       end
 
-      def vertices_adjacent_to(vertex, except: [])
-        adjacent_vertices(vertex) - except
-      end
-
       private
 
       def add_to_set(set, vertex:, fail_if_in:)
