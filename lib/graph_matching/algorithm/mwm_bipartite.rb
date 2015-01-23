@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require_relative '../matching'
 require_relative 'matching_algorithm'
 
@@ -48,7 +50,7 @@ module GraphMatching
                 # If there are matched edges, follow each to a dog and
                 # label the dog with S.  Otherwise, backtrack to
                 # construct an augmenting path.
-                m_dogs = matched_adjacent(from: j, except: i, g: g, m: m)
+                m_dogs = matched_adjacent(j, i, g, m)
 
                 m_dogs.each do |md|
                   s << md

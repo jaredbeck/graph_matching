@@ -40,7 +40,7 @@ module GraphMatching
               # If there are matched edges, follow each to a vertex
               # in U and label the U-vertex with R.  Otherwise,
               # backtrack to construct an augmenting path.
-              adj_u_in_m = matched_adjacent(from: vi, except: start, g: g, m: m)
+              adj_u_in_m = matched_adjacent(vi, start, g, m)
 
               adj_u_in_m.each do |ui|
                 r << ui
@@ -95,7 +95,7 @@ module GraphMatching
         augmenting_path
       end
 
-      def matched_adjacent(from:, except:, g:, m:)
+      def matched_adjacent(from, except, g, m)
         g.adjacent_vertices(from).select { |i| i != except && m[from] == i }
       end
 

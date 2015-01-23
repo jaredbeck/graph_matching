@@ -1,3 +1,4 @@
+require 'graph_matching/core_ext/set'
 require 'graph_matching/graph/graph'
 require 'graph_matching/graph/bigraph'
 require 'graph_matching/graph/weighted_graph'

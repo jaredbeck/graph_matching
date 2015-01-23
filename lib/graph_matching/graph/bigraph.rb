@@ -34,7 +34,7 @@ module GraphMatching
 
       private
 
-      def add_to_set(set, vertex:, fail_if_in:)
+      def add_to_set(set, vertex, fail_if_in)
         raise NotBipartite if fail_if_in.include?(vertex)
         set.add(vertex)
       end
@@ -45,9 +45,9 @@ module GraphMatching
 
       def examine_edge_for_partition(from, to, u, v)
         if u.include?(from)
-          add_to_set(v, vertex: to, fail_if_in: u)
+          add_to_set(v, to, u)
         elsif v.include?(from)
-          add_to_set(u, vertex: to, fail_if_in: v)
+          add_to_set(u, to, v)
         else
           u.add(from)
           v.add(to)
