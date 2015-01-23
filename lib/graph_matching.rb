@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'graph_matching/core_ext/set'
 require 'graph_matching/graph/graph'
 require 'graph_matching/graph/bigraph'

@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'rgl/adjacency'
 require 'rgl/connected_components'
 require 'set'

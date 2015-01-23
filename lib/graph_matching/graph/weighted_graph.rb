@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require_relative 'weighted'
 require_relative '../algorithm/mwm_general'
 

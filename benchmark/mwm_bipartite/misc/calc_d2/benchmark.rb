@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 # No shebang here.  Usage:
 # ruby -I lib benchmark/mwm_bipartite/misc/calc_d2/benchmark.rb
 
