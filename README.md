@@ -5,7 +5,7 @@ Efficient algorithms for **maximum cardinality** and
 **maximum weighted** [matchings][6] in undirected [graphs][7].
 Uses the [Ruby Graph Library (RGL)][4].
 
-![Build Status][20]
+[![Build Status][20]][23]
 [![Code Climate][22]][21]
 
 Algorithms
@@ -172,3 +172,4 @@ and non-bipartite graphs (pdf)][10]
 [20]: https://travis-ci.org/jaredbeck/graph_matching.svg?branch=master
 [21]: https://codeclimate.com/github/jaredbeck/graph_matching
 [22]: https://codeclimate.com/github/jaredbeck/graph_matching/badges/gpa.svg
+[23]: https://travis-ci.org/jaredbeck/graph_matching/builds
