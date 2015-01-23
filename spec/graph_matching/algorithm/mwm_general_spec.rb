@@ -23,6 +23,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
 
     context 'two vertexes' do
       it 'returns matching of size 1' do
+        skip 'Not yet implemented'
         g = graph_class[[1, 2, 1]]
         m = described_class.new(g).match
         expect(m.vertexes).to match_array([1, 2])
@@ -32,6 +33,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
 
     context 'three vertexes' do
       it 'matches the edge with greater weight' do
+        skip 'Not yet implemented'
         g = graph_class[
           [1, 2, 1],
           [2, 3, 2],

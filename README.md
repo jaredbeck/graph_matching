@@ -5,6 +5,8 @@ Efficient algorithms for **maximum cardinality** and
 **maximum weighted** [matchings][6] in undirected [graphs][7].
 Uses the [Ruby Graph Library (RGL)][4].
 
+![Build Status][20]
+
 Algorithms
 ----------
 
@@ -166,3 +168,4 @@ and non-bipartite graphs (pdf)][10]
 [17]: https://github.com/jaredbeck/graph_matching/blob/master/benchmark/mcm_bipartite/complete_bigraphs/plot.png
 [18]: https://github.com/jaredbeck/graph_matching/blob/master/benchmark/mcm_general/complete_graphs/plot.png
 [19]: https://github.com/jaredbeck/graph_matching/blob/master/benchmark/mwm_bipartite/complete_bigraphs/plot.png
+[20]: https://api.travis-ci.org/jaredbeck/graph_matching.svg
