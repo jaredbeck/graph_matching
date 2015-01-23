@@ -6,6 +6,7 @@ Efficient algorithms for **maximum cardinality** and
 Uses the [Ruby Graph Library (RGL)][4].
 
 ![Build Status][20]
+[![Code Climate][22]][21]
 
 Algorithms
 ----------
@@ -169,3 +170,5 @@ and non-bipartite graphs (pdf)][10]
 [18]: https://github.com/jaredbeck/graph_matching/blob/master/benchmark/mcm_general/complete_graphs/plot.png
 [19]: https://github.com/jaredbeck/graph_matching/blob/master/benchmark/mwm_bipartite/complete_bigraphs/plot.png
 [20]: https://travis-ci.org/jaredbeck/graph_matching.svg?branch=master
+[21]: https://codeclimate.com/github/jaredbeck/graph_matching
+[22]: https://codeclimate.com/github/jaredbeck/graph_matching/badges/gpa.svg
