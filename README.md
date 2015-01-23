@@ -168,4 +168,4 @@ and non-bipartite graphs (pdf)][10]
 [17]: https://github.com/jaredbeck/graph_matching/blob/master/benchmark/mcm_bipartite/complete_bigraphs/plot.png
 [18]: https://github.com/jaredbeck/graph_matching/blob/master/benchmark/mcm_general/complete_graphs/plot.png
 [19]: https://github.com/jaredbeck/graph_matching/blob/master/benchmark/mwm_bipartite/complete_bigraphs/plot.png
-[20]: https://api.travis-ci.org/jaredbeck/graph_matching.svg
+[20]: https://travis-ci.org/jaredbeck/graph_matching.svg?branch=master
