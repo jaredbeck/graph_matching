@@ -6,6 +6,12 @@ RSpec.describe GraphMatching::Algorithm::MCMGeneral do
   let(:graph_class) { GraphMatching::Graph::Graph }
   let(:g) { graph_class.new }
 
+  describe '.new' do
+    it 'requires a Graph' do
+      expect { described_class.new("banana") }.to raise_error(TypeError)
+    end
+  end
+
   describe '#match' do
 
     def complete_graph(n)

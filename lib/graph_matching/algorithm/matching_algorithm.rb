@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+require_relative '../assertion'
+
 module GraphMatching
   module Algorithm
 
@@ -10,6 +12,10 @@ module GraphMatching
 
       def initialize(graph)
         @g = graph
+      end
+
+      def assert(obj)
+        Assertion.new(obj)
       end
     end
 

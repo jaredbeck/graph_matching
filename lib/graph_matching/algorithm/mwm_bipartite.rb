@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+require_relative '../graph/weighted_bigraph'
 require_relative '../matching'
 require_relative 'matching_algorithm'
 
@@ -12,7 +13,7 @@ module GraphMatching
     class MWMBipartite < MCMBipartite
 
       def initialize(graph)
-        assert_weighted_bipartite graph
+        assert(graph).is_a(Graph::WeightedBigraph)
         super
 
         # Optimization: Keeping a reference to the graph's weights

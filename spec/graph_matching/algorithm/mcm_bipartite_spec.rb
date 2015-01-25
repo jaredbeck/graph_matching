@@ -5,6 +5,12 @@ require 'spec_helper'
 RSpec.describe GraphMatching::Algorithm::MCMBipartite do
   let(:g) { GraphMatching::Graph::Bigraph.new }
 
+  describe '.new' do
+    it 'requires a Bigraph' do
+      expect { described_class.new("banana") }.to raise_error(TypeError)
+    end
+  end
+
   describe '#augment' do
     it 'augments the matching' do
       mcm = described_class.new(g)

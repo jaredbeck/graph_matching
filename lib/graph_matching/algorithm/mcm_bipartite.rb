@@ -11,7 +11,7 @@ module GraphMatching
     class MCMBipartite < MatchingAlgorithm
 
       def initialize(graph)
-        raise ArgumentError unless graph.is_a?(GraphMatching::Graph::Bigraph)
+        assert(graph).is_a(Graph::Bigraph)
         super
       end
 

@@ -5,6 +5,12 @@ require 'spec_helper'
 RSpec.describe GraphMatching::Algorithm::MWMBipartite do
   let(:graph_class) { GraphMatching::Graph::WeightedBigraph }
 
+  describe '.new' do
+    it 'requires a WeightedBigraph' do
+      expect { described_class.new("banana") }.to raise_error(TypeError)
+    end
+  end
+
   describe '#match' do
     context 'empty graph' do
       it 'returns the expected matching' do

@@ -5,6 +5,12 @@ require 'spec_helper'
 RSpec.describe GraphMatching::Algorithm::MWMGeneral do
   let(:graph_class) { GraphMatching::Graph::WeightedGraph }
 
+  describe '.new' do
+    it 'requires a WeightedGraph' do
+      expect { described_class.new("banana") }.to raise_error(TypeError)
+    end
+  end
+
   describe '#match' do
     context 'empty graph' do
       it 'returns empty matching' do
