@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'open3'
+require 'rgl/rdot'
 
 module GraphMatching
 
@@ -18,15 +19,13 @@ module GraphMatching
 
     # `dot` returns a string representing the graph, in .dot format.
     # http://www.graphviz.org/content/dot-language
-    # TODO: Try using `rgl-0.4.0/lib/rgl/dot.rb` instead.
     def dot
-      s = "strict graph G {\n"
-      graph.each_edge { |u, v|
-        e = [u, v].map { |x| safe_vertex(x) }
-        s << e.join(GRAPHVIZ_EDGE_DELIMITER) + ";\n"
+      edges = []
+      graph.each_edge { |u,v|
+        edges << RGL::DOT::Edge.new('from' => u, 'to' => v)
       }
-      s << "}\n"
-      s
+      rdg = RGL::DOT::Graph.new('elements' => edges)
+      rdg.to_s
     end
 
     # `png` writes a ".png" file with graphviz and opens it
