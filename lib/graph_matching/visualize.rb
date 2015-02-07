@@ -20,12 +20,7 @@ module GraphMatching
     # `dot` returns a string representing the graph, in .dot format.
     # http://www.graphviz.org/content/dot-language
     def dot
-      edges = []
-      graph.each_edge { |u,v|
-        edges << RGL::DOT::Edge.new('from' => u, 'to' => v)
-      }
-      rdg = RGL::DOT::Graph.new('elements' => edges)
-      rdg.to_s
+      RGL::DOT::Graph.new('elements' => dot_edges).to_s
     end
 
     # `png` writes a ".png" file with graphviz and opens it
@@ -37,7 +32,7 @@ module GraphMatching
       system "open #{abs_path}"
     end
 
-  private
+    private
 
     def check_that_dot_is_installed
       unless dot_installed?
@@ -45,6 +40,18 @@ module GraphMatching
         $stderr.puts "Please install graphviz"
         exit(1)
       end
+    end
+
+    def dot_edge(u, v, label)
+      RGL::DOT::Edge.new({ 'from' => u, 'to' => v, 'label' => label }, ['label'])
+    end
+
+    def dot_edges
+      graph.edges.map { |e| dot_edge(e.source, e.target, dot_edge_label(e)) }
+    end
+
+    def dot_edge_label(edge)
+      graph.is_a?(GraphMatching::Graph::Weighted) ? graph.w([*edge]) : nil
     end
 
     def assert_usr_bin_env_exists

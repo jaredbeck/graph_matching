@@ -22,7 +22,7 @@ RSpec.describe GraphMatching::Visualize do
       it 'returns a string in .dot format' do
         g.add_edge('alice', 'bob')
         str = described_class.new(g).dot
-        expect(normalize_ws(str)).to eq('strict graph G { alice--bob; }')
+        expect(normalize_ws(str)).to eq('graph { alice -- bob }')
       end
     end
 
@@ -31,7 +31,7 @@ RSpec.describe GraphMatching::Visualize do
         g.add_edge('alice', 'bob')
         g.add_edge('tom', 'jerry')
         str = described_class.new(g).dot
-        expect(normalize_ws(str)).to eq('strict graph G { alice--bob; tom--jerry; }')
+        expect(normalize_ws(str)).to eq('graph { alice -- bob tom -- jerry }')
       end
     end
   end
