@@ -109,6 +109,13 @@ legend
 #=> {1=>"a", 2=>"b"}
 ```
 
+Troubleshooting
+---------------
+
+* If you have [graphviz][24] installed, calling `#print` on
+  any `GraphMatching::Graph` will write a `png` to `/tmp` and
+  `open` it.
+
 Glossary
 --------
 
@@ -173,3 +180,4 @@ and non-bipartite graphs (pdf)][10]
 [21]: https://codeclimate.com/github/jaredbeck/graph_matching
 [22]: https://codeclimate.com/github/jaredbeck/graph_matching/badges/gpa.svg
 [23]: https://travis-ci.org/jaredbeck/graph_matching/builds
+[24]: http://www.graphviz.org/

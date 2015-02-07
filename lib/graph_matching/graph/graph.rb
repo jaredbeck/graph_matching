@@ -6,6 +6,8 @@ require 'set'
 require_relative '../algorithm/mcm_general'
 require_relative '../ordered_set'
 
+autoload(:SecureRandom, 'securerandom')
+
 module GraphMatching
   module Graph
     class Graph < RGL::AdjacencyGraph
@@ -39,7 +41,8 @@ module GraphMatching
         Algorithm::MCMGeneral.new(self).match
       end
 
-      def print(base_filename)
+      def print
+        base_filename = SecureRandom.hex(16)
         Visualize.new(self).png(base_filename)
       end
 
