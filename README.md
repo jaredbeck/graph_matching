@@ -83,7 +83,7 @@ See [Benchmarking MWM in Complete Bigraphs][16]
 ### 4. Maximum Weighted Matching in General Graphs
 
 Implementation underway, borrowing heavily from
-[Joris van Rantwijk][25]'s solution in python, while referring to
+[van Rantwijk (2013)][11], while referring to
 Gabow (1985) and, of course, Galil (1986).
 
 Benchmarks
@@ -150,7 +150,7 @@ matching in graphs. *ACM Computing Surveys*. Vol. 18, No. 1, pp. 23-38
 finding maximal matching in general graphs. *Proceedings of the 21st
 Annual IEEE Symposium on Foundations of Computer Science*.
 IEEE, New York, pp. 17-27
-- Rantwijk, J. [Maximum Weighted Matching][11]
+- van Rantwijk, J. (2013) [Maximum Weighted Matching][11]
 - [Stolee, D.][8]
     - [The Augmenting Path Algorithm for Bipartite Matching][1]
     - [The Augmenting Path Algorithm (Example)][2]
@@ -182,4 +182,3 @@ and non-bipartite graphs (pdf)][10]
 [22]: https://codeclimate.com/github/jaredbeck/graph_matching/badges/gpa.svg
 [23]: https://travis-ci.org/jaredbeck/graph_matching/builds
 [24]: http://www.graphviz.org/
-[25]: http://jorisvr.nl/maximummatching.html
