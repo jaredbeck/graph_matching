@@ -50,14 +50,14 @@ module GraphMatching
         # > If p is an edge endpoint,
         # > endpoint[p] is the vertex to which endpoint p is attached.
         # > Not modified by the algorithm.
-        # > (van Rantwijk, mwmatching.py, line 93)
+        # > (Van Rantwijk, mwmatching.py, line 93)
         #
         @endpoint = edges.map { |e| [e.source, e.target] }.flatten
 
         # > If v is a vertex,
         # > neighbend[v] is the list of remote endpoints of the edges attached to v.
         # > Not modified by the algorithm.
-        # > (van Rantwijk, mwmatching.py, line 98)
+        # > (Van Rantwijk, mwmatching.py, line 98)
         @neighb_end = Array.new(g.num_vertices) { [] }
         edges.each_with_index do |e, k|
           @neighb_end[e.source].push(2 * k + 1)
@@ -68,7 +68,7 @@ module GraphMatching
         # > mate[v] is the remote endpoint of its matched edge, or -1 if it is single
         # > (i.e. endpoint[mate[v]] is v's partner vertex).
         # > Initially all vertices are single; updated during augmentation.
-        # > (van Rantwijk, mwmatching.py)
+        # > (Van Rantwijk, mwmatching.py)
         #
         @mate = Array.new(g.num_vertices, nil)
 
@@ -81,7 +81,7 @@ module GraphMatching
         # > If v is a vertex inside a T-blossom,
         # > label[v] is 2 iff v is reachable from an S-vertex outside the blossom.
         # > Labels are assigned during a stage and reset after each augmentation.
-        # > (van Rantwijk, mwmatching.py)
+        # > (Van Rantwijk, mwmatching.py)
         #
         @label = rantwijk_array(LBL_FREE)
 
@@ -91,7 +91,7 @@ module GraphMatching
         # > If v is a vertex inside a T-blossom and label[v] == 2,
         # > labelend[v] is the remote endpoint of the edge through which v is
         # > reachable from outside the blossom.
-        # > (van Rantwijk, mwmatching.py)
+        # > (Van Rantwijk, mwmatching.py)
         #
         @label_end = rantwijk_array(nil)
 
@@ -100,7 +100,7 @@ module GraphMatching
         # > If v is a top-level vertex, v is itself a blossom (a trivial blossom)
         # > and inblossom[v] == v.
         # > Initially all vertices are top-level trivial blossoms.
-        # > (van Rantwijk, mwmatching.py)
+        # > (Van Rantwijk, mwmatching.py)
         #
         @in_blossom = (0 ... g.num_vertices).to_a
 
@@ -111,7 +111,7 @@ module GraphMatching
         # > bestedge[b] is the least-slack edge to a different S-blossom,
         # > or -1 if there is no such edge.
         # > This is used for efficient computation of delta2 and delta3.
-        # > (van Rantwijk, mwmatching.py)
+        # > (Van Rantwijk, mwmatching.py)
         #
         @best_edge = rantwijk_array(nil)
 
@@ -119,7 +119,7 @@ module GraphMatching
         # > blossombestedges[b] is a list of least-slack edges to neighbouring
         # > S-blossoms, or None if no such list has been computed yet.
         # > This is used for efficient computation of delta3.
-        # > (van Rantwijk, mwmatching.py, line 168)
+        # > (Van Rantwijk, mwmatching.py, line 168)
         #
         @blossom_best_edges = rantwijk_array(nil)
 
@@ -135,18 +135,18 @@ module GraphMatching
         # > vertex is a leaf.
         # > (Gabow, 1985, p. 91)
         #
-        # van Rantwijk implements the blossom tree with an array in
+        # Van Rantwijk implements the blossom tree with an array in
         # two halves.  The first half is "trivial" blossoms, vertexes,
         # the leaves of the tree.  The second half are non-trivial blossoms.
         #
         # > Vertices are numbered 0 .. (nvertex-1).
         # > Non-trivial blossoms are numbered nvertex .. (2*nvertex-1)
-        # > (van Rantwijk, mwmatching.py, line 58)
+        # > (Van Rantwijk, mwmatching.py, line 58)
         #
         # > If b is a non-trivial (sub-)blossom,
         # > blossomchilds[b] is an ordered list of its sub-blossoms, starting with
         # > the base and going round the blossom.
-        # > (van Rantwijk, mwmatching.py, line 147)
+        # > (Van Rantwijk, mwmatching.py, line 147)
         #
         @blossom_children = rantwijk_array(nil)
 
@@ -174,7 +174,7 @@ module GraphMatching
       # > Assign label t to the top-level blossom containing vertex w
       # > and record the fact that w was reached through the edge with
       # > remote endpoint p.
-      # > (van Rantwijk, mwmatching.py)
+      # > (Van Rantwijk, mwmatching.py)
       #
       def assign_label(w, t, p = nil)
         b = in_blossom[w]
@@ -261,7 +261,7 @@ module GraphMatching
 
                 if in_blossom[v] == in_blossom[w]
                   # > this edge is internal to a blossom; ignore it
-                  # > (van Rantwijk, mwmatching.py, line 681)
+                  # > (Van Rantwijk, mwmatching.py, line 681)
                   next
                 end
 
@@ -398,7 +398,7 @@ module GraphMatching
         init_stage_labels
       end
 
-      # Clear the van Rantwijk "best edge" caches
+      # Clear the Van Rantwijk "best edge" caches
       def init_stage_caches
         @best_edge = rantwijk_array(nil)
         @blossom_best_edges.fill(nil, g.num_vertices)
@@ -409,7 +409,7 @@ module GraphMatching
       # > (Galil, 1986, p. 26)
       #
       # > Label single blossoms/vertices with S and put them in
-      # > the queue. (van Rantwijk, mwmatching.py, line 649)
+      # > the queue. (Van Rantwijk, mwmatching.py, line 649)
       def init_stage_labels
         @label = rantwijk_array(LBL_FREE)
         (0 ... g.num_vertices).each do |v|
@@ -496,7 +496,7 @@ module GraphMatching
       end
 
       # Returns an array of size 2n, where n is the number of
-      # vertexes.  Common in van Rantwijk's implementation, but
+      # vertexes.  Common in Van Rantwijk's implementation, but
       # the idea may come from Gabow (1985) or earlier.
       def rantwijk_array(fill)
         Array.new(2 * g.num_vertices, fill)
