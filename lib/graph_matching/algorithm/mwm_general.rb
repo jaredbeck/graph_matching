@@ -18,19 +18,28 @@ module GraphMatching
       LBL_FREE = 0
       LBL_S = 1
       LBL_T = 2
+      LBL_NAMES = ['Free', 'S', 'T']
 
-      attr_reader :mate,
+      attr_reader :tight_edge,
+        :mate,
         :endpoint,
         :label,
         :label_end,
         :in_blossom,
         :best_edge,
         :queue,
-        :blossom_children
+        :blossom_children,
+        :neighb_end
 
       def initialize(graph)
         assert(graph).is_a(Graph::WeightedGraph)
+        assert(graph.vertexes).are_natural_numbers
         super
+
+        # As we build our "state" throughout this constructor, we'll
+        # iterate over the edges a few times.  It's important that
+        # the order of iteration be consistent.
+        edges = g.edges.to_a
 
         # In Joris van Rantwijk's implementation, there seems to be
         # a concept of "edge numbers".  His `endpoint` array has two
@@ -41,9 +50,19 @@ module GraphMatching
         # > If p is an edge endpoint,
         # > endpoint[p] is the vertex to which endpoint p is attached.
         # > Not modified by the algorithm.
-        # > (van Rantwijk, mwmatching.py)
+        # > (van Rantwijk, mwmatching.py, line 93)
         #
-        @endpoint = g.edges.map { |e| [e.source, e.target] }.flatten
+        @endpoint = edges.map { |e| [e.source, e.target] }.flatten
+
+        # > If v is a vertex,
+        # > neighbend[v] is the list of remote endpoints of the edges attached to v.
+        # > Not modified by the algorithm.
+        # > (van Rantwijk, mwmatching.py, line 98)
+        @neighb_end = Array.new(g.num_vertices) { [] }
+        edges.each_with_index do |e, k|
+          @neighb_end[e.source].push(2 * k + 1)
+          @neighb_end[e.target].push(2 * k)
+        end
 
         # > If v is a vertex,
         # > mate[v] is the remote endpoint of its matched edge, or -1 if it is single
@@ -130,6 +149,20 @@ module GraphMatching
         # > (van Rantwijk, mwmatching.py, line 147)
         #
         @blossom_children = rantwijk_array(nil)
+
+        # Optimization: Cache of tight (zero slack) edges.  *Tight*
+        # is a term I attribute to Gabow, though it may be earlier.
+        #
+        # > Edge ij is *tight* if equality holds in [its dual
+        # > value function]. (Gabow, 1985, p. 91)
+        #
+        # Van Rantwijk calls this cache `allowedge`, denoting its use
+        # in the algorithm.
+        #
+        # > If allowedge[k] is true, edge k has zero slack in the optimization
+        # > problem; if allowedge[k] is false, the edge's slack may or may not
+        # > be zero.
+        @tight_edge = Array.new(g.num_edges, false)
       end
 
       def log(indent, msg)
@@ -203,114 +236,96 @@ module GraphMatching
       def match
         return Matching.new if g.size < 2
 
-        # Iterative *stages*.  In each we look for an augmenting path.
+        # Iterative *stages*.  Each stage augments the matching.
+        # There can be at most n stages, where n is num. vertexes.
         while true do
-          log(0, "stage. mate = #{mate}")
+          init_stage
 
-          @label = rantwijk_array(LBL_FREE)
+          # *sub-stages* either augment or scale the duals.
+          augmented = false
+          while true do
+            log(1, "substage")
 
-          # Clear the van Rantwijk "best edge" caches
-          @best_edge = rantwijk_array(nil)
-          @blossom_best_edges.fill(nil, g.num_vertices)
+            # > The search is conducted by scanning the S-vertices in turn.
+            # > Scanning a vertex means considering in turn all its edges
+            # > except the matched edge. (There will be at most one).
+            # > (Galil, 1986, p. 26)
+            until augmented || queue.empty?
+              v = queue.pop
+              log(2, "scan #{v}")
+              assert_label(v, LBL_S)
 
-          # > We start by labeling all single persons S
-          # > (Galil, 1986, p. 26)
-          (0 ... g.num_vertices).each do |v|
-            if single?(v) && label[in_blossom[v]] == LBL_FREE
-              assign_label(v, LBL_S)
-            end
-          end
-          log(1, "labels: #{label}")
+              neighb_end[v].each do |p|
+                k = p / 2 # note: floor division
+                w = endpoint[p]
 
-          fail('not yet implemented')
-
-          # If all vertexes are matched, we're done!
-          break if s.empty?
-
-          # > The search is conducted by scanning the S-vertices in turn.
-          # > Scanning a vertex means considering in turn all its edges
-          # > except the matched edge. (There will be at most one).
-          # > (Galil, 1986, p. 26)
-          scan = s.keys.dup
-          scan.each do |i|
-            log(1, "scan #{i}")
-            adj = unmatched_adjacent(i, m)
-
-            # > we only use edges with π<sub>ij</sub> = 0. (Galil, 1986, p. 32)
-            adj.each do |j|
-              log(2, "adj #{j}. π = #{π(i, j, u, z)}")
-              next unless π(i, j, u, z) == 0
-
-              # > If we scan the S-vertex *i* and consider the edge (i,j),
-              # > there are two cases:
-              # >
-              # > * (C1) j is free; or
-              # > * (C2) j is an S-vertex
-              # >
-              # > C2 cannot occur in the bipartite case.  The case in
-              # > which j is a T-vertex is discarded.
-              # > (Galil, 1986, p. 26-27)
-              if free?(j, [s, t])
-
-                # > In case C1 we apply R12. (Galil, 1986, p. 27)
-                #
-                # > * (R1) If (i, j) is not matched and i is an S-person
-                # >   and j a free (unlabeled) person then label j by T; and
-                # > * (R2) If (i, j) is matched and j is a T-person
-                # >   and i a free person, then label i by S.
-                # >
-                # > Modified from (Galil, 1986, p. 25) as follows:
-                #
-                # > Any time R1 is used and j is labeled by T, R2 is
-                # > immediately used to label the spouse of j with S.
-                # > (Since j was not labeled before, it must be married
-                # > and its spouse must be unlabeled.)  We call this
-                # > rule R12. (Galil, 1986, p. 26)
-
-                # R12
-                if !matched_edge?(i, j, m) && s.key?(i) && free?(j, [s, t])
-                  t[j] = i
-                  s[m[j]] = j # "label the spouse of j with S" (see above)
+                if in_blossom[v] == in_blossom[w]
+                  # > this edge is internal to a blossom; ignore it
+                  # > (van Rantwijk, mwmatching.py, line 681)
+                  next
                 end
 
-              elsif s.key?(j)
+                kslack = calc_slack(k)
 
-                # (C2) j is an S-vertex
-                #
-                # > Backtrack from i and j, using the labels, to the
-                # > single persons s<sub>i</sub> and s<sub>j</sub>
-                # > from which i and j got their S labels.  If
-                # > s<sub>i</sub> ≠ s<sub>j</sub>, we find an augmenting
-                # > path from s<sub>i</sub> to s<sub>j</sub> and augment
-                # > the matching. (Galil, 1986, p. 27)
-                back_i = s[i]
-                back_j = s[j]
-                if back_i.nil? && back_j.nil?
-                  log(3, "trivial AP")
-                  p = [i, j]
-                elsif back_i != back_j
-                  log(3, "backtrack AP")
-                  p = backtrack(j, s)
-                else
-                  log(3, "blossom shrinking")
-                  fail 'Not yet implemented: blossom shrinking'
-                end
+                # > .. we only use edges with π<sub>ij</sub> = 0.
+                # > (Galil, 1986, p. 32)
+                if tight_edge[k]
 
-              end
+                  # > If we scan the S-vertex *i* and consider the edge (i,j),
+                  # > there are two cases:
+                  # >
+                  # > * (C1) j is free; or
+                  # > * (C2) j is an S-vertex
+                  # >
+                  # > C2 cannot occur in the bipartite case.  The case in
+                  # > which j is a T-vertex is discarded.
+                  # > (Galil, 1986, p. 26-27)
+                  #
+                  if free?(in_blossom[w])
 
-              break unless p.nil?
-            end
+                    # > (C1) w is a free vertex;
+                    # > label w with T and label its mate with S (R12).
+                    # > (Van Rantwijk, mwmatching.py, line 690)
+                    #
+                    # > In case C1 we apply R12. (Galil, 1986, p. 27)
+                    #
+                    # > * (R1) If (i, j) is not matched and i is an S-person
+                    # >   and j a free (unlabeled) person then label j by T; and
+                    # > * (R2) If (i, j) is matched and j is a T-person
+                    # >   and i a free person, then label i by S.
+                    # >
+                    # > Modified from (Galil, 1986, p. 25) as follows:
+                    #
+                    # > Any time R1 is used and j is labeled by T, R2 is
+                    # > immediately used to label the spouse of j with S.
+                    # > (Since j was not labeled before, it must be married
+                    # > and its spouse must be unlabeled.)  We call this
+                    # > rule R12. (Galil, 1986, p. 26)
+                    #
+                    assign_label(w, LBL_T, p ^ 1)
 
-            break unless p.nil?
-          end # scan
+                  elsif label[in_blossom[w]] == LBL_S
 
-          if p.nil?
-            scale_duals(s, t, tb, u, z)
-          else
-            log(1, "augment. #{p}")
-            augment(m, p)
-          end
+                    # > (C2) w is an S-vertex (not in the same blossom);
+                    # > follow back-links to discover either an
+                    # > augmenting path or a new blossom.
+                    # > (Van Rantwijk, mwmatching.py, line 694)
+                    #
+                    # > Backtrack from i and j, using the labels, to the
+                    # > single persons s<sub>i</sub> and s<sub>j</sub>
+                    # > from which i and j got their S labels.  If
+                    # > s<sub>i</sub> ≠ s<sub>j</sub>, we find an augmenting
+                    # > path from s<sub>i</sub> to s<sub>j</sub> and augment
+                    # > the matching. (Galil, 1986, p. 27)
+                    #
+                    fail 'not yet implemented'
+                    base = scan_blossom(v, w)
 
+                  end # free blossom
+                end # tight edge
+              end # scan neighbors of `v`
+            end # queue
+          end # sub-stage
         end # stage
 
         Matching.gabow(m)
@@ -322,6 +337,12 @@ module GraphMatching
       # Eventually, these methods will probably be private.  For now,
       # they are public so they can be easily tested.
       #
+
+      def assert_label(v, lbl)
+        unless label[in_blossom[v]] == lbl
+          raise "Expected vertex #{v} to be labeled #{LBL_NAMES[lbl]}"
+        end
+      end
 
       def augment(m, path)
         ap = Path.new(path)
@@ -352,8 +373,51 @@ module GraphMatching
         p
       end
 
+      # Returns nil if `k` is known to be an endpoint of a tight
+      # edge.  Otherwise, calculates and returns the slack of `k`,
+      # and updates the `tight_edge` cache.
+      def calc_slack(k)
+        if tight_edge[k]
+          nil
+        else
+          slack(k).tap { |kslack|
+            @tight_edge[k] = true if kslack <= 0
+          }
+        end
+      end
+
+      # TODO: Optimize by de-normalizing
       def free?(x)
         @label[x] == LBL_FREE
+      end
+
+      def init_stage
+        log(0, "stage. mate = #{mate}")
+        init_stage_caches
+        @queue = []
+        init_stage_labels
+      end
+
+      # Clear the van Rantwijk "best edge" caches
+      def init_stage_caches
+        @best_edge = rantwijk_array(nil)
+        @blossom_best_edges.fill(nil, g.num_vertices)
+        @tight_edge = Array.new(g.num_edges, false)
+      end
+
+      # > We start by labeling all single persons S
+      # > (Galil, 1986, p. 26)
+      #
+      # > Label single blossoms/vertices with S and put them in
+      # > the queue. (van Rantwijk, mwmatching.py, line 649)
+      def init_stage_labels
+        @label = rantwijk_array(LBL_FREE)
+        (0 ... g.num_vertices).each do |v|
+          if single?(v) && label[in_blossom[v]] == LBL_FREE
+            assign_label(v, LBL_S)
+          end
+        end
+        log(1, "labels: #{label}")
       end
 
       # Returns true if vertex `i` is matched in `mate`.
@@ -452,12 +516,16 @@ module GraphMatching
         slacks
       end
 
+      # > We now define slacks π<sub>ij</sub> slightly differently
+      # > [compared to problem 3]. (Galil, 1986, p.31)
+      def slack(k)
+        fail 'not yet implemented'
+      end
+
       def unmatched_adjacent(v, m)
         g.adjacent_vertices(v).select { |i| m[v] != i }
       end
 
-      # > We now define slacks π<sub>ij</sub> slightly differently
-      # > [compared to problem 3]. (Galil, 1986, p.31)
       def π(i, j, u, z)
         u[i] + u[j] - g.w([i, j]) + Σz(i, j, z)
       end

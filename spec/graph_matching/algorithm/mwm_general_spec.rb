@@ -15,11 +15,11 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
     context 'five vertexes, one blossom' do
       it 'returns array of leaves' do
         g = graph_class[
+          [0, 1, 0],
           [1, 2, 0],
+          [1, 3, 0],
           [2, 3, 0],
-          [2, 4, 0],
-          [3, 4, 0],
-          [4, 5, 0]
+          [3, 4, 0]
         ]
         a = described_class.new(g)
         allow(a).to receive(:blossom_children).and_return([
@@ -49,7 +49,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
     context 'single vertex' do
       it 'returns empty matching' do
         g = graph_class.new
-        g.add_vertex(1)
+        g.add_vertex(0)
         m = described_class.new(g).match
         expect(m).to be_empty
       end
@@ -58,10 +58,10 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
     context 'two vertexes' do
       it 'returns matching of size 1' do
         skip('not yet implemented')
-        g = graph_class[[1, 2, 1]]
+        g = graph_class[[0, 1, 7]]
         m = described_class.new(g).match
-        expect(m.vertexes).to match_array([1, 2])
-        expect(m.weight(g)).to eq(1)
+        expect(m.vertexes).to match_array([0, 1])
+        expect(m.weight(g)).to eq(7)
       end
     end
 
@@ -69,12 +69,12 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       it 'matches the edge with greater weight' do
         skip('not yet implemented')
         g = graph_class[
-          [1, 2, 1],
-          [2, 3, 2],
-          [3, 1, 3]
+          [0, 1, 1],
+          [1, 2, 2],
+          [2, 0, 3]
         ]
         m = described_class.new(g).match
-        expect(m.vertexes).to match_array([3, 1])
+        expect(m.vertexes).to match_array([2, 0])
         expect(m.weight(g)).to eq(3)
       end
     end
@@ -83,11 +83,11 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       it 'returns the matching with max. weight' do
         skip('not yet implemented')
         g = graph_class[
-          [1, 2, 2],
-          [2, 3, 0],
-          [2, 4, 6], # highest weight edge, but cannot be used in a complete matching
-          [3, 4, 4],
-          [4, 5, 2]
+          [0, 1, 2],
+          [1, 2, 0],
+          [1, 3, 6], # highest weight edge, but cannot be used in a complete matching
+          [2, 3, 4],
+          [3, 4, 2]
         ]
         m = described_class.new(g).match
         expect(m.vertexes).to match_array([1, 2, 3, 4])

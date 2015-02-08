@@ -5,6 +5,16 @@ module GraphMatching
   class GraphMatchingError < StandardError
   end
 
+  class InvalidVertexNumbering < GraphMatchingError
+    def initialize(msg = nil)
+      msg ||= <<-EOS
+Expected vertexes to be consecutive positive integers \
+starting with zero
+      EOS
+      super(msg)
+    end
+  end
+
   class DisconnectedGraph < GraphMatchingError
   end
 
