@@ -12,6 +12,7 @@ Algorithms
 ----------
 
 This library will implement the four algorithms described by Galil (1986).
+When all four have been implemented, a gem version 1.0.0 will be released.
 
 ### 1. Maximum Cardinality Matching in Bipartite Graphs
 
@@ -81,9 +82,9 @@ See [Benchmarking MWM in Complete Bigraphs][16]
 
 ### 4. Maximum Weighted Matching in General Graphs
 
-Not yet implemented.
-
-Currently considering Gabow (1985).
+Implementation underway, borrowing heavily from
+[Joris van Rantwijk][25]'s solution in python, while referring to
+Gabow (1985) and, of course, Galil (1986).
 
 Benchmarks
 ----------
@@ -181,3 +182,4 @@ and non-bipartite graphs (pdf)][10]
 [22]: https://codeclimate.com/github/jaredbeck/graph_matching/badges/gpa.svg
 [23]: https://travis-ci.org/jaredbeck/graph_matching/builds
 [24]: http://www.graphviz.org/
+[25]: http://jorisvr.nl/maximummatching.html
