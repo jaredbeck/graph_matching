@@ -52,16 +52,84 @@ module GraphMatching
         # > (van Rantwijk, mwmatching.py)
         #
         @mate = Array.new(g.num_vertices, nil)
-        @label = Array.new(2 * g.num_vertices, LBL_FREE)
-        @label_end = Array.new(2 * g.num_vertices, nil)
-        @in_blossom = Array.new(g.num_vertices, nil)
-        @best_edge = Array.new(2 * g.num_vertices, nil)
+
+        # > If b is a top-level blossom,
+        # > label[b] is 0 if b is unlabeled (free);
+        # >             1 if b is an S-vertex/blossom;
+        # >             2 if b is a T-vertex/blossom.
+        # > The label of a vertex is found by looking at the label of its
+        # > top-level containing blossom.
+        # > If v is a vertex inside a T-blossom,
+        # > label[v] is 2 iff v is reachable from an S-vertex outside the blossom.
+        # > Labels are assigned during a stage and reset after each augmentation.
+        # > (van Rantwijk, mwmatching.py)
+        #
+        @label = rantwijk_array(LBL_FREE)
+
+        # > If b is a labeled top-level blossom,
+        # > labelend[b] is the remote endpoint of the edge through which b obtained
+        # > its label, or -1 if b's base vertex is single.
+        # > If v is a vertex inside a T-blossom and label[v] == 2,
+        # > labelend[v] is the remote endpoint of the edge through which v is
+        # > reachable from outside the blossom.
+        # > (van Rantwijk, mwmatching.py)
+        #
+        @label_end = rantwijk_array(nil)
+
+        # > If v is a vertex,
+        # > inblossom[v] is the top-level blossom to which v belongs.
+        # > If v is a top-level vertex, v is itself a blossom (a trivial blossom)
+        # > and inblossom[v] == v.
+        # > Initially all vertices are top-level trivial blossoms.
+        # > (van Rantwijk, mwmatching.py)
+        #
+        @in_blossom = (0 ... g.num_vertices).to_a
+
+        # > If v is a free vertex (or an unreached vertex inside a T-blossom),
+        # > bestedge[v] is the edge to an S-vertex with least slack,
+        # > or -1 if there is no such edge.
+        # > If b is a (possibly trivial) top-level S-blossom,
+        # > bestedge[b] is the least-slack edge to a different S-blossom,
+        # > or -1 if there is no such edge.
+        # > This is used for efficient computation of delta2 and delta3.
+        # > (van Rantwijk, mwmatching.py)
+        #
+        @best_edge = rantwijk_array(nil)
+
+        # > If b is a non-trivial top-level S-blossom,
+        # > blossombestedges[b] is a list of least-slack edges to neighbouring
+        # > S-blossoms, or None if no such list has been computed yet.
+        # > This is used for efficient computation of delta3.
+        # > (van Rantwijk, mwmatching.py, line 168)
+        #
+        @blossom_best_edges = rantwijk_array(nil)
+
+        # Queue of newly discovered S-vertices.
         @queue = []
 
-        # If b is a non-trivial (sub-)blossom,
-        # blossomchilds[b] is an ordered list of its sub-blossoms, starting with
-        # the base and going round the blossom.
-        @blossom_children = Array.new(2 * g.num_vertices, nil)
+        # A 2D array representing a tree of blossoms.
+        #
+        # > The blossom structure of a graph is represented by a
+        # > *blossom tree*.  Its nodes are the graph G, the blossoms
+        # > of G, and all vertices included in blossoms.  The root is
+        # > G, whose children are the maximal blossoms.  ..  Any
+        # > vertex is a leaf.
+        # > (Gabow, 1985, p. 91)
+        #
+        # van Rantwijk implements the blossom tree with an array in
+        # two halves.  The first half is "trivial" blossoms, vertexes,
+        # the leaves of the tree.  The second half are non-trivial blossoms.
+        #
+        # > Vertices are numbered 0 .. (nvertex-1).
+        # > Non-trivial blossoms are numbered nvertex .. (2*nvertex-1)
+        # > (van Rantwijk, mwmatching.py, line 58)
+        #
+        # > If b is a non-trivial (sub-)blossom,
+        # > blossomchilds[b] is an ordered list of its sub-blossoms, starting with
+        # > the base and going round the blossom.
+        # > (van Rantwijk, mwmatching.py, line 147)
+        #
+        @blossom_children = rantwijk_array(nil)
       end
 
       def log(indent, msg)
@@ -135,24 +203,26 @@ module GraphMatching
       def match
         return Matching.new if g.size < 2
 
-        u = init_vertex_duals
-        z = [] # blossom duals
-        b = [] # blossoms
-
         # Iterative *stages*.  In each we look for an augmenting path.
         while true do
-          log(0, "stage. m = #{m}")
-          p = nil # augmenting path
+          log(0, "stage. mate = #{mate}")
 
-          # Queue of newly discovered S-vertices.
-          q = []
+          @label = rantwijk_array(LBL_FREE)
 
-          # > We start by labeling all single persons S (Galil, 1986, p. 26)
-          g.each_vertex do |v|
-            if matched?(v) && label[in_blossom[v]] == LBL_FREE
+          # Clear the van Rantwijk "best edge" caches
+          @best_edge = rantwijk_array(nil)
+          @blossom_best_edges.fill(nil, g.num_vertices)
+
+          # > We start by labeling all single persons S
+          # > (Galil, 1986, p. 26)
+          (0 ... g.num_vertices).each do |v|
+            if single?(v) && label[in_blossom[v]] == LBL_FREE
               assign_label(v, LBL_S)
             end
           end
+          log(1, "labels: #{label}")
+
+          fail('not yet implemented')
 
           # If all vertexes are matched, we're done!
           break if s.empty?
@@ -286,25 +356,16 @@ module GraphMatching
         @label[x] == LBL_FREE
       end
 
-      def init_s_labels(m)
-        s = {}
-        g.each_vertex do |i|
-          if m[i].nil?
-            s[i] = nil
-          end
-        end
-        s
+      # Returns true if vertex `i` is matched in `mate`.
+      # TODO: Optimize by de-normalizing.
+      def matched?(i)
+        !mate[i].nil?
       end
 
-      def init_vertex_duals
-        u = []
-        g.each_vertex do |i| u[i] = g.max_w / 2 end
-        u
-      end
-
-      # Returns true if vertex `i` is matched in `m`.
-      def matched?(i, m)
-        !m[i].nil?
+      # Returns false if vertex `i` is matched in `mate`.
+      # TODO: Optimize by de-normalizing.
+      def single?(i)
+        mate[i].nil?
       end
 
       # Returns true if edge i,j is matched in `m`.
@@ -370,6 +431,13 @@ module GraphMatching
         cross_blossom_s_edges(s_vtx).map { |(i, j)| π(i, j, u, z).to_f / 2 }
       end
 
+      # Returns an array of size 2n, where n is the number of
+      # vertexes.  Common in van Rantwijk's implementation, but
+      # the idea may come from Gabow (1985) or earlier.
+      def rantwijk_array(fill)
+        Array.new(2 * g.num_vertices, fill)
+      end
+
       # Returns slacks of edges between S-vertexes and adjacent
       # free vertexes.
       def s_free_slacks(s_vtx, s, t, u, z)
@@ -401,6 +469,7 @@ module GraphMatching
         z.select { |k| k.graph.has_edge?(i, j) }.
           reduce(0) { |sum, k| sum + k.dual }
       end
+
     end
   end
 end
