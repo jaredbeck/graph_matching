@@ -80,7 +80,8 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
     end
 
     context 'five vertexes, one blossom, three complete matchings with diff. weights' do
-      it 'returns the matching with max. weight', focus: true do
+      it 'returns the matching with max. weight' do
+        skip('not yet implemented')
         g = graph_class[
           [1, 2, 2],
           [2, 3, 0],
