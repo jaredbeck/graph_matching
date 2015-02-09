@@ -90,9 +90,9 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
           [3, 4, 2]
         ]
         m = described_class.new(g).match
-        expect(m.vertexes).to match_array([1, 2, 3, 4])
-        expect(m.has_edge?([1, 2])).to eq(true)
-        expect(m.has_edge?([3, 4])).to eq(true)
+        expect(m.vertexes).to match_array([0, 1, 2, 3])
+        expect(m.has_edge?([0, 1])).to eq(true)
+        expect(m.has_edge?([2, 3])).to eq(true)
         expect(m.weight(g)).to eq(6)
       end
     end
