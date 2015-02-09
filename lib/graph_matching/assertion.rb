@@ -14,12 +14,6 @@ module GraphMatching
       @obj = obj
     end
 
-    def is_a(klass)
-      unless obj.is_a?(klass)
-        raise TypeError, "Expected #{klass}, got #{obj.class}"
-      end
-    end
-
     # van Rantwijk's implementation expects consecutive positive
     # integers starting with zero.
     #
@@ -36,6 +30,30 @@ module GraphMatching
       obj.each do |v|
         raise InvalidVertexNumbering unless v == expected
         expected += 1
+      end
+    end
+
+    def eq(other)
+      unless obj == other
+        raise "Expected #{other}, got #{obj}"
+      end
+    end
+
+    def gte(other)
+      unless obj >= other
+        raise "Expected #{obj} to be >= #{other}"
+      end
+    end
+
+    def is_a(klass)
+      unless obj.is_a?(klass)
+        raise TypeError, "Expected #{klass}, got #{obj.class}"
+      end
+    end
+
+    def not_nil
+      if obj.nil?
+        raise "Unexpected nil"
       end
     end
 
