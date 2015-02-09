@@ -11,6 +11,9 @@ module GraphMatching
     # general graphs.
     class MWMGeneral < MatchingAlgorithm
 
+      # Debugging flag
+      CHECK_DELTA = true
+
       # If b is a top-level blossom,
       # label[b] is 0 if b is unlabeled (free);
       #             1 if b is an S-vertex/blossom;
@@ -20,6 +23,15 @@ module GraphMatching
       LBL_T = 2
       LBL_CRUMB = 5
       LBL_NAMES = ['Free', 'S', 'T', 'Crumb']
+
+      # Van Rantwijk's implementation (and, consequently, this port)
+      # supports both maximum cardinality maximum weight matching
+      # and MWM irrespective of cardinality.
+      #
+      # TODO: Determine how/if to expose this
+      # option as part of the library's public API.
+      #
+      MAX_CARDINALITY = true
 
       attr_reader(
         :best_edge,
@@ -35,7 +47,6 @@ module GraphMatching
         :label_end,
         :mate,
         :neighb_end,
-        :queue,
         :tight_edge
       )
 
@@ -43,6 +54,8 @@ module GraphMatching
         assert(graph).is_a(Graph::WeightedGraph)
         assert(graph.vertexes).are_natural_numbers
         super
+
+        @nvertex = g.num_vertices
 
         # Make a local copy of the edges.  We'll refer to edges
         # by number throughout throughout the algorithm and it's
@@ -61,13 +74,13 @@ module GraphMatching
         # > (Van Rantwijk, mwmatching.py, line 93)
         #
         @endpoint = edges.map { |e| [e.source, e.target] }.flatten
-        puts "endpoints: #{endpoint}"
+        log(0, "endpoints: #{endpoint}")
 
         # > If v is a vertex,
         # > neighbend[v] is the list of remote endpoints of the edges attached to v.
         # > Not modified by the algorithm.
         # > (Van Rantwijk, mwmatching.py, line 98)
-        @neighb_end = Array.new(g.num_vertices) { [] }
+        @neighb_end = Array.new(@nvertex) { [] }
         edges.each_with_index do |e, k|
           @neighb_end[e.source].push(2 * k + 1)
           @neighb_end[e.target].push(2 * k)
@@ -79,7 +92,7 @@ module GraphMatching
         # > Initially all vertices are single; updated during augmentation.
         # > (Van Rantwijk, mwmatching.py)
         #
-        @mate = Array.new(g.num_vertices, nil)
+        @mate = Array.new(@nvertex, nil)
 
         # > If b is a top-level blossom,
         # > label[b] is 0 if b is unlabeled (free);
@@ -111,7 +124,7 @@ module GraphMatching
         # > Initially all vertices are top-level trivial blossoms.
         # > (Van Rantwijk, mwmatching.py)
         #
-        @in_blossom = (0 ... g.num_vertices).to_a
+        @in_blossom = (0 ... @nvertex).to_a
 
         # > If b is a sub-blossom,
         # > blossomparent[b] is its immediate parent (sub-)blossom.
@@ -148,7 +161,7 @@ module GraphMatching
         # > blossombase[b] is its base VERTEX (i.e. recursive sub-blossom).
         # > (Van Rantwijk, mwmatching.py, line 153)
         #
-        @blossom_base = (0 ... g.num_vertices).to_a + Array.new(g.num_vertices, nil)
+        @blossom_base = (0 ... @nvertex).to_a + Array.new(@nvertex, nil)
 
         # > If b is a non-trivial (sub-)blossom,
         # > blossomendps[b] is a list of endpoints on its connecting edges,
@@ -189,7 +202,7 @@ module GraphMatching
         # > problem.
         # > (Van Rantwijk, mwmatching.py, line 177)
         #
-        @dual = Array.new(g.num_vertices, g.max_w) + Array.new(g.num_vertices, 0)
+        @dual = Array.new(@nvertex, g.max_w) + Array.new(@nvertex, 0)
 
         # Optimization: Cache of tight (zero slack) edges.  *Tight*
         # is a term I attribute to Gabow, though it may be earlier.
@@ -207,6 +220,7 @@ module GraphMatching
       end
 
       def log(indent, msg)
+        return unless ENV['DEBUG']
         space = ' '
         indent_str = space * 2 * indent.to_i
         puts '%s%s' % [indent_str, msg]
@@ -227,7 +241,7 @@ module GraphMatching
         best_edge[w] = best_edge[b] = nil
         if t == LBL_S
           # b became an S-vertex/blossom; add it(s vertices) to the queue.
-          queue.concat(blossom_leaves(b))
+          @queue.concat(blossom_leaves(b))
         elsif t == LBL_T
           # b became a T-vertex/blossom; assign label S to its mate.
           # (If b is a non-trivial blossom, its base is the only vertex
@@ -266,7 +280,7 @@ module GraphMatching
 
       # TODO: Optimize by de-normalizing.
       def leaf?(x)
-        x < g.num_vertices
+        x < @nvertex
       end
 
       # > As in Problem 3, the algorithm consists of O(n) *stages*.
@@ -291,8 +305,8 @@ module GraphMatching
             # > Scanning a vertex means considering in turn all its edges
             # > except the matched edge. (There will be at most one).
             # > (Galil, 1986, p. 26)
-            until augmented || queue.empty?
-              v = queue.pop
+            until augmented || @queue.empty?
+              v = @queue.pop
               log(2, "scan #{v}")
               assert_label(in_blossom[v], LBL_S)
 
@@ -411,12 +425,153 @@ module GraphMatching
 
             break if augmented
 
-            fail 'not yet implemented: calc. deltas, scale the duals'
+            # > There is no augmenting path under these constraints;
+            # > compute delta and reduce slack in the optimization problem.
+            # > (Note that our vertex dual variables, edge slacks and delta's
+            # > are pre-multiplied by two.)
+            # > (Van Rantwijk, mwmatching.py, line 732)
+            delta_type = nil
+            delta = delta_edge = delta_blossom = nil
+
+            # > Verify data structures for delta2/delta3 computation.
+            # > (Van Rantwijk, mwmatching.py, line 739)
+            if CHECK_DELTA
+              check_delta2
+              check_delta3
+            end
+
+            # > Compute delta1: the minumum value of any vertex dual.
+            # > (Van Rantwijk, mwmatching.py)
+            if !MAX_CARDINALITY
+              delta_type = 1
+              delta = @dual[0, @nvertex].min
+            end
+
+            # > Compute delta2: the minimum slack on any edge between
+            # > an S-vertex and a free vertex.
+            # > (Van Rantwijk, mwmatching.py)
+            (0 ... @nvertex).each do |v|
+              if @label[@in_blossom[v]] == LBL_FREE && !@best_edge[v].nil?
+                d = slack(@best_edge[v])
+                if delta_type == nil || d < delta
+                  delta = d
+                  delta_type = 2
+                  delta_edge = @best_edge[v]
+                end
+              end
+            end
+
+            # > Compute delta3: half the minimum slack on any edge between
+            # > a pair of S-blossoms.
+            # > (Van Rantwijk, mwmatching.py)
+            (0 ... 2 * @nvertex).each do |b|
+              if @blossom_parent[b].nil? && @label[b] == LBL_S && !@best_edge[b].nil?
+                kslack = slack(@best_edge[b])
+                d = kslack / 2 # Van Rantwijk had some type checking here.  Why?
+                if delta_type.nil? || d < delta
+                  delta = d
+                  delta_type = 3
+                  delta_edge = @best_edge[b]
+                end
+              end
+            end
+
+            # > Compute delta4: minimum z variable of any T-blossom.
+            # > (Van Rantwijk, mwmatching.py)
+            (@nvertex ... 2 * @nvertex).each do |b|
+              top_t_blossom = top_level_blossom?(b) && @label[b] == LBL_T
+              if top_t_blossom && (delta_type.nil? || @dual[b] < delta)
+                delta = @dual[b]
+                delta_type = 4
+                deltablossom = b
+              end
+            end
+
+            if delta_type.nil?
+              # > No further improvement possible; max-cardinality optimum
+              # > reached. Do a final delta update to make the optimum
+              # > verifyable.
+              # > (Van Rantwijk, mwmatching.py)
+              assert(MAX_CARDINALITY).eq(true)
+              delta_type = 1
+              delta = [0, @dual[0, @nvertex].min].max
+            end
+
+            # > .. we make the following changes in the dual
+            # > variables. (Galil, 1986, p. 32)
+            (0 ... @nvertex).each do |v|
+              case @label[@in_blossom[v]]
+              when LBL_S
+                @dual[v] -= delta
+              when LBL_T
+                @dual[v] += delta
+              else
+                # No change to free vertexes
+              end
+            end
+            (@nvertex ... 2 * @nvertex).each do |b|
+              if top_level_blossom?(b)
+                case @label[b]
+                when LBL_S
+                  @dual[b] += delta
+                when LBL_T
+                  @dual[b] -= delta
+                else
+                  # No change to free blossoms
+                end
+              end
+            end
+
+            # > Take action at the point where minimum delta occurred.
+            # > (Van Rantwijk, mwmatching.py)
+            case delta_type
+            when 1
+              # > No further improvement possible; optimum reached.
+              break
+            when 2
+              # > Use the least-slack edge to continue the search.
+              @tight_edge[delta_edge] = true
+              i, j = @edges[delta_edge].to_a
+              if @label[@in_blossom[i]] == LBL_FREE
+                i, j = j, i
+              end
+              assert_label(@in_blossom[i], LBL_S)
+              @queue.push(i)
+            when 3
+              # > Use the least-slack edge to continue the search.
+              @tight_edge[delta_edge] = true
+              i, j = @edges[delta_edge].to_a
+              assert_label(@in_blossom[i], LBL_S)
+              @queue.push(i)
+            when 4
+              # > Expand the least-z blossom.
+              expand_blossom(delta_blossom, false)
+            else
+              raise "Invalid delta_type: #{delta_type}"
+            end
 
           end # sub-stage
+
+          # > Stop when no more augmenting path can be found.
+          # > (Van Rantwijk, mwmatching.py)
+          break unless augmented
+
+          # > End of a stage; expand all S-blossoms which have dualvar = 0.
+          # > (Van Rantwijk, mwmatching.py)
+          (@nvertex ... 2 * @nvertex).each do |b|
+            if top_level_blossom?(b) && @label[b] == LBL_S && @dual[b] == 0
+              expand_blossom(b, true)
+            end
+          end
+
         end # stage
 
-        Matching.gabow(m)
+        # The stages are complete, and hopefully so is the matching!
+        matching = Matching.new
+        @mate.each do |p|
+          matching.add([@endpoint[p], @endpoint[p ^ 1]]) unless p.nil?
+        end
+        matching
       end
 
       # Pseudo-private
@@ -452,7 +607,7 @@ module GraphMatching
             assert_label(bs, LBL_S)
             assert(label_end[bs]).eq(mate[blossom_base[bs]])
             # > Augment through the S-blossom from s to base.
-            if bs >= g.num_vertices
+            if bs >= @nvertex
               augment_blossom(bs, s)
             end
             @mate[s] = p
@@ -468,7 +623,7 @@ module GraphMatching
             j = endpoint[label_end[bt] ^ 1]
             # > Augment through the T-blossom from j to base.
             assert(blossom_base[bt]).eq(t)
-            if bt >= g.num_vertices
+            if bt >= @nvertex
               augment_blossom(bt, j)
             end
             mate[j] = label_end[bt]
@@ -477,35 +632,6 @@ module GraphMatching
             p = label_end[bt] ^ 1
           end
         end
-      end
-
-      def augment(m, path)
-        ap = Path.new(path)
-        augmenting_path_edges = ap.edges
-        raise "invalid augmenting path: must have odd length" unless augmenting_path_edges.length.odd?
-        ap.vertexes.each do |v|
-          w = m[v]
-          unless w.nil?
-            m[v] = nil
-            m[w] = nil
-          end
-        end
-        augmenting_path_edges.each_with_index do |edge, ix|
-          if ix.even?
-            i, j = edge
-            m[i] = j
-            m[j] = i
-          end
-        end
-        m
-      end
-
-      def backtrack(v, labels)
-        p = [v]
-        while n = labels[p.last]
-          p.push(n)
-        end
-        p
       end
 
       # Returns nil if `k` is known to be an endpoint of a tight
@@ -519,6 +645,88 @@ module GraphMatching
             @tight_edge[k] = true if kslack <= 0
           }
         end
+      end
+
+      # > Check optimized delta2 against a trivial computation.
+      # > (Van Rantwijk, mwmatching.py, line 580)
+      def check_delta2
+        (0 ... @nvertex).each do |v|
+          if @label[@in_blossom[v]] == LBL_FREE
+            bd = nil
+            bk = nil
+            @neighb_end[v].each do |p|
+              k = p / 2 # Note: floor division
+              w = @endpoint[p]
+              if @label[@in_blossom[w]] == LBL_S
+                d = slack(k)
+                if bk.nil? || d < bd
+                  bk = k
+                  bd = d
+                end
+              end
+            end
+            option1 = bk.nil? && @best_edge[v].nil?
+            option2 = !@best_edge[v].nil? && bd == slack(@best_edge[v])
+            unless option1 || option2
+              raise "Assertion failed: Free vertex #{v}"
+            end
+          end
+        end
+      end
+
+      # > Check optimized delta3 against a trivial computation.
+      # > (Van Rantwijk, mwmatching.py, line 598)
+      def check_delta3
+        bk = nil
+        bd = nil
+        tbk = nil
+        tbd = nil
+        (0 ... 2 * @nvertex).each do |b|
+          if @blossom_parent[b].nil? && @label[b] == LBL_S
+            blossom_leaves(b).each do |v|
+              @neighb_end[v].each do |p|
+                k = p / 2 # Note: floor division
+                w = @endpoint[p]
+                if @in_blossom[w] != b && @label[@in_blossom[w]] == LBL_S
+                  d = slack(k)
+                  if bk.nil? || d < bd
+                    bk = k
+                    bd = d
+                  end
+                end
+              end
+            end
+            if !@best_edge[b].nil?
+              i, j = @edges[@best_edge[b]].to_a
+              unless @in_blossom[i] == b || @in_blossom[j] == b
+                raise 'Assertion failed'
+              end
+              unless @in_blossom[i] != b || @in_blossom[j] != b
+                raise 'Assertion failed'
+              end
+              unless @label[@in_blossom[i]] == LBL_S && @label[@in_blossom[j]] == LBL_S
+                raise 'Assertion failed'
+              end
+              if tbk.nil? || slack(@best_edge[b]) < tbd
+                tbk = @best_edge[b]
+                tbd = slack(@best_edge[b])
+              end
+            end
+          end
+        end
+        unless bd == tbd
+          raise 'Assertion failed'
+        end
+      end
+
+      # > Expand the given top-level blossom.
+      # > (Van Rantwijk, mwmatching.py, line 361)
+      #
+      # Blossoms are expanded during slack adjustment detlta type 4,
+      # and after all stages are complete (endstage will be true).
+      #
+      def expand_blossom(b, endstage)
+        fail 'not yet implemented: expand_blossom'
       end
 
       # TODO: Optimize by de-normalizing
@@ -536,7 +744,7 @@ module GraphMatching
       # Clear the Van Rantwijk "best edge" caches
       def init_stage_caches
         @best_edge = rantwijk_array(nil)
-        @blossom_best_edges.fill(nil, g.num_vertices)
+        @blossom_best_edges.fill(nil, @nvertex)
         @tight_edge = Array.new(g.num_edges, false)
       end
 
@@ -547,7 +755,7 @@ module GraphMatching
       # > the queue. (Van Rantwijk, mwmatching.py, line 649)
       def init_stage_labels
         @label = rantwijk_array(LBL_FREE)
-        (0 ... g.num_vertices).each do |v|
+        (0 ... @nvertex).each do |v|
           if single?(v) && label[in_blossom[v]] == LBL_FREE
             assign_label(v, LBL_S)
           end
@@ -619,77 +827,11 @@ module GraphMatching
         mate[i].nil?
       end
 
-      # > If the search is not successful, we make the following
-      # > changes in the dual variables.
-      def scale_duals(s, t, tb, u, z)
-        log(1, 'scale.')
-        s_vtx = s.keys
-        t_vtx = t.keys
-        free_vtx = Set[g.vertexes] - s_vtx - t_vtx
-        d1 = s_vtx.map { |i| u[i] }.min
-        log(2, "d1 = #{d1}")
-        d2 = s_free_slacks(s_vtx, s, t, u, z).min
-        log(2, "d2 = #{d2}")
-        d3 = cross_blossom_s_edge_half_slacks(s_vtx, u, z).min
-        log(2, "d3 = #{d3}")
-        d4 = t_blossom_duals(tb, z).min
-        log(2, "d4 = #{d4}")
-        d = [d1, d2, d3, d4].compact.min # TODO: is compact a problem?
-        log(2, "d = #{d}")
-        fail 'Not yet implemented: scale the duals'
-      end
-
-      def t_blossom_duals(tb, z)
-        tb.map { |k| z[k] }
-      end
-
-      # Returns edges i,j where i ∈ S and j ∈ S.
-      def s_edges(s_vtx)
-        edges = Set.new
-        s_vtx.each do |i|
-          g.each_adjacent(i) do |j|
-            if s_vtx.include?(j)
-              edges.add(RGL::Edge::UnDirectedEdge.new(i, j))
-            end
-          end
-        end
-        edges
-      end
-
-      # Returns true unless i and j are in the same blossom.
-      def cross_blossom?(i, j)
-        true # TODO: how are blossoms stored?
-      end
-
-      def cross_blossom_s_edges(s_vtx)
-        s_edges(s_vtx).select { |(i, j)| cross_blossom?(i, j) }
-      end
-
-      # Returns half-slacks (simply slack / 2) for S-edges i,j
-      # where i and j are not in the same blossom.
-      def cross_blossom_s_edge_half_slacks(s_vtx, u, z)
-        cross_blossom_s_edges(s_vtx).map { |(i, j)| π(i, j, u, z).to_f / 2 }
-      end
-
       # Returns an array of size 2n, where n is the number of
       # vertexes.  Common in Van Rantwijk's implementation, but
       # the idea may come from Gabow (1985) or earlier.
       def rantwijk_array(fill)
-        Array.new(2 * g.num_vertices, fill)
-      end
-
-      # Returns slacks of edges between S-vertexes and adjacent
-      # free vertexes.
-      def s_free_slacks(s_vtx, s, t, u, z)
-        slacks = []
-        s_vtx.each do |i|
-          g.each_adjacent(i) do |j|
-            if free?(j, [s, t])
-              slacks.push π(i, j, u, z)
-            end
-          end
-        end
-        slacks
+        Array.new(2 * @nvertex, fill)
       end
 
       # Van Rantwijk's implementation of slack does not match Galil's.
@@ -702,22 +844,8 @@ module GraphMatching
         dual[i] + dual[j] - 2 * g.w([i, j])
       end
 
-      def unmatched_adjacent(v, m)
-        g.adjacent_vertices(v).select { |i| m[v] != i }
-      end
-
-      # > We now define slacks π<sub>ij</sub> slightly differently
-      # > [compared to problem 3]. (Galil, 1986, p.31)
-      def π(i, j, u, z)
-        u[i] + u[j] - g.w([i, j]) + Σz(i, j, z)
-      end
-
-      # Σ<sub>ij ∈ Bk</sub> zk
-      #
-      # The sum of the duals (z) of every blossom with edge ij.
-      def Σz(i, j, z)
-        z.select { |k| k.graph.has_edge?(i, j) }.
-          reduce(0) { |sum, k| sum + k.dual }
+      def top_level_blossom?(b)
+        !@blossom_base[b].nil? && @blossom_parent[b].nil?
       end
 
     end

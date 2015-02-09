@@ -57,7 +57,6 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
 
     context 'two vertexes' do
       it 'returns matching of size 1' do
-        skip('not yet implemented')
         g = graph_class[[0, 1, 7]]
         m = described_class.new(g).match
         expect(m.vertexes).to match_array([0, 1])
@@ -81,7 +80,6 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
 
     context 'five vertexes, one blossom, three complete matchings with diff. weights' do
       it 'returns the matching with max. weight' do
-        skip('not yet implemented')
         g = graph_class[
           [0, 1, 2],
           [1, 2, 0],
