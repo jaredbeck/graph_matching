@@ -61,6 +61,7 @@ module GraphMatching
         # > (Van Rantwijk, mwmatching.py, line 93)
         #
         @endpoint = edges.map { |e| [e.source, e.target] }.flatten
+        puts "endpoints: #{endpoint}"
 
         # > If v is a vertex,
         # > neighbend[v] is the list of remote endpoints of the edges attached to v.
@@ -324,6 +325,7 @@ module GraphMatching
                   # > (Galil, 1986, p. 26-27)
                   #
                   if free?(in_blossom[w])
+                    log(4, "tight edge (C1)")
 
                     # > (C1) w is a free vertex;
                     # > label w with T and label its mate with S (R12).
@@ -347,6 +349,7 @@ module GraphMatching
                     assign_label(w, LBL_T, p ^ 1)
 
                   elsif label[in_blossom[w]] == LBL_S
+                    log(4, "tight edge (C2)")
 
                     # > (C2) w is an S-vertex (not in the same blossom);
                     # > follow back-links to discover either an
@@ -369,6 +372,7 @@ module GraphMatching
                     end
 
                   elsif label[w] == LBL_FREE
+                    log(4, "tight edge (C3)")
 
                     # > w is inside a T-blossom, but w itself has not
                     # > yet been reached from outside the blossom;
@@ -381,6 +385,7 @@ module GraphMatching
                   end # free blossom
 
                 elsif label[in_blossom[w]] == LBL_S
+                  log(4, "loose edge (L1)")
                   # > keep track of the least-slack non-allowable edge to
                   # > a different S-blossom.
                   # > (Van Rantwijk, mwmatching.py, line 717)
@@ -390,7 +395,15 @@ module GraphMatching
                   end
 
                 elsif label[w] == LBL_FREE
-                  fail 'not yet implemented'
+                  log(4, "loose edge (L2)")
+
+                  # > w is a free vertex (or an unreached vertex inside
+                  # > a T-blossom) but we can not reach it yet;
+                  # > keep track of the least-slack edge that reaches w.
+                  # > (Van Rantwijk, mwmatching.py, line 725)
+                  if best_edge[w].nil? || kslack < slack(best_edge[w])
+                    @best_edge[w] = k
+                  end
 
                 end # tight edge
               end # scan neighbors of `v`
@@ -423,8 +436,47 @@ module GraphMatching
         end
       end
 
+      # > Swap matched/unmatched edges over an alternating path
+      # > between two single vertices. The augmenting path runs
+      # > through edge k, which connects a pair of S vertices.
+      # > (Van Rantwijk, mwmatching.py, line 494)
       def augment_matching(k)
-        fail 'not yet implemented: augment_matching'
+        v, w = edges[k].to_a
+        [[v, 2 * k + 1], [w, 2 * k]].each do |(s, p)|
+          # > Match vertex s to remote endpoint p. Then trace back from s
+          # > until we find a single vertex, swapping matched and unmatched
+          # > edges as we go.
+          # > (Van Rantwijk, mwmatching.py, line 504)
+          while true
+            bs = in_blossom[s]
+            assert_label(bs, LBL_S)
+            assert(label_end[bs]).eq(mate[blossom_base[bs]])
+            # > Augment through the S-blossom from s to base.
+            if bs >= g.num_vertices
+              augment_blossom(bs, s)
+            end
+            @mate[s] = p
+            # > Trace one step back.
+            # If we reach a single vertex, stop
+            break if label_end[bs].nil?
+            t = endpoint[label_end[bs]]
+            bt = in_blossom[t]
+            assert_label(bt, LBL_T)
+            # > Trace one step back.
+            assert(label_end[bt]).not_nil
+            s = endpoint[label_end[bt]]
+            j = endpoint[label_end[bt] ^ 1]
+            # > Augment through the T-blossom from j to base.
+            assert(blossom_base[bt]).eq(t)
+            if bt >= g.num_vertices
+              augment_blossom(bt, j)
+            end
+            mate[j] = label_end[bt]
+            # > Keep the opposite endpoint;
+            # > it will be assigned to mate[s] in the next step.
+            p = label_end[bt] ^ 1
+          end
+        end
       end
 
       def augment(m, path)
