@@ -14,25 +14,6 @@ module GraphMatching
       @obj = obj
     end
 
-    # van Rantwijk's implementation expects consecutive positive
-    # integers starting with zero.
-    #
-    # > Vertices are identified by consecutive, non-negative integers.
-    # > (van Rantwijk, mwmatching.py, line 98)
-    #
-    # I believe this assertion can be applied in the other
-    # algorithms as well, but I'll have to check.  Also,
-    # I suspect I'll need to change IntegerVertexes to start
-    # at zero.
-    #
-    def are_natural_numbers
-      expected = 0
-      obj.each do |v|
-        raise InvalidVertexNumbering unless v == expected
-        expected += 1
-      end
-    end
-
     def eq(other)
       unless obj == other
         raise "Expected #{other}, got #{obj}"

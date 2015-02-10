@@ -41,6 +41,10 @@ module GraphMatching
         Algorithm::MCMGeneral.new(self).match
       end
 
+      def max_v
+        vertexes.max
+      end
+
       def print
         base_filename = SecureRandom.hex(16)
         Visualize.new(self).png(base_filename)

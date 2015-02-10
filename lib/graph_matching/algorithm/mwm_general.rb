@@ -52,10 +52,13 @@ module GraphMatching
 
       def initialize(graph)
         assert(graph).is_a(Graph::WeightedGraph)
-        assert(graph.vertexes).are_natural_numbers
         super
 
-        @nvertex = g.num_vertices
+        # The size of the array (or part of an array) used for
+        # vertexes (as opposed to blossoms) throughout this
+        # algorithm.  It is *not*, as one might assume from the
+        # name, the number of vertexes in the graph.
+        @nvertex = g.max_v.to_i + 1
 
         # Make a local copy of the edges.  We'll refer to edges
         # by number throughout throughout the algorithm and it's

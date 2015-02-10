@@ -39,4 +39,15 @@ RSpec.describe GraphMatching::Graph::Graph do
       expect(g).to_not be_connected
     end
   end
+
+  describe "#max_v" do
+    it "returns the largest vertex number" do
+      g = described_class[1, 3, 3, 7]
+      expect(g.max_v).to eq(7)
+    end
+
+    it "returns nil when graph is empty" do
+      expect(g.max_v).to eq(nil)
+    end
+  end
 end

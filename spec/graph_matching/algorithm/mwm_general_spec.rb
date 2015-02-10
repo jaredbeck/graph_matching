@@ -94,5 +94,12 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
         expect(m.weight(g)).to eq(6)
       end
     end
+
+    it "passes Van Rantwijk test 12" do
+      g = graph_class[[1, 2, 10], [2, 3, 11]]
+      m = described_class.new(g).match
+      expect(m.vertexes).to match_array([2, 3])
+      expect(m.weight(g)).to eq(11)
+    end
   end
 end
