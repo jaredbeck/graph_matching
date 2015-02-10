@@ -63,10 +63,14 @@ module GraphMatching
           end
         end
 
-        # `weighted_edge?` returns true if `e` is an array with
-        # exactly three integers.
+        # `weighted_edge?` returns true if `e` is an array whose
+        # first two elements are integers, and whose third element
+        # is a real number.
         def weighted_edge?(e)
-          e.is_a?(Array) && e.length == 3 && e.all? { |i| i.is_a?(Integer) }
+          e.is_a?(Array) &&
+            e.length == 3 &&
+            e[0, 2].all? { |i| i.is_a?(Integer) } &&
+            e[2].is_a?(Integer) || e[2].is_a?(Float)
         end
       end
 
