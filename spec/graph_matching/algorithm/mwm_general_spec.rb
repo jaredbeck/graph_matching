@@ -41,7 +41,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
     context 'empty graph' do
       it 'returns empty matching' do
         g = graph_class.new
-        m = described_class.new(g).match
+        m = described_class.new(g).match(true)
         expect(m).to be_empty
       end
     end
@@ -50,7 +50,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       it 'returns empty matching' do
         g = graph_class.new
         g.add_vertex(0)
-        m = described_class.new(g).match
+        m = described_class.new(g).match(true)
         expect(m).to be_empty
       end
     end
@@ -58,7 +58,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
     context 'two vertexes' do
       it 'returns matching of size 1' do
         g = graph_class[[0, 1, 7]]
-        m = described_class.new(g).match
+        m = described_class.new(g).match(true)
         expect(m.vertexes).to match_array([0, 1])
         expect(m.weight(g)).to eq(7)
       end
@@ -72,7 +72,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
           [1, 2, 2],
           [2, 0, 3]
         ]
-        m = described_class.new(g).match
+        m = described_class.new(g).match(true)
         expect(m.vertexes).to match_array([2, 0])
         expect(m.weight(g)).to eq(3)
       end
@@ -87,7 +87,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
           [2, 3, 4],
           [3, 4, 2]
         ]
-        m = described_class.new(g).match
+        m = described_class.new(g).match(true)
         expect(m.vertexes).to match_array([0, 1, 2, 3])
         expect(m.has_edge?([0, 1])).to eq(true)
         expect(m.has_edge?([2, 3])).to eq(true)
@@ -97,9 +97,21 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
 
     it "passes Van Rantwijk test 12" do
       g = graph_class[[1, 2, 10], [2, 3, 11]]
-      m = described_class.new(g).match
+      m = described_class.new(g).match(false)
       expect(m.vertexes).to match_array([2, 3])
       expect(m.weight(g)).to eq(11)
     end
+
+    it "passes Van Rantwijk test 13" do
+      g = graph_class[
+        [1, 2, 5],
+        [2, 3, 11],
+        [3, 4, 5]
+      ]
+      m = described_class.new(g).match(false)
+      expect(m.vertexes).to match_array([2, 3])
+      expect(m.weight(g)).to eq(11)
+    end
+
   end
 end

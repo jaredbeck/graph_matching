@@ -24,15 +24,6 @@ module GraphMatching
       LBL_CRUMB = 5
       LBL_NAMES = ['Free', 'S', 'T', 'Crumb']
 
-      # Van Rantwijk's implementation (and, consequently, this port)
-      # supports both maximum cardinality maximum weight matching
-      # and MWM irrespective of cardinality.
-      #
-      # TODO: Determine how/if to expose this
-      # option as part of the library's public API.
-      #
-      MAX_CARDINALITY = true
-
       attr_reader(
         :best_edge,
         :blossom_base,
@@ -291,7 +282,11 @@ module GraphMatching
       # > labeling R12 and the two cases C1, C2 as in the simple
       # > algorithm for Problem 2, except that we only use edges
       # > with π<sub>ij</sub> = 0. (Galil, 1986, p. 32)
-      def match
+      #
+      # Van Rantwijk's implementation (and, consequently, this port)
+      # supports both maximum cardinality maximum weight matching
+      # and MWM irrespective of cardinality.
+      def match(max_cardinality)
         return Matching.new if g.size < 2
 
         # Iterative *stages*.  Each stage augments the matching.
@@ -445,7 +440,7 @@ module GraphMatching
 
             # > Compute delta1: the minumum value of any vertex dual.
             # > (Van Rantwijk, mwmatching.py)
-            if !MAX_CARDINALITY
+            if !max_cardinality
               delta_type = 1
               delta = @dual[0, @nvertex].min
             end
@@ -495,7 +490,7 @@ module GraphMatching
               # > reached. Do a final delta update to make the optimum
               # > verifyable.
               # > (Van Rantwijk, mwmatching.py)
-              assert(MAX_CARDINALITY).eq(true)
+              assert(max_cardinality).eq(true)
               delta_type = 1
               delta = [0, @dual[0, @nvertex].min].max
             end

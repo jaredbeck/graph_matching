@@ -66,14 +66,15 @@ and Galil (1986), which performs in O(n ^ (3/4) m log N).
 
 ```ruby
 require 'graph_matching'
-g = GraphMatching::Graph::WeightedBigraph[1,2, 1,3]
-g.set_w([1,2], 100)
-g.set_w([1,3], 101)
+g = GraphMatching::Graph::WeightedGraph[
+  [1, 2, 10],
+  [1, 3, 11]
+]
 m = g.maximum_weighted_matching
 m.edges
 #=> [[3, 1]]
 m.weight(g)
-#=> 101
+#=> 11
 ```
 
 ![MWM in Complete Bigraph is O(n ^ (3/4) m log N)][19]
@@ -85,6 +86,19 @@ See [Benchmarking MWM in Complete Bigraphs][16]
 Implementation underway, borrowing heavily from
 [Van Rantwijk (2013)][11], while referring to
 Gabow (1985) and, of course, Galil (1986).
+
+```ruby
+require 'graph_matching'
+g = GraphMatching::Graph::WeightedGraph[
+  [1, 2, 10],
+  [1, 3, 11]
+]
+m = g.maximum_weighted_matching(false)
+m.edges
+#=> [[3, 1]]
+m.weight(g)
+#=> 11
+```
 
 Benchmarks
 ----------

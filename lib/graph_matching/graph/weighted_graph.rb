@@ -8,8 +8,8 @@ module GraphMatching
     class WeightedGraph < Graph
       include Weighted
 
-      def maximum_weighted_matching
-        Algorithm::MWMGeneral.new(self).match
+      def maximum_weighted_matching(max_cardinality)
+        Algorithm::MWMGeneral.new(self).match(max_cardinality)
       end
     end
   end
