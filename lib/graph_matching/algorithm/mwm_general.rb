@@ -184,8 +184,9 @@ module GraphMatching
         #
         @blossom_best_edges = rantwijk_array(nil)
 
-        # Queue of newly discovered S-vertices.
-        @queue = []
+        # > List of currently unused blossom numbers.
+        # > (Van Rantwijk, mwmatching.py, line 174)
+        @unused_blossoms = (@nvertex ... 2 * @nvertex).to_a
 
         # > If v is a vertex,
         # > dualvar[v] = 2 * u(v) where u(v) is the v's variable in the dual
@@ -211,6 +212,9 @@ module GraphMatching
         # > problem; if allowedge[k] is false, the edge's slack may or may not
         # > be zero.
         @tight_edge = Array.new(g.num_edges, false)
+
+        # Queue of newly discovered S-vertices.
+        @queue = []
       end
 
       def log(indent, msg)
@@ -579,8 +583,140 @@ module GraphMatching
       # they are public so they can be easily tested.
       #
 
+      # > Construct a new blossom with given base, containing edge
+      # > k which connects a pair of S vertices. Label the new
+      # > blossom as S; set its dual variable to zero; relabel its
+      # > T-vertices to S and add them to the queue.
+      # > (Van Rantwijk, mwmatching.py, line 270)
       def add_blossom(base, k)
-        fail 'not yet implemented: add_blossom'
+        log(0, "add_blossom. base = #{base}, k = #{k}")
+        v, w = @edges[k].to_a
+        bb = @in_blossom[base]
+        bv = @in_blossom[v]
+        bw = @in_blossom[w]
+
+        # Create a new top-level blossom.
+        b = @unused_blossoms.pop
+        @blossom_base[b] = base
+        @blossom_parent[b] = nil
+        @blossom_parent[bb] = b
+
+        # > Make list of sub-blossoms and their interconnecting
+        # > edge endpoints.
+        @blossom_children[b] = path = []
+        @blossom_endps[b] = endps = []
+
+        # > Trace back from v to base.
+        while bv != bb
+          log(1, "tracing to bb = #{bb}, bv = #{bv}")
+
+          # > Add bv to the new blossom.
+          @blossom_parent[bv] = b
+          path << bv
+          endps << @label_end[bv]
+          assert_blossom_trace(bv)
+
+          # > Trace one step back
+          assert(@label_end[bv]).not_nil
+          v = @endpoint[@label_end[bv]]
+          bv = @in_blossom[v]
+        end
+
+        # > Reverse lists, add endpoint that connects the pair of S vertices.
+        path << bb
+        path = path.reverse
+        endps = endps.reverse
+        endps << 2 * k
+
+        # > Trace back from w to base
+        # TODO: Seems really similar to "trace back from v" above
+        while bw != bb
+          log(1, "tracing to bb = #{bb}, bw = #{bw}")
+          @blossom_parent[bw] = b
+          path << bw
+          endps << (@label_end[bw] ^ 1)
+          assert_blossom_trace(bw)
+          assert(@label_end[bw]).not_nil
+          w = @endpoint[@label_end[bw]]
+          bw = @in_blossom[w]
+        end
+
+        # > Set label to S
+        assert(@label[bb]).eq(LBL_S)
+        @label[b] = LBL_S
+        @label_end[b] = @label_end[bb]
+
+        # > Set dual variable to zero.
+        @dual[b] = 0
+
+        # > Relabel vertices.
+        blossom_leaves(b).each do |v|
+          if @label[@in_blossom[v]] == LBL_T
+            # > This T-vertex now turns into an S-vertex because it
+            # > becomes part of an S-blossom; add it to the queue.
+            @queue << v
+          end
+          @in_blossom[v] = b
+        end
+
+        # > Compute blossombestedges[b].
+        best_edge_to = rantwijk_array(nil)
+        path.each do |bv|
+          if @blossom_best_edges[bv].nil?
+            # > This subblossom [bv] does not have a list of least-
+            # > slack edges.  Get the information from the vertices.
+            nblists = blossom_leaves(bv).map { |v|
+              @neighb_end[v].map { |p|
+                p / 2 # floor division
+              }
+            }
+          else
+            # > Walk this subblossom's least-slack edges.
+            nblists = [@blossom_best_edges[bv]]
+          end
+
+          nblists.each do |nblist|
+            nblist.each do |k|
+              i, j = @edges[k].to_a
+              if @in_blossom[j] == b
+                i, j = j, i
+              end
+              bj = @in_blossom[j]
+              if bj != b &&
+                  @label[bj] == LBL_S &&
+                  (best_edge_to[bj] == nil || slack(k) < slack(best_edge_to[bj]))
+                best_edge_to[bj] = k
+              end
+            end
+          end
+
+          # > Forget about least-slack edges of the subblossom.
+          @blossom_best_edges[bv] = nil
+          @best_edge[bv] = nil
+        end
+
+        @blossom_best_edges[b] = best_edge_to.compact
+
+        # > Select bestedge[b]
+        @best_edge[b] = nil
+        @blossom_best_edges[b].each do |k|
+          if @best_edge[b].nil? || slack(k) < slack(@best_edge[b])
+            @best_edge[b] = k
+          end
+        end
+      end
+
+      def assert_blossom_trace(b)
+        t = @label[b] == LBL_T
+        s = @label[b] == LBL_S
+        m = @label_end[b] == @mate[@blossom_base[b]]
+        unless t || s && m
+          raise <<-EOS
+              Assertion failed: Expected either:
+              1. Current Bv to be a T-blossom, or
+              2. Bv is an S-blossom and its base is matched to @label_end[bv]
+          EOS
+        end
       end
 
       def assert_label(ix, lbl)

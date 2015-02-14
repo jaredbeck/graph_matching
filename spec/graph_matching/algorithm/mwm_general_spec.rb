@@ -66,7 +66,6 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
 
     context 'three vertexes' do
       it 'matches the edge with greater weight' do
-        skip('not yet implemented')
         g = graph_class[
           [0, 1, 1],
           [1, 2, 2],
@@ -127,10 +126,11 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
     end
 
     it "passes Van Rantwijk test 15: floating-point weights" do
+      skip "augment_blossom not yet implemented"
       g = graph_class[
         [1, 2, Math::PI],
         [2, 3, Math.exp(1)],
-        # [1, 3, 3.0], # TODO: add_blossom not yet implemented
+        [1, 3, 3.0],
         [1, 4, Math.sqrt(2.0)]
       ]
       m = described_class.new(g).match(false)
