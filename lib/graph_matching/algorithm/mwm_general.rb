@@ -603,23 +603,22 @@ module GraphMatching
 
         # > Make list of sub-blossoms and their interconnecting
         # > edge endpoints.
+        # > (Van Rantwijk, mwmatching.py, line 284)
+        #
+        # Note the deliberate use of "reference assignment" here.
+        # That is, `path` and `@blossom_children[b]` point to the
+        # same array in memory.  This provides a convenient and
+        # slightly more efficient (7% faster in ruby 2.2.0) way to
+        # work with `@blossom_children[b]`.
+        #
         @blossom_children[b] = path = []
         @blossom_endps[b] = endps = []
 
         # > Trace back from v to base.
-        while bv != bb
-          log(1, "tracing to bb = #{bb}, bv = #{bv}")
-
-          # > Add bv to the new blossom.
+        trace_to_base(bv, bb) do |bv|
           @blossom_parent[bv] = b
           path << bv
           endps << @label_end[bv]
-          assert_blossom_trace(bv)
-
-          # > Trace one step back
-          assert(@label_end[bv]).not_nil
-          v = @endpoint[@label_end[bv]]
-          bv = @in_blossom[v]
         end
 
         # > Reverse lists, add endpoint that connects the pair of S vertices.
@@ -629,16 +628,10 @@ module GraphMatching
         endps << 2 * k
 
         # > Trace back from w to base
-        # TODO: Seems really similar to "trace back from v" above
-        while bw != bb
-          log(1, "tracing to bb = #{bb}, bw = #{bw}")
+        trace_to_base(bw, bb) do |bw|
           @blossom_parent[bw] = b
           path << bw
           endps << (@label_end[bw] ^ 1)
-          assert_blossom_trace(bw)
-          assert(@label_end[bw]).not_nil
-          w = @endpoint[@label_end[bw]]
-          bw = @in_blossom[w]
         end
 
         # > Set label to S
@@ -959,6 +952,19 @@ module GraphMatching
       # TODO: Optimize by de-normalizing.
       def single?(i)
         mate[i].nil?
+      end
+
+      # Trace a path around a blossom, from sub-blossom `bx` to
+      # blossom base `bb`, by following `@label_end`.  At each
+      # step, `yield` the sub-blossom `bx`.
+      def trace_to_base(bx, bb)
+        while bx != bb
+          log(1, "tracing to bb = #{bb}, bx = #{bx}")
+          yield bx
+          assert_blossom_trace(bx)
+          assert(@label_end[bx]).not_nil
+          bx = @in_blossom[@endpoint[@label_end[bx]]]
+        end
       end
 
       # Returns an array of size 2n, where n is the number of
