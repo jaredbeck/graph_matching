@@ -605,33 +605,26 @@ module GraphMatching
         # > edge endpoints.
         # > (Van Rantwijk, mwmatching.py, line 284)
         #
-        # Note the deliberate use of "reference assignment" here.
-        # That is, `path` and `@blossom_children[b]` point to the
-        # same array in memory.  This provides a convenient and
-        # slightly more efficient (7% faster in ruby 2.2.0) way to
-        # work with `@blossom_children[b]`.
+        # 1. Clear the existing lists
+        # 2. Trace back from v to base
+        # 3. Reverse lists, add endpoint that connects the pair of S vertices
+        # 4. Trace back from w to base
         #
-        @blossom_children[b] = path = []
-        @blossom_endps[b] = endps = []
-
-        # > Trace back from v to base.
+        @blossom_children[b] = []
+        @blossom_endps[b] = []
         trace_to_base(bv, bb) do |bv|
           @blossom_parent[bv] = b
-          path << bv
-          endps << @label_end[bv]
+          @blossom_children[b] << bv
+          @blossom_endps[b] << @label_end[bv]
         end
-
-        # > Reverse lists, add endpoint that connects the pair of S vertices.
-        path << bb
-        path = path.reverse
-        endps = endps.reverse
-        endps << 2 * k
-
-        # > Trace back from w to base
+        @blossom_children[b] << bb
+        @blossom_children[b].reverse!
+        @blossom_endps[b].reverse!
+        @blossom_endps[b] << 2 * k
         trace_to_base(bw, bb) do |bw|
           @blossom_parent[bw] = b
-          path << bw
-          endps << (@label_end[bw] ^ 1)
+          @blossom_children[b] << bw
+          @blossom_endps[b] << (@label_end[bw] ^ 1)
         end
 
         # > Set label to S
@@ -654,7 +647,7 @@ module GraphMatching
 
         # > Compute blossombestedges[b].
         best_edge_to = rantwijk_array(nil)
-        path.each do |bv|
+        @blossom_children[b].each do |bv|
           if @blossom_best_edges[bv].nil?
             # > This subblossom [bv] does not have a list of least-
             # > slack edges.  Get the information from the vertices.
