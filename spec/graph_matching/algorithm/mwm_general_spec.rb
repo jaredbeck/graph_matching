@@ -267,9 +267,25 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
           [6, 7, 14],
           [7, 8, 12]
         ]
-        # [ -1, 2, 1, 5, 6, 3, 4, 8, 7 ])
         m = described_class.new(g).match(false)
         expect(m).to match_edges [[1, 2], [3, 5], [4, 6], [7, 8]]
+      end
+    end
+
+    context "Van Rantwijk test 25" do
+      it "create S-blossom, relabel as T, expand" do
+        g = graph_class[
+          [1, 2, 23],
+          [1, 5, 22],
+          [1, 6, 15],
+          [2, 3, 25],
+          [3, 4, 22],
+          [4, 5, 25],
+          [4, 8, 14],
+          [5, 7, 13]
+        ]
+        m = described_class.new(g).match(false)
+        expect(m).to match_edges [[1, 6], [2, 3], [4, 8], [5, 7]]
       end
     end
 
