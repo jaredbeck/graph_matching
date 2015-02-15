@@ -289,5 +289,24 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       end
     end
 
+    context "Van Rantwijk test 26" do
+      it "create nested S-blossom, relabel as T, expand" do
+        g = graph_class[
+          [1, 2, 19],
+          [1, 3, 20],
+          [1, 8, 8],
+          [2, 3, 25],
+          [2, 4, 18],
+          [3, 5, 18],
+          [4, 5, 13],
+          [4, 7, 7],
+          [5, 6, 7]
+        ]
+        # [ -1, 8, 3, 2, 7, 6, 5, 4, 1 ]
+        m = described_class.new(g).match(false)
+        expect(m).to match_edges [[1, 8], [2, 3], [4, 7], [5, 6]]
+      end
+    end
+
   end
 end
