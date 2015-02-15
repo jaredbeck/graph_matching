@@ -899,85 +899,88 @@ module GraphMatching
         # > If we expand a T-blossom during a stage, its sub-blossoms
         # > must be relabeled.
         if !endstage && @label[b] == LBL_T
-
-          # > Start at the sub-blossom through which the expanding
-          # > blossom obtained its label, and relabel sub-blossoms until
-          # > we reach the base.
-          # > Figure out through which sub-blossom the expanding blossom
-          # > obtained its label initially.
-          assert(@label_end[b]).not_nil
-          entry_child = @in_blossom[@endpoint[@label_end[b] ^ 1]]
-
-          # > Decide in which direction we will go round the blossom.
-          j = @blossom_children[b].index(entry_child)
-          if j.odd?
-            # > go forward and wrap
-            j -= @blossom_children[b].length
-            jstep = 1
-            endptrick = 0
-          else
-            # > go backward
-            jstep = -1
-            endptrick = 1
-          end
-
-          # > Move along the blossom until we get to the base.
-          p = @label_end[b]
-          while j != 0
-
-            # > Relabel the T-sub-blossom.
-            @label[@endpoint[p ^ 1]] = LBL_FREE
-            @label[@endpoint[@blossom_endps[b][j - endptrick] ^ endptrick ^ 1]] = LBL_FREE
-            assign_label(@endpoint[p ^ 1], LBL_T, p)
-
-            # > Step to the next S-sub-blossom and note its forward endpoint.
-            @tight_edge[@blossom_endps[b][j - endptrick] / 2] = true # floor division
-            j += jstep
-            p = @blossom_endps[b][j - endptrick] ^ endptrick
-
-            # > Step to the next T-sub-blossom.
-            @tight_edge[p / 2] = true # floor division
-            j += jstep
-          end
-
-          # > Relabel the base T-sub-blossom WITHOUT stepping through to
-          # > its mate (so don't call assignLabel).
-          bv = @blossom_children[b][j]
-          @label[@endpoint[p ^ 1]] = @label[bv] = LBL_T
-          @label_end[@endpoint[p ^ 1]] = @label_end[bv] = p
-          @best_edge[bv] = nil
-
-          # > Continue along the blossom until we get back to entrychild.
-          j += jstep
-          while @blossom_children[b][j] != entry_child
-
-            # > Examine the vertices of the sub-blossom to see whether
-            # > it is reachable from a neighbouring S-vertex outside the
-            # > expanding blossom.
-            bv = @blossom_children[b][j]
-            if @label[bv] == LBL_S
-              # > This sub-blossom just got label S through one of its
-              # > neighbours; leave it.
-              j += jstep
-              next
-            end
-
-            # > If the sub-blossom contains a reachable vertex, assign
-            # > label T to the sub-blossom.
-            v = first_labeled_blossom_leaf(bv)
-            unless v.nil?
-              assert_label(v, LBL_T)
-              assert(@in_blossom[v]).eq(bv)
-              @label[v] = LBL_FREE
-              @label[@endpoint[@mate[@blossom_base[bv]]]] = LBL_FREE
-              assign_label(v, LBL_T, @label_end[v])
-            end
-
-            j += jstep
-          end
+          expand_t_blossom(b)
         end
 
         recycle_blossom_number(b)
+      end
+
+      # > Start at the sub-blossom through which the expanding
+      # > blossom obtained its label, and relabel sub-blossoms until
+      # > we reach the base.
+      # > Figure out through which sub-blossom the expanding blossom
+      # > obtained its label initially.
+      def expand_t_blossom(b)
+        assert(@label_end[b]).not_nil
+        entry_child = @in_blossom[@endpoint[@label_end[b] ^ 1]]
+
+        # > Decide in which direction we will go round the blossom.
+        j = @blossom_children[b].index(entry_child)
+        if j.odd?
+          # > go forward and wrap
+          j -= @blossom_children[b].length
+          jstep = 1
+          endptrick = 0
+        else
+          # > go backward
+          jstep = -1
+          endptrick = 1
+        end
+
+        # > Move along the blossom until we get to the base.
+        p = @label_end[b]
+        while j != 0
+
+          # > Relabel the T-sub-blossom.
+          @label[@endpoint[p ^ 1]] = LBL_FREE
+          @label[@endpoint[@blossom_endps[b][j - endptrick] ^ endptrick ^ 1]] = LBL_FREE
+          assign_label(@endpoint[p ^ 1], LBL_T, p)
+
+          # > Step to the next S-sub-blossom and note its forward endpoint.
+          @tight_edge[@blossom_endps[b][j - endptrick] / 2] = true # floor division
+          j += jstep
+          p = @blossom_endps[b][j - endptrick] ^ endptrick
+
+          # > Step to the next T-sub-blossom.
+          @tight_edge[p / 2] = true # floor division
+          j += jstep
+        end
+
+        # > Relabel the base T-sub-blossom WITHOUT stepping through to
+        # > its mate (so don't call assignLabel).
+        bv = @blossom_children[b][j]
+        @label[@endpoint[p ^ 1]] = @label[bv] = LBL_T
+        @label_end[@endpoint[p ^ 1]] = @label_end[bv] = p
+        @best_edge[bv] = nil
+
+        # > Continue along the blossom until we get back to entrychild.
+        j += jstep
+        while @blossom_children[b][j] != entry_child
+
+          # > Examine the vertices of the sub-blossom to see whether
+          # > it is reachable from a neighbouring S-vertex outside the
+          # > expanding blossom.
+          bv = @blossom_children[b][j]
+          if @label[bv] == LBL_S
+            # > This sub-blossom just got label S through one of its
+            # > neighbours; leave it.
+            j += jstep
+            next
+          end
+
+          # > If the sub-blossom contains a reachable vertex, assign
+          # > label T to the sub-blossom.
+          v = first_labeled_blossom_leaf(bv)
+          unless v.nil?
+            assert_label(v, LBL_T)
+            assert(@in_blossom[v]).eq(bv)
+            @label[v] = LBL_FREE
+            @label[@endpoint[@mate[@blossom_base[bv]]]] = LBL_FREE
+            assign_label(v, LBL_T, @label_end[v])
+          end
+
+          j += jstep
+        end
       end
 
       def first_labeled_blossom_leaf(b)
