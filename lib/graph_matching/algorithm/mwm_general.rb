@@ -881,20 +881,7 @@ module GraphMatching
       # and after all stages are complete (endstage will be true).
       #
       def expand_blossom(b, endstage)
-
-        # > Convert sub-blossoms into top-level blossoms.
-        @blossom_children[b].each do |s|
-          @blossom_parent[s] = nil
-          if s < @nvertex
-            @in_blossom[s] = s
-          elsif endstage && @dual[s] == 0
-            expand_blossom(s, endstage)
-          else
-            blossom_leaves(s).each do |v|
-              @in_blossom[v] = s
-            end
-          end
-        end
+        promote_sub_blossoms_of(b, endstage)
 
         # > If we expand a T-blossom during a stage, its sub-blossoms
         # > must be relabeled.
@@ -910,6 +897,7 @@ module GraphMatching
       # > we reach the base.
       # > Figure out through which sub-blossom the expanding blossom
       # > obtained its label initially.
+      # > (Van Rantwijk, mwmatching.py, line 378)
       def expand_t_blossom(b)
         assert(@label_end[b]).not_nil
         entry_child = @in_blossom[@endpoint[@label_end[b] ^ 1]]
@@ -1029,6 +1017,23 @@ module GraphMatching
       def match_endpoint(p)
         @mate[@endpoint[p]] = p ^ 1
         @mate[@endpoint[p ^ 1]] = p
+      end
+
+      # > Convert sub-blossoms [of `b`] into top-level blossoms.
+      # > (Van Rantwijk, mwmatching.py, line 364)
+      def promote_sub_blossoms_of(b, endstage)
+        @blossom_children[b].each do |s|
+          @blossom_parent[s] = nil
+          if s < @nvertex
+            @in_blossom[s] = s
+          elsif endstage && @dual[s] == 0
+            expand_blossom(s, endstage)
+          else
+            blossom_leaves(s).each do |v|
+              @in_blossom[v] = s
+            end
+          end
+        end
       end
 
       def recycle_blossom_number(b)
