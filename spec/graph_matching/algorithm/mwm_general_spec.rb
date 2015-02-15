@@ -157,5 +157,38 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       expect(m.weight(g)).to eq(-3)
     end
 
+    context "Van Rantwijk test 20: Uses S-blossom for augmentation" do
+      it "passes test 20-A" do
+        g = graph_class[
+          [1, 2, 8],
+          [1, 3, 9],
+          [2, 3, 10],
+          [3, 4, 7]
+        ]
+        m = described_class.new(g).match(false)
+        expect(m.vertexes).to match_array([1, 2, 3, 4])
+        expect(m.has_edge?([1, 2])).to eq(true)
+        expect(m.has_edge?([3, 4])).to eq(true)
+        expect(m.weight(g)).to eq(15)
+      end
+
+      it "passes test 20-B" do
+        g = graph_class[
+          [1, 2, 8],
+          [1, 3, 9],
+          [2, 3, 10],
+          [3, 4, 7],
+          [1, 6, 5],
+          [4, 5, 6]
+        ]
+        m = described_class.new(g).match(false)
+        expect(m.vertexes).to match_array([1, 2, 3, 4, 5, 6])
+        expect(m.has_edge?([1, 6])).to eq(true)
+        expect(m.has_edge?([2, 3])).to eq(true)
+        expect(m.has_edge?([4, 5])).to eq(true)
+        expect(m.weight(g)).to eq(21)
+      end
+    end
+
   end
 end
