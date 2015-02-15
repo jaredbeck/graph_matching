@@ -59,7 +59,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       it 'returns matching of size 1' do
         g = graph_class[[0, 1, 7]]
         m = described_class.new(g).match(true)
-        expect(m.vertexes).to match_array([0, 1])
+        expect(m).to match_edges [[0, 1]]
         expect(m.weight(g)).to eq(7)
       end
     end
@@ -72,7 +72,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
           [2, 0, 3]
         ]
         m = described_class.new(g).match(true)
-        expect(m.vertexes).to match_array([2, 0])
+        expect(m).to match_edges [[0, 2]]
         expect(m.weight(g)).to eq(3)
       end
     end
@@ -87,9 +87,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
           [3, 4, 2]
         ]
         m = described_class.new(g).match(true)
-        expect(m.vertexes).to match_array([0, 1, 2, 3])
-        expect(m.has_edge?([0, 1])).to eq(true)
-        expect(m.has_edge?([2, 3])).to eq(true)
+        expect(m).to match_edges [[0, 1], [2, 3]]
         expect(m.weight(g)).to eq(6)
       end
     end
@@ -97,7 +95,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
     it "passes Van Rantwijk test 12" do
       g = graph_class[[1, 2, 10], [2, 3, 11]]
       m = described_class.new(g).match(false)
-      expect(m.vertexes).to match_array([2, 3])
+      expect(m).to match_edges [[2, 3]]
       expect(m.weight(g)).to eq(11)
     end
 
@@ -108,7 +106,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
         [3, 4, 5]
       ]
       m = described_class.new(g).match(false)
-      expect(m.vertexes).to match_array([2, 3])
+      expect(m).to match_edges [[2, 3]]
       expect(m.weight(g)).to eq(11)
     end
 
@@ -119,9 +117,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
         [3, 4, 5]
       ]
       m = described_class.new(g).match(true)
-      expect(m.vertexes).to match_array([1, 2, 3, 4])
-      expect(m.has_edge?([1, 2])).to eq(true)
-      expect(m.has_edge?([3, 4])).to eq(true)
+      expect(m).to match_edges [[1, 2], [3, 4]]
       expect(m.weight(g)).to eq(10)
     end
 
@@ -133,9 +129,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
         [1, 4, Math.sqrt(2.0)]
       ]
       m = described_class.new(g).match(false)
-      expect(m.vertexes).to match_array([1, 2, 3, 4])
-      expect(m.has_edge?([1, 4])).to eq(true)
-      expect(m.has_edge?([2, 3])).to eq(true)
+      expect(m).to match_edges [[1, 4], [2, 3]]
       expect(m.weight(g)).to be_within(0.00001).of(Math.sqrt(2.0) + Math.exp(1))
     end
 
@@ -148,12 +142,10 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
         [3, 4, -6]
       ]
       m = described_class.new(g).match(false)
-      expect(m.vertexes).to match_array([1, 2])
+      expect(m).to match_edges [[1, 2]]
       expect(m.weight(g)).to eq(2)
       m = described_class.new(g).match(true)
-      expect(m.vertexes).to match_array([1, 2, 3, 4])
-      expect(m.has_edge?([1, 3])).to eq(true)
-      expect(m.has_edge?([2, 4])).to eq(true)
+      expect(m).to match_edges [[1, 3], [2, 4]]
       expect(m.weight(g)).to eq(-3)
     end
 
@@ -166,9 +158,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
           [3, 4, 7]
         ]
         m = described_class.new(g).match(false)
-        expect(m.vertexes).to match_array([1, 2, 3, 4])
-        expect(m.has_edge?([1, 2])).to eq(true)
-        expect(m.has_edge?([3, 4])).to eq(true)
+        expect(m).to match_edges [[1, 2], [3, 4]]
         expect(m.weight(g)).to eq(15)
       end
 
@@ -182,10 +172,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
           [4, 5, 6]
         ]
         m = described_class.new(g).match(false)
-        expect(m.vertexes).to match_array([1, 2, 3, 4, 5, 6])
-        expect(m.has_edge?([1, 6])).to eq(true)
-        expect(m.has_edge?([2, 3])).to eq(true)
-        expect(m.has_edge?([4, 5])).to eq(true)
+        expect(m).to match_edges [[1, 6], [2, 3], [4, 5]]
         expect(m.weight(g)).to eq(21)
       end
     end

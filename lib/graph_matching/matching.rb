@@ -90,16 +90,14 @@ module GraphMatching
       edges.map { |e| g.w(e) }.reduce(0, :+)
     end
 
-    def vertexes
-      @ary.compact
-    end
-
-    private
-
     def undirected_edges
       @ary.each_with_index.inject(Set.new) { |set, (el, ix)|
         el.nil? ? set : set.add(RGL::Edge::UnDirectedEdge.new(el, ix))
       }
+    end
+
+    def vertexes
+      @ary.compact
     end
 
   end

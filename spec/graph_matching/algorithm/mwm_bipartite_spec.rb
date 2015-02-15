@@ -26,7 +26,7 @@ RSpec.describe GraphMatching::Algorithm::MWMBipartite do
         g = graph_class[[1, 2, 7]]
         m = described_class.new(g).match
         expect(m.size).to eq(1)
-        expect(m.vertexes).to match_array([1,2])
+        expect(m).to match_edges [[1, 2]]
         expect(m.weight(g)).to eq(7)
       end
     end
@@ -38,7 +38,7 @@ RSpec.describe GraphMatching::Algorithm::MWMBipartite do
           [1, 3, 2]
         ]
         m = described_class.new(g).match
-        expect(m.vertexes).to match_array([1,3])
+        expect(m).to match_edges [[1, 3]]
         expect(m.weight(g)).to eq(2)
       end
 
@@ -48,13 +48,13 @@ RSpec.describe GraphMatching::Algorithm::MWMBipartite do
           [1, 3, -3]
         ]
         m = described_class.new(g).match
-        expect(m.vertexes).to match_array([1,2])
+        expect(m).to match_edges [[1, 2]]
         expect(m.weight(g)).to eq(-1)
       end
     end
 
     context 'bigraph with two connected components' do
-      it 'returns the expected matching' do
+      it 'returns one of two expected matchings' do
         g = graph_class[
           [1, 5, 3],
           [2, 4, 2],
@@ -64,6 +64,18 @@ RSpec.describe GraphMatching::Algorithm::MWMBipartite do
         m = described_class.new(g).match
         expect(m.size).to eq(2)
         expect(m.weight(g)).to eq(5)
+      end
+
+      it 'returns the expected matching' do
+        g = graph_class[
+          [1, 5, 4],
+          [2, 4, 2],
+          [2, 6, 1],
+          [3, 5, 3]
+        ]
+        m = described_class.new(g).match
+        expect(m).to match_edges [[1, 5], [2, 4]]
+        expect(m.weight(g)).to eq(6)
       end
     end
   end

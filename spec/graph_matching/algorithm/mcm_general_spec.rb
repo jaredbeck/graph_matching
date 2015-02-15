@@ -43,7 +43,7 @@ RSpec.describe GraphMatching::Algorithm::MCMGeneral do
       it 'returns one edge' do
         m = described_class.new(g).match
         expect(m.size).to eq(1)
-        expect(m.vertexes).to match_array([1,2])
+        expect(m).to match_edges [[1, 2]]
       end
     end
 
@@ -63,10 +63,12 @@ RSpec.describe GraphMatching::Algorithm::MCMGeneral do
       it 'returns an expected result' do
         m = described_class.new(g).match
         expect(m.size).to eq(3)
-        expect(m.vertexes).to match_array([1,2,3,4,5,6])
+        expect(m).to match_edges [[1, 2], [3, 4], [5, 6]]
       end
     end
 
+    # TODO: Other algorithms (e.g. both MWM) support disconnected
+    # graphs.  MCM General should too.
     context 'disconnected graph' do
       it 'raises a DisconnectedGraph error' do
         2.times { g.add_vertex(double) }
@@ -75,29 +77,24 @@ RSpec.describe GraphMatching::Algorithm::MCMGeneral do
       end
     end
 
-    it 'simple example: graph with stem (123) and blossom (345)' do
+    it 'simple example: graph with blossom (234)' do
       g = graph_class[1,2, 2,3, 2,4, 3,4, 4,5, 5,6]
       m = described_class.new(g).match
       expect(m.size).to eq(3)
-      expect(m.vertexes).to match_array(g.to_a)
+      expect(m).to match_edges [[1, 2], [3, 4], [5, 6]]
     end
 
     it 'example from West\'s Introduction to Graph Theory, p. 143' do
       g = graph_class[1,2, 1,8, 2,3, 3,4, 3,7, 4,5, 4,7, 5,6, 7,9, 8,9, 10,8]
       m = described_class.new(g).match
       expect(m.size).to eq(5)
-      expect(m.vertexes).to match_array(g.vertexes)
+      expect(m).to match_edges [[1, 2], [3, 4], [5, 6], [7, 9], [8, 10]]
     end
 
     it 'example from Gabow (1976)' do
       g = graph_class[1,2, 2,3, 1,3, 1,10, 3,9, 3,4, 4,7, 4,8, 7,8, 9,5, 5,6, 6,7]
       m = described_class.new(g).match
-      expect(m.size).to eq(5)
-      expect(m.vertexes).to match_array(1.upto(10))
-      expected = [[10,1], [2,3], [4,8], [7,6], [5,9]]
-      expected.each do |edge|
-        expect(m).to have_edge(edge)
-      end
+      expect(m).to match_edges [[10,1], [2,3], [4,8], [7,6], [5,9]]
     end
 
     it 'various complete graphs' do
