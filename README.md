@@ -27,7 +27,7 @@ m.edges
 #=> [[4, 1], [3, 2]]
 ```
 
-![MCM in Complete Bigraph is O(e * v)][17]
+![MCM is O(e * v)][17]
 
 See [Benchmarking MCM in Complete Bigraphs][14]
 
@@ -47,7 +47,7 @@ m.edges
 ```
 
 
-![MCM in Complete Graph is O(v ^ 3)][18]
+![MCM is O(v ^ 3)][18]
 
 See [Benchmarking MCM in Complete Graphs][15]
 
@@ -77,15 +77,20 @@ m.weight(g)
 #=> 11
 ```
 
-![MWM in Complete Bigraph is O(n ^ (3/4) m log N)][19]
+![MWM is O(n ^ (3/4) m log N)][19]
 
 See [Benchmarking MWM in Complete Bigraphs][16]
 
 ### 4. Maximum Weighted Matching in General Graphs
 
-Implementation underway, borrowing heavily from
-[Van Rantwijk (2013)][11], while referring to
-Gabow (1985) and, of course, Galil (1986).
+A direct port of [Van Rantwijk's][11] implementation in python,
+while referring to Gabow (1985) and Galil (1986) for the big
+picture.
+
+Unlike the other algorithms above,
+`WeightedGraph#maximum_weighted_matching` takes a single argument,
+`max_cardinality`.  If true, only maximum cardinality, maximum
+weighted matchings will be considered.
 
 ```ruby
 require 'graph_matching'
@@ -99,6 +104,15 @@ m.edges
 m.weight(g)
 #=> 11
 ```
+
+No optimization has been attempted yet, though Van Rantwijk's
+implementation has already done the heavy lifting there, so
+little improvement can be hoped for, barring some mistake in
+the translation.
+
+![MWM is O(mn log n)][26]
+
+See [Benchmarking MWM in Complete Graphs][25]
 
 Benchmarks
 ----------
@@ -196,3 +210,5 @@ and non-bipartite graphs (pdf)][10]
 [22]: https://codeclimate.com/github/jaredbeck/graph_matching/badges/gpa.svg
 [23]: https://travis-ci.org/jaredbeck/graph_matching/builds
 [24]: http://www.graphviz.org/
+[25]: https://github.com/jaredbeck/graph_matching/wiki/Benchmarking-MWM-in-Complete-Graphs
+[26]: https://github.com/jaredbeck/graph_matching/blob/master/benchmark/mwm_general/complete_graphs/plot.png
