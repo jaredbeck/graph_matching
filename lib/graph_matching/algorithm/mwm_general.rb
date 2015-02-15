@@ -689,6 +689,23 @@ module GraphMatching
         end
       end
 
+      # > Decide in which direction we will go round the blossom.
+      # > (Van Rantwijk, mwmatching.py, lines 385, 460)
+      def blossom_loop_direction(b, t)
+        j = @blossom_children[b].index(t)
+        if j.odd?
+          # > go forward and wrap
+          j -= @blossom_children[b].length
+          jstep = 1
+          endptrick = 0
+        else
+          # > go backward
+          jstep = -1
+          endptrick = 1
+        end
+        return j, jstep, endptrick
+      end
+
       # > Swap matched/unmatched edges over an alternating path
       # > through blossom b between vertex v and the base vertex.
       # > Keep blossom bookkeeping consistent.
@@ -701,20 +718,9 @@ module GraphMatching
           augment_blossom(t, v)
         end
 
-        # > Decide in which direction we will go round the blossom.
-        i = j = @blossom_children[b].index(t)
-        if i.odd?
-          # > go forward and wrap
-          j -= @blossom_children[b].length
-          jstep = 1
-          endptrick = 0
-        else
-          # > go backward
-          jstep = -1
-          endptrick = 1
-        end
-
         # > Move along the blossom until we get to the base.
+        j, jstep, endptrick = blossom_loop_direction(b, t)
+        i = j
         while j != 0
           # > Step to the next sub-blossom and augment it recursively.
           j += jstep
@@ -902,20 +908,8 @@ module GraphMatching
         assert(@label_end[b]).not_nil
         entry_child = @in_blossom[@endpoint[@label_end[b] ^ 1]]
 
-        # > Decide in which direction we will go round the blossom.
-        j = @blossom_children[b].index(entry_child)
-        if j.odd?
-          # > go forward and wrap
-          j -= @blossom_children[b].length
-          jstep = 1
-          endptrick = 0
-        else
-          # > go backward
-          jstep = -1
-          endptrick = 1
-        end
-
         # > Move along the blossom until we get to the base.
+        j, jstep, endptrick = blossom_loop_direction(b, entry_child)
         p = @label_end[b]
         while j != 0
 
