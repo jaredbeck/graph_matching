@@ -712,6 +712,63 @@ module GraphMatching
       end
 
       # > Swap matched/unmatched edges over an alternating path
+      # > through blossom b between vertex v and the base vertex.
+      # > Keep blossom bookkeeping consistent.
+      # > (Van Rantwijk, mwmatching.py, line 448)
+      def augment_blossom(b, v)
+        t = immediate_subblossom_of(b, v)
+
+        # > Recursively deal with the first sub-blossom.
+        if t >= @nvertex
+          augment_blossom(t, v)
+        end
+
+        # > Decide in which direction we will go round the blossom.
+        i = j = @blossom_children[b].index(t)
+        if i.odd?
+          # > go forward and wrap
+          j -= @blossom_children[b].length
+          jstep = 1
+          endptrick = 0
+        else
+          # > go backward
+          jstep = -1
+          endptrick = 1
+        end
+
+        # > Move along the blossom until we get to the base.
+        while j != 0
+          # > Step to the next sub-blossom and augment it recursively.
+          j += jstep
+          p = @blossom_endps[b][j - endptrick] ^ endptrick
+          x = @endpoint[p]
+          augment_blossom_step(b, j, x)
+
+          # > Step to the next sub-blossom and augment it recursively.
+          j += jstep
+          x = @endpoint[p ^ 1]
+          augment_blossom_step(b, j, x)
+
+          # > Match the edge connecting those sub-blossoms.
+          match_endpoint(p)
+        end
+
+        # > Rotate the list of sub-blossoms to put the new base at
+        # > the front.
+        @blossom_children[b].rotate!(i)
+        @blossom_endps[b].rotate!(i)
+        @blossom_base[b] = @blossom_base[@blossom_children[b][0]]
+        assert(@blossom_base[b]).eq(v)
+      end
+
+      def augment_blossom_step(b, j, x)
+        t = @blossom_children[b][j]
+        if t >= @nvertex
+          augment_blossom(t, x)
+        end
+      end
+
+      # > Swap matched/unmatched edges over an alternating path
       # > between two single vertices. The augmenting path runs
       # > through edge k, which connects a pair of S vertices.
       # > (Van Rantwijk, mwmatching.py, line 494)
@@ -854,6 +911,16 @@ module GraphMatching
         @label[x] == LBL_FREE
       end
 
+      # Starting from a vertex `v`, ascend the blossom tree, and
+      # return the sub-blossom immediately below `b`.
+      def immediate_subblossom_of(b, v)
+        t = v
+        while @blossom_parent[t] != b
+          t = @blossom_parent[t]
+        end
+        t
+      end
+
       def init_stage
         log(0, "stage. mate = #{mate}")
         init_stage_caches
@@ -880,6 +947,12 @@ module GraphMatching
             assign_label(v, LBL_S)
           end
         end
+      end
+
+      # Add endpoint p's edge to the matching.
+      def match_endpoint(p)
+        @mate[@endpoint[p]] = p ^ 1
+        @mate[@endpoint[p ^ 1]] = p
       end
 
       # Returns true if vertex `i` is matched in `mate`.

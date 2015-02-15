@@ -126,7 +126,6 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
     end
 
     it "passes Van Rantwijk test 15: floating-point weights" do
-      skip "augment_blossom not yet implemented"
       g = graph_class[
         [1, 2, Math::PI],
         [2, 3, Math.exp(1)],
