@@ -485,7 +485,7 @@ module GraphMatching
               if top_t_blossom && (delta_type.nil? || @dual[b] < delta)
                 delta = @dual[b]
                 delta_type = 4
-                deltablossom = b
+                delta_blossom = b
               end
             end
 
