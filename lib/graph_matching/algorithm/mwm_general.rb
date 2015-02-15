@@ -24,23 +24,6 @@ module GraphMatching
       LBL_CRUMB = 5
       LBL_NAMES = ['Free', 'S', 'T', 'Crumb']
 
-      attr_reader(
-        :best_edge,
-        :blossom_base,
-        :blossom_children,
-        :blossom_endps,
-        :blossom_parent,
-        :dual,
-        :edges,
-        :endpoint,
-        :in_blossom,
-        :label,
-        :label_end,
-        :mate,
-        :neighb_end,
-        :tight_edge
-      )
-
       def initialize(graph)
         assert(graph).is_a(Graph::WeightedGraph)
         super
@@ -67,15 +50,15 @@ module GraphMatching
         # > Not modified by the algorithm.
         # > (Van Rantwijk, mwmatching.py, line 93)
         #
-        @endpoint = edges.map { |e| [e.source, e.target] }.flatten
-        log(0, "endpoints: #{endpoint}")
+        @endpoint = @edges.map { |e| [e.source, e.target] }.flatten
+        log(0, "endpoints: #{@endpoint}")
 
         # > If v is a vertex,
         # > neighbend[v] is the list of remote endpoints of the edges attached to v.
         # > Not modified by the algorithm.
         # > (Van Rantwijk, mwmatching.py, line 98)
         @neighb_end = Array.new(@nvertex) { [] }
-        edges.each_with_index do |e, k|
+        @edges.each_with_index do |e, k|
           @neighb_end[e.source].push(2 * k + 1)
           @neighb_end[e.target].push(2 * k)
         end
@@ -217,69 +200,6 @@ module GraphMatching
         @queue = []
       end
 
-      def log(indent, msg)
-        return unless ENV['DEBUG']
-        space = ' '
-        indent_str = space * 2 * indent.to_i
-        puts '%s%s' % [indent_str, msg]
-      end
-
-      # > Assign label t to the top-level blossom containing vertex w
-      # > and record the fact that w was reached through the edge with
-      # > remote endpoint p.
-      # > (Van Rantwijk, mwmatching.py)
-      #
-      def assign_label(w, t, p = nil)
-        b = in_blossom[w]
-        assert_label(w, LBL_FREE)
-        assert_label(b, LBL_FREE)
-        label[w] = label[b] = t
-        label_end[w] = label_end[b] = p
-        best_edge[w] = best_edge[b] = nil
-        if t == LBL_S
-          # b became an S-vertex/blossom; add it(s vertices) to the queue.
-          @queue.concat(blossom_leaves(b))
-        elsif t == LBL_T
-          # b became a T-vertex/blossom; assign label S to its mate.
-          # (If b is a non-trivial blossom, its base is the only vertex
-          # with an external mate.)
-          base = blossom_base[b]
-          if mate[base].nil?
-            raise "Expected blossom #{b}'s base (#{base}) to be matched"
-          end
-
-          # Assign label S to the mate of blossom b's base.
-          # Remember, `mate` elements are pointers to "endpoints".
-          # The bitwise XOR is very clever. `mate[x]` and `mate[x] ^ 1`
-          # are connected "endpoints".
-          base_edge_endpoints = [mate[base], mate[base] ^ 1]
-          assign_label(endpoint[base_edge_endpoints[0]], LBL_S, base_edge_endpoints[1])
-        else
-          raise ArgumentError, "Unexpected label: #{t}"
-        end
-      end
-
-      # TODO: Optimize by returning lazy iterator
-      def blossom_leaves(b, ary = [])
-        if leaf?(b)
-          ary.push(b)
-        else
-          blossom_children[b].each do |c|
-             if leaf?(c)
-               ary.push(c)
-             else
-               ary.concat(blossom_leaves(c))
-             end
-          end
-        end
-        ary
-      end
-
-      # TODO: Optimize by de-normalizing.
-      def leaf?(x)
-        x < @nvertex
-      end
-
       # > As in Problem 3, the algorithm consists of O(n) *stages*.
       # > In each stage we look for an augmenting path using the
       # > labeling R12 and the two cases C1, C2 as in the simple
@@ -300,7 +220,7 @@ module GraphMatching
           # *sub-stages* either augment or scale the duals.
           augmented = false
           while true do
-            log(1, "substage. duals: #{dual}")
+            log(1, "substage. duals: #{@dual}")
 
             # > The search is conducted by scanning the S-vertices in turn.
             # > Scanning a vertex means considering in turn all its edges
@@ -309,14 +229,14 @@ module GraphMatching
             until augmented || @queue.empty?
               v = @queue.pop
               log(2, "scan #{v}")
-              assert_label(in_blossom[v], LBL_S)
+              assert_label(@in_blossom[v], LBL_S)
 
-              neighb_end[v].each do |p|
+              @neighb_end[v].each do |p|
                 k = p / 2 # note: floor division
-                w = endpoint[p]
+                w = @endpoint[p]
                 log(3, "neighbor #{w}")
 
-                if in_blossom[v] == in_blossom[w]
+                if @in_blossom[v] == @in_blossom[w]
                   # > this edge is internal to a blossom; ignore it
                   # > (Van Rantwijk, mwmatching.py, line 681)
                   next
@@ -327,7 +247,7 @@ module GraphMatching
 
                 # > .. we only use edges with π<sub>ij</sub> = 0.
                 # > (Galil, 1986, p. 32)
-                if tight_edge[k]
+                if @tight_edge[k]
 
                   # > If we scan the S-vertex *i* and consider the edge (i,j),
                   # > there are two cases:
@@ -339,7 +259,7 @@ module GraphMatching
                   # > which j is a T-vertex is discarded.
                   # > (Galil, 1986, p. 26-27)
                   #
-                  if @label[in_blossom[w]] == LBL_FREE
+                  if @label[@in_blossom[w]] == LBL_FREE
                     log(4, "tight edge (C1)")
 
                     # > (C1) w is a free vertex;
@@ -363,7 +283,7 @@ module GraphMatching
                     #
                     assign_label(w, LBL_T, p ^ 1)
 
-                  elsif label[in_blossom[w]] == LBL_S
+                  elsif @label[@in_blossom[w]] == LBL_S
                     log(4, "tight edge (C2)")
 
                     # > (C2) w is an S-vertex (not in the same blossom);
@@ -386,7 +306,7 @@ module GraphMatching
                       add_blossom(base, k)
                     end
 
-                  elsif label[w] == LBL_FREE
+                  elsif @label[w] == LBL_FREE
                     log(4, "tight edge (C3)")
 
                     # > w is inside a T-blossom, but w itself has not
@@ -401,24 +321,24 @@ module GraphMatching
 
                   end # free blossom
 
-                elsif label[in_blossom[w]] == LBL_S
+                elsif @label[@in_blossom[w]] == LBL_S
                   log(4, "loose edge (L1)")
                   # > keep track of the least-slack non-allowable edge to
                   # > a different S-blossom.
                   # > (Van Rantwijk, mwmatching.py, line 717)
-                  b = in_blossom[v]
-                  if best_edge[b].nil? || kslack < slack(best_edge[b])
+                  b = @in_blossom[v]
+                  if @best_edge[b].nil? || kslack < slack(@best_edge[b])
                     @best_edge[b] = k
                   end
 
-                elsif label[w] == LBL_FREE
+                elsif @label[w] == LBL_FREE
                   log(4, "loose edge (L2)")
 
                   # > w is a free vertex (or an unreached vertex inside
                   # > a T-blossom) but we can not reach it yet;
                   # > keep track of the least-slack edge that reaches w.
                   # > (Van Rantwijk, mwmatching.py, line 725)
-                  if best_edge[w].nil? || kslack < slack(best_edge[w])
+                  if @best_edge[w].nil? || kslack < slack(@best_edge[w])
                     @best_edge[w] = k
                   end
 
@@ -488,12 +408,7 @@ module GraphMatching
         matching
       end
 
-      # Pseudo-private
-      # --------------
-      #
-      # Eventually, these methods will probably be private.  For now,
-      # they are public so they can be easily tested.
-      #
+      private
 
       # > Construct a new blossom with given base, containing edge
       # > k which connects a pair of S vertices. Label the new
@@ -618,8 +533,43 @@ module GraphMatching
       end
 
       def assert_label(ix, lbl)
-        unless label[ix] == lbl
+        unless @label[ix] == lbl
           raise "Expected label at #{ix} to be #{LBL_NAMES[lbl]}"
+        end
+      end
+
+      # > Assign label t to the top-level blossom containing vertex w
+      # > and record the fact that w was reached through the edge with
+      # > remote endpoint p.
+      # > (Van Rantwijk, mwmatching.py)
+      #
+      def assign_label(w, t, p = nil)
+        b = @in_blossom[w]
+        assert_label(w, LBL_FREE)
+        assert_label(b, LBL_FREE)
+        @label[w] = @label[b] = t
+        @label_end[w] = @label_end[b] = p
+        @best_edge[w] = @best_edge[b] = nil
+        if t == LBL_S
+          # b became an S-vertex/blossom; add it(s vertices) to the queue.
+          @queue.concat(blossom_leaves(b))
+        elsif t == LBL_T
+          # b became a T-vertex/blossom; assign label S to its mate.
+          # (If b is a non-trivial blossom, its base is the only vertex
+          # with an external mate.)
+          base = @blossom_base[b]
+          if @mate[base].nil?
+            raise "Expected blossom #{b}'s base (#{base}) to be matched"
+          end
+
+          # Assign label S to the mate of blossom b's base.
+          # Remember, `mate` elements are pointers to "endpoints".
+          # The bitwise XOR is very clever. `mate[x]` and `mate[x] ^ 1`
+          # are connected "endpoints".
+          base_edge_endpoints = [@mate[base], @mate[base] ^ 1]
+          assign_label(@endpoint[base_edge_endpoints[0]], LBL_S, base_edge_endpoints[1])
+        else
+          raise ArgumentError, "Unexpected label: #{t}"
         end
       end
 
@@ -674,16 +624,16 @@ module GraphMatching
       # > through edge k, which connects a pair of S vertices.
       # > (Van Rantwijk, mwmatching.py, line 494)
       def augment_matching(k)
-        v, w = edges[k].to_a
+        v, w = @edges[k].to_a
         [[v, 2 * k + 1], [w, 2 * k]].each do |(s, p)|
           # > Match vertex s to remote endpoint p. Then trace back from s
           # > until we find a single vertex, swapping matched and unmatched
           # > edges as we go.
           # > (Van Rantwijk, mwmatching.py, line 504)
           while true
-            bs = in_blossom[s]
+            bs = @in_blossom[s]
             assert_label(bs, LBL_S)
-            assert(label_end[bs]).eq(mate[blossom_base[bs]])
+            assert(@label_end[bs]).eq(@mate[@blossom_base[bs]])
             # > Augment through the S-blossom from s to base.
             if bs >= @nvertex
               augment_blossom(bs, s)
@@ -691,25 +641,41 @@ module GraphMatching
             @mate[s] = p
             # > Trace one step back.
             # If we reach a single vertex, stop
-            break if label_end[bs].nil?
-            t = endpoint[label_end[bs]]
-            bt = in_blossom[t]
+            break if @label_end[bs].nil?
+            t = @endpoint[@label_end[bs]]
+            bt = @in_blossom[t]
             assert_label(bt, LBL_T)
             # > Trace one step back.
-            assert(label_end[bt]).not_nil
-            s = endpoint[label_end[bt]]
-            j = endpoint[label_end[bt] ^ 1]
+            assert(@label_end[bt]).not_nil
+            s = @endpoint[@label_end[bt]]
+            j = @endpoint[@label_end[bt] ^ 1]
             # > Augment through the T-blossom from j to base.
-            assert(blossom_base[bt]).eq(t)
+            assert(@blossom_base[bt]).eq(t)
             if bt >= @nvertex
               augment_blossom(bt, j)
             end
-            mate[j] = label_end[bt]
+            @mate[j] = @label_end[bt]
             # > Keep the opposite endpoint;
             # > it will be assigned to mate[s] in the next step.
-            p = label_end[bt] ^ 1
+            p = @label_end[bt] ^ 1
           end
         end
+      end
+
+      # TODO: Optimize by returning lazy iterator
+      def blossom_leaves(b, ary = [])
+        if b < @nvertex
+          ary.push(b)
+        else
+          @blossom_children[b].each do |c|
+            if c < @nvertex
+              ary.push(c)
+            else
+              ary.concat(blossom_leaves(c))
+            end
+          end
+        end
+        ary
       end
 
       # > Decide in which direction we will go round the blossom.
@@ -806,7 +772,7 @@ module GraphMatching
       # edge.  Otherwise, calculates and returns the slack of `k`,
       # and updates the `tight_edge` cache.
       def calc_slack(k)
-        if tight_edge[k]
+        if @tight_edge[k]
           nil
         else
           slack(k).tap { |kslack|
@@ -987,7 +953,7 @@ module GraphMatching
       end
 
       def init_stage
-        log(0, "stage. mate = #{mate}")
+        log(0, "stage. mate = #{@mate}")
         init_stage_caches
         @queue = []
         init_stage_labels
@@ -1008,10 +974,17 @@ module GraphMatching
       def init_stage_labels
         @label = rantwijk_array(LBL_FREE)
         (0 ... @nvertex).each do |v|
-          if single?(v) && label[in_blossom[v]] == LBL_FREE
+          if single?(v) && @label[@in_blossom[v]] == LBL_FREE
             assign_label(v, LBL_S)
           end
         end
+      end
+
+      def log(indent, msg)
+        return unless ENV['DEBUG']
+        space = ' '
+        indent_str = space * 2 * indent.to_i
+        puts '%s%s' % [indent_str, msg]
       end
 
       # Add endpoint p's edge to the matching.
@@ -1067,26 +1040,26 @@ module GraphMatching
         base = nil
         until v.nil? && w.nil?
           # > Look for a breadcrumb in v's blossom or put a new breadcrumb.
-          b = in_blossom[v]
-          if label[b] & 4 != 0
-            base = blossom_base[b]
+          b = @in_blossom[v]
+          if @label[b] & 4 != 0
+            base = @blossom_base[b]
             break
           end
           assert_label(b, LBL_S)
           path.push(b)
           @label[b] = LBL_CRUMB
           # > Trace one step back.
-          assert(label_end[b]).eq(mate[blossom_base[b]])
-          if label_end[b].nil?
+          assert(@label_end[b]).eq(@mate[@blossom_base[b]])
+          if @label_end[b].nil?
             # > The base of blossom b is single; stop tracing this path.
             v = nil
           else
-            v = endpoint[label_end[b]]
-            b = in_blossom[v]
+            v = @endpoint[@label_end[b]]
+            b = @in_blossom[v]
             assert_label(b, LBL_T)
             # > b is a T-blossom; trace one more step back.
-            assert(label_end[b]).not_nil
-            v = endpoint[label_end[b]]
+            assert(@label_end[b]).not_nil
+            v = @endpoint[@label_end[b]]
           end
 
           # > Swap v and w so that we alternate between both paths.
@@ -1104,7 +1077,7 @@ module GraphMatching
       # Returns false if vertex `i` is matched in `mate`.
       # TODO: Optimize by de-normalizing.
       def single?(i)
-        mate[i].nil?
+        @mate[i].nil?
       end
 
       # Trace a path around a blossom, from sub-blossom `bx` to
@@ -1133,8 +1106,8 @@ module GraphMatching
       # > (Van Rantwijk, mwmatching.py, line 194)
       #
       def slack(k)
-        i, j = edges[k].to_a
-        dual[i] + dual[j] - 2 * g.w([i, j])
+        i, j = @edges[k].to_a
+        @dual[i] + @dual[j] - 2 * g.w([i, j])
       end
 
       def top_level_blossom?(b)

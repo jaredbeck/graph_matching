@@ -22,7 +22,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
           [3, 4, 0]
         ]
         a = described_class.new(g)
-        allow(a).to receive(:blossom_children).and_return([
+        a.instance_variable_set(:@blossom_children, [
           nil,
           nil,
           nil,
@@ -30,9 +30,9 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
           nil,
           [2, 3, 4]
         ])
-        expect(a.blossom_leaves(0)).to eq([0])
-        expect(a.blossom_leaves(4)).to eq([4])
-        expect(a.blossom_leaves(5)).to eq([2, 3, 4])
+        expect(a.send(:blossom_leaves, 0)).to eq([0])
+        expect(a.send(:blossom_leaves, 4)).to eq([4])
+        expect(a.send(:blossom_leaves, 5)).to eq([2, 3, 4])
       end
     end
   end
