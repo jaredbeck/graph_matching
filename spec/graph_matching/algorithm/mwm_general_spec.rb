@@ -366,5 +366,37 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       end
     end
 
+    context "Van Rantwijk test 33" do
+      # create nested blossom, relabel as T in more than one way,
+      # expand outer blossom such that inner blossom ends up on
+      # an augmenting path
+      it "see comment" do
+        g = graph_class[
+          [1, 2, 45],
+          [1, 7, 45],
+          [2, 3, 50],
+          [3, 4, 45],
+          [4, 5, 95],
+          [4, 6, 94],
+          [5, 6, 94],
+          [6, 7, 50],
+          [1, 8, 30],
+          [3, 11, 35],
+          [5, 9, 36],
+          [7, 10, 26],
+          [11, 12, 5]
+        ]
+        m = described_class.new(g).match(false)
+        expect(m).to match_edges [
+          [1, 8],
+          [2, 3],
+          [4, 6],
+          [5, 9],
+          [7, 10],
+          [11, 12]
+        ]
+      end
+    end
+
   end
 end
