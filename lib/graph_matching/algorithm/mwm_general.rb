@@ -82,15 +82,7 @@ module GraphMatching
                   augmented = consider_tight_edge(k, w, p, v)
                   break if augmented
                 elsif @label[@in_blossom[w]] == LBL_S
-                  log(4, "loose edge (L1)")
-                  # > keep track of the least-slack non-allowable edge to
-                  # > a different S-blossom.
-                  # > (Van Rantwijk, mwmatching.py, line 717)
-                  b = @in_blossom[v]
-                  if @best_edge[b].nil? || kslack < slack(@best_edge[b])
-                    @best_edge[b] = k
-                  end
-
+                  consider_loose_edge_to_s_blossom(v, k, kslack)
                 elsif @label[w] == LBL_FREE
                   log(4, "loose edge (L2)")
 
@@ -610,6 +602,22 @@ module GraphMatching
         end
         unless bd == tbd
           raise 'Assertion failed'
+        end
+      end
+
+      # While scanning neighbors of `v`, a loose edge to an
+      # S-blossom is found, and the `@best_edge` cache may
+      # be updated.
+      #
+      # > keep track of the least-slack non-allowable [loose] edge
+      # > to a different S-blossom.
+      # > (Van Rantwijk, mwmatching.py, line 717)
+      #
+      def consider_loose_edge_to_s_blossom(v, k, kslack)
+        log(4, "loose edge (L1)")
+        b = @in_blossom[v]
+        if @best_edge[b].nil? || kslack < slack(@best_edge[b])
+          @best_edge[b] = k
         end
       end
 
