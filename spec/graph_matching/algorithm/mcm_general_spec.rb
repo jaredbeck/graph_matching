@@ -83,7 +83,7 @@ RSpec.describe GraphMatching::Algorithm::MCMGeneral do
     end
 
     it 'example from West\'s Introduction to Graph Theory, p. 143' do
-      g = graph_class[1,2, 1,8, 2,3, 3,4, 3,7, 4,5, 5,6, 7,9, 8,9, 10,8]
+      g = graph_class[1,2, 1,8, 2,3, 3,4, 3,7, 4,5, 4,7, 5,6, 7,9, 8,9, 10,8]
       m = described_class.new(g).match
       expect(m.size).to eq(5)
       expect(m.vertexes).to match_array(g.vertexes)
