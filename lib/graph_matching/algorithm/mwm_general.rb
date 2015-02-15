@@ -396,7 +396,9 @@ module GraphMatching
                     # > during T-blossom expansion).
                     # > (Van Rantwijk, mwmatching.py, line 709)
                     #
-                    fail 'not yet implemented'
+                    assert_label(@in_blossom[w], LBL_T)
+                    @label[w] = LBL_T
+                    @label_end[w] = p ^ 1
 
                   end # free blossom
 
