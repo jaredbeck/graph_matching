@@ -336,8 +336,29 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
           [4, 5, 50],
           [1, 6, 30],
           [3, 9, 35],
-          [4, 8, 26],
-          [5, 7, 40],
+          [4, 8, 26], # differs from test 30
+          [5, 7, 40], # differs from test 30
+          [9, 10, 5]
+        ]
+        m = described_class.new(g).match(false)
+        expect(m).to match_edges [[1, 6], [2, 3], [4, 8], [5, 7], [9, 10]]
+      end
+    end
+
+    context "Van Rantwijk test 32" do
+      # create blossom, relabel as T, expand such that a new
+      # least-slack S-to-free edge is produced, augment
+      it "see comment" do
+        g = graph_class[
+          [1, 2, 45],
+          [1, 5, 45],
+          [2, 3, 50],
+          [3, 4, 45],
+          [4, 5, 50],
+          [1, 6, 30],
+          [3, 9, 35],
+          [4, 8, 28],
+          [5, 7, 26],
           [9, 10, 5]
         ]
         m = described_class.new(g).match(false)
