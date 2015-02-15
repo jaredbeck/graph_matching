@@ -433,73 +433,7 @@ module GraphMatching
             # > (Note that our vertex dual variables, edge slacks and delta's
             # > are pre-multiplied by two.)
             # > (Van Rantwijk, mwmatching.py, line 732)
-            delta_type = nil
-            delta = delta_edge = delta_blossom = nil
-
-            # > Verify data structures for delta2/delta3 computation.
-            # > (Van Rantwijk, mwmatching.py, line 739)
-            if CHECK_DELTA
-              check_delta2
-              check_delta3
-            end
-
-            # > Compute delta1: the minumum value of any vertex dual.
-            # > (Van Rantwijk, mwmatching.py)
-            if !max_cardinality
-              delta_type = 1
-              delta = @dual[0, @nvertex].min
-            end
-
-            # > Compute delta2: the minimum slack on any edge between
-            # > an S-vertex and a free vertex.
-            # > (Van Rantwijk, mwmatching.py)
-            (0 ... @nvertex).each do |v|
-              if @label[@in_blossom[v]] == LBL_FREE && !@best_edge[v].nil?
-                d = slack(@best_edge[v])
-                if delta_type == nil || d < delta
-                  delta = d
-                  delta_type = 2
-                  delta_edge = @best_edge[v]
-                end
-              end
-            end
-
-            # > Compute delta3: half the minimum slack on any edge between
-            # > a pair of S-blossoms.
-            # > (Van Rantwijk, mwmatching.py)
-            (0 ... 2 * @nvertex).each do |b|
-              if @blossom_parent[b].nil? && @label[b] == LBL_S && !@best_edge[b].nil?
-                kslack = slack(@best_edge[b])
-                d = kslack / 2 # Van Rantwijk had some type checking here.  Why?
-                if delta_type.nil? || d < delta
-                  delta = d
-                  delta_type = 3
-                  delta_edge = @best_edge[b]
-                end
-              end
-            end
-
-            # > Compute delta4: minimum z variable of any T-blossom.
-            # > (Van Rantwijk, mwmatching.py)
-            (@nvertex ... 2 * @nvertex).each do |b|
-              top_t_blossom = top_level_blossom?(b) && @label[b] == LBL_T
-              if top_t_blossom && (delta_type.nil? || @dual[b] < delta)
-                delta = @dual[b]
-                delta_type = 4
-                delta_blossom = b
-              end
-            end
-
-            if delta_type.nil?
-              # > No further improvement possible; max-cardinality optimum
-              # > reached. Do a final delta update to make the optimum
-              # > verifyable.
-              # > (Van Rantwijk, mwmatching.py)
-              assert(max_cardinality).eq(true)
-              delta_type = 1
-              delta = [0, @dual[0, @nvertex].min].max
-            end
-
+            delta, delta_type, delta_edge, delta_blossom = calc_delta(max_cardinality)
             update_duals(delta)
 
             # > Take action at the point where minimum delta occurred.
@@ -689,23 +623,6 @@ module GraphMatching
         end
       end
 
-      # > Decide in which direction we will go round the blossom.
-      # > (Van Rantwijk, mwmatching.py, lines 385, 460)
-      def blossom_loop_direction(b, t)
-        j = @blossom_children[b].index(t)
-        if j.odd?
-          # > go forward and wrap
-          j -= @blossom_children[b].length
-          jstep = 1
-          endptrick = 0
-        else
-          # > go backward
-          jstep = -1
-          endptrick = 1
-        end
-        return j, jstep, endptrick
-      end
-
       # > Swap matched/unmatched edges over an alternating path
       # > through blossom b between vertex v and the base vertex.
       # > Keep blossom bookkeeping consistent.
@@ -793,6 +710,96 @@ module GraphMatching
             p = label_end[bt] ^ 1
           end
         end
+      end
+
+      # > Decide in which direction we will go round the blossom.
+      # > (Van Rantwijk, mwmatching.py, lines 385, 460)
+      def blossom_loop_direction(b, t)
+        j = @blossom_children[b].index(t)
+        if j.odd?
+          # > go forward and wrap
+          j -= @blossom_children[b].length
+          jstep = 1
+          endptrick = 0
+        else
+          # > go backward
+          jstep = -1
+          endptrick = 1
+        end
+        return j, jstep, endptrick
+      end
+
+      def calc_delta(max_cardinality)
+        delta = nil
+        delta_type = nil
+        delta_edge = nil
+        delta_blossom = nil
+
+        # > Verify data structures for delta2/delta3 computation.
+        # > (Van Rantwijk, mwmatching.py, line 739)
+        if CHECK_DELTA
+          check_delta2
+          check_delta3
+        end
+
+        # > Compute delta1: the minumum value of any vertex dual.
+        # > (Van Rantwijk, mwmatching.py)
+        if !max_cardinality
+          delta_type = 1
+          delta = @dual[0, @nvertex].min
+        end
+
+        # > Compute delta2: the minimum slack on any edge between
+        # > an S-vertex and a free vertex.
+        # > (Van Rantwijk, mwmatching.py)
+        (0 ... @nvertex).each do |v|
+          if @label[@in_blossom[v]] == LBL_FREE && !@best_edge[v].nil?
+            d = slack(@best_edge[v])
+            if delta_type == nil || d < delta
+              delta = d
+              delta_type = 2
+              delta_edge = @best_edge[v]
+            end
+          end
+        end
+
+        # > Compute delta3: half the minimum slack on any edge between
+        # > a pair of S-blossoms.
+        # > (Van Rantwijk, mwmatching.py)
+        (0 ... 2 * @nvertex).each do |b|
+          if @blossom_parent[b].nil? && @label[b] == LBL_S && !@best_edge[b].nil?
+            kslack = slack(@best_edge[b])
+            d = kslack / 2 # Van Rantwijk had some type checking here.  Why?
+            if delta_type.nil? || d < delta
+              delta = d
+              delta_type = 3
+              delta_edge = @best_edge[b]
+            end
+          end
+        end
+
+        # > Compute delta4: minimum z variable of any T-blossom.
+        # > (Van Rantwijk, mwmatching.py)
+        (@nvertex ... 2 * @nvertex).each do |b|
+          top_t_blossom = top_level_blossom?(b) && @label[b] == LBL_T
+          if top_t_blossom && (delta_type.nil? || @dual[b] < delta)
+            delta = @dual[b]
+            delta_type = 4
+            delta_blossom = b
+          end
+        end
+
+        if delta_type.nil?
+          # > No further improvement possible; max-cardinality optimum
+          # > reached. Do a final delta update to make the optimum
+          # > verifyable.
+          # > (Van Rantwijk, mwmatching.py)
+          assert(max_cardinality).eq(true)
+          delta_type = 1
+          delta = [0, @dual[0, @nvertex].min].max
+        end
+
+        return delta, delta_type, delta_edge, delta_blossom
       end
 
       # Returns nil if `k` is known to be an endpoint of a tight
