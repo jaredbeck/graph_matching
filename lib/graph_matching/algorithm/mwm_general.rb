@@ -231,9 +231,8 @@ module GraphMatching
       #
       def assign_label(w, t, p = nil)
         b = in_blossom[w]
-        unless free?(w) && free?(b)
-          raise "Expected vertex #{w} and blossom #{b} to be free"
-        end
+        assert_label(w, LBL_FREE)
+        assert_label(b, LBL_FREE)
         label[w] = label[b] = t
         label_end[w] = label_end[b] = p
         best_edge[w] = best_edge[b] = nil
@@ -340,7 +339,7 @@ module GraphMatching
                   # > which j is a T-vertex is discarded.
                   # > (Galil, 1986, p. 26-27)
                   #
-                  if free?(in_blossom[w])
+                  if @label[in_blossom[w]] == LBL_FREE
                     log(4, "tight edge (C1)")
 
                     # > (C1) w is a free vertex;
@@ -983,11 +982,6 @@ module GraphMatching
 
       def first_labeled_blossom_leaf(b)
         blossom_leaves(b).find { |leaf| @label[leaf] != LBL_FREE }
-      end
-
-      # TODO: Optimize by de-normalizing
-      def free?(x)
-        @label[x] == LBL_FREE
       end
 
       # Starting from a vertex `v`, ascend the blossom tree, and
