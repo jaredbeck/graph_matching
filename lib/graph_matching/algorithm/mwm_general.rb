@@ -499,30 +499,7 @@ module GraphMatching
               delta = [0, @dual[0, @nvertex].min].max
             end
 
-            # > .. we make the following changes in the dual
-            # > variables. (Galil, 1986, p. 32)
-            (0 ... @nvertex).each do |v|
-              case @label[@in_blossom[v]]
-              when LBL_S
-                @dual[v] -= delta
-              when LBL_T
-                @dual[v] += delta
-              else
-                # No change to free vertexes
-              end
-            end
-            (@nvertex ... 2 * @nvertex).each do |b|
-              if top_level_blossom?(b)
-                case @label[b]
-                when LBL_S
-                  @dual[b] += delta
-                when LBL_T
-                  @dual[b] -= delta
-                else
-                  # No change to free blossoms
-                end
-              end
-            end
+            update_duals(delta)
 
             # > Take action at the point where minimum delta occurred.
             # > (Van Rantwijk, mwmatching.py)
@@ -1052,6 +1029,33 @@ module GraphMatching
 
       def top_level_blossom?(b)
         !@blossom_base[b].nil? && @blossom_parent[b].nil?
+      end
+
+      # > .. we make the following changes in the dual
+      # > variables. (Galil, 1986, p. 32)
+      def update_duals(delta)
+        (0 ... @nvertex).each do |v|
+          case @label[@in_blossom[v]]
+          when LBL_S
+            @dual[v] -= delta
+          when LBL_T
+            @dual[v] += delta
+          else
+            # No change to free vertexes
+          end
+        end
+        (@nvertex ... 2 * @nvertex).each do |b|
+          if top_level_blossom?(b)
+            case @label[b]
+            when LBL_S
+              @dual[b] += delta
+            when LBL_T
+              @dual[b] -= delta
+            else
+              # No change to free blossoms
+            end
+          end
+        end
       end
 
     end
