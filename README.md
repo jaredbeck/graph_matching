@@ -11,8 +11,7 @@ Uses the [Ruby Graph Library (RGL)][4].
 Algorithms
 ----------
 
-This library will implement the four algorithms described by Galil (1986).
-When all four have been implemented, a gem version 1.0.0 will be released.
+This library implements the four algorithms described by Galil (1986).
 
 ### 1. Maximum Cardinality Matching in Bipartite Graphs
 
@@ -45,7 +44,6 @@ m = g.maximum_cardinality_matching
 m.edges
 #=> [[2, 1], [4, 3]]
 ```
-
 
 ![MCM is O(v ^ 3)][18]
 
@@ -88,9 +86,9 @@ while referring to Gabow (1985) and Galil (1986) for the big
 picture.
 
 Unlike the other algorithms above,
-`WeightedGraph#maximum_weighted_matching` takes a single argument,
-`max_cardinality`.  If true, only maximum cardinality, maximum
-weighted matchings will be considered.
+`WeightedGraph#maximum_weighted_matching` takes an argument,
+`max_cardinality`.  If true, only maximum cardinality matchings
+will be considered.
 
 ```ruby
 require 'graph_matching'
@@ -113,11 +111,6 @@ the translation.
 ![MWM is O(mn log n)][26]
 
 See [Benchmarking MWM in Complete Graphs][25]
-
-Benchmarks
-----------
-
-Benchmarks can be found in `/benchmark` and the github wiki.
 
 Limitations
 -----------
