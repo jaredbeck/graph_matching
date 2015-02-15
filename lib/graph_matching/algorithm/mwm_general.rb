@@ -84,19 +84,10 @@ module GraphMatching
                 elsif @label[@in_blossom[w]] == LBL_S
                   consider_loose_edge_to_s_blossom(v, k, kslack)
                 elsif @label[w] == LBL_FREE
-                  log(4, "loose edge (L2)")
-
-                  # > w is a free vertex (or an unreached vertex inside
-                  # > a T-blossom) but we can not reach it yet;
-                  # > keep track of the least-slack edge that reaches w.
-                  # > (Van Rantwijk, mwmatching.py, line 725)
-                  if @best_edge[w].nil? || kslack < slack(@best_edge[w])
-                    @best_edge[w] = k
-                  end
-
-                end # tight edge
-              end # scan neighbors of `v`
-            end # queue
+                  consider_loose_edge_to_free_vertex(w, k, kslack)
+                end
+              end
+            end
 
             break if augmented
 
@@ -602,6 +593,17 @@ module GraphMatching
         end
         unless bd == tbd
           raise 'Assertion failed'
+        end
+      end
+
+      # > w is a free vertex (or an unreached vertex inside
+      # > a T-blossom) but we can not reach it yet;
+      # > keep track of the least-slack edge that reaches w.
+      # > (Van Rantwijk, mwmatching.py, line 725)
+      def consider_loose_edge_to_free_vertex(w, k, kslack)
+        log(4, "loose edge (L2)")
+        if @best_edge[w].nil? || kslack < slack(@best_edge[w])
+          @best_edge[w] = k
         end
       end
 
