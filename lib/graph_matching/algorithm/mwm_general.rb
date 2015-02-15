@@ -1034,12 +1034,6 @@ module GraphMatching
         @mate[@endpoint[p ^ 1]] = p
       end
 
-      # Returns true if vertex `i` is matched in `mate`.
-      # TODO: Optimize by de-normalizing.
-      def matched?(i)
-        !mate[i].nil?
-      end
-
       def recycle_blossom_number(b)
         @label[b] = nil
         @label_end[b] = nil
