@@ -79,79 +79,8 @@ module GraphMatching
                 # > .. we only use edges with π<sub>ij</sub> = 0.
                 # > (Galil, 1986, p. 32)
                 if @tight_edge[k]
-
-                  # > If we scan the S-vertex *i* and consider the edge (i,j),
-                  # > there are two cases:
-                  # >
-                  # > * (C1) j is free; or
-                  # > * (C2) j is an S-vertex
-                  # >
-                  # > C2 cannot occur in the bipartite case.  The case in
-                  # > which j is a T-vertex is discarded.
-                  # > (Galil, 1986, p. 26-27)
-                  #
-                  if @label[@in_blossom[w]] == LBL_FREE
-                    log(4, "tight edge (C1)")
-
-                    # > (C1) w is a free vertex;
-                    # > label w with T and label its mate with S (R12).
-                    # > (Van Rantwijk, mwmatching.py, line 690)
-                    #
-                    # > In case C1 we apply R12. (Galil, 1986, p. 27)
-                    #
-                    # > * (R1) If (i, j) is not matched and i is an S-person
-                    # >   and j a free (unlabeled) person then label j by T; and
-                    # > * (R2) If (i, j) is matched and j is a T-person
-                    # >   and i a free person, then label i by S.
-                    # >
-                    # > Modified from (Galil, 1986, p. 25) as follows:
-                    #
-                    # > Any time R1 is used and j is labeled by T, R2 is
-                    # > immediately used to label the spouse of j with S.
-                    # > (Since j was not labeled before, it must be married
-                    # > and its spouse must be unlabeled.)  We call this
-                    # > rule R12. (Galil, 1986, p. 26)
-                    #
-                    assign_label(w, LBL_T, p ^ 1)
-
-                  elsif @label[@in_blossom[w]] == LBL_S
-                    log(4, "tight edge (C2)")
-
-                    # > (C2) w is an S-vertex (not in the same blossom);
-                    # > follow back-links to discover either an
-                    # > augmenting path or a new blossom.
-                    # > (Van Rantwijk, mwmatching.py, line 694)
-                    #
-                    base = scan_blossom(v, w)
-                    if base.nil?
-                      # > Found an augmenting path; augment the
-                      # > matching and end this stage.
-                      # > (Van Rantwijk, mwmatching.py, line 703)
-                      augment_matching(k)
-                      augmented = true
-                      break
-                    else
-                      # > Found a new blossom; add it to the blossom
-                      # > bookkeeping and turn it into an S-blossom.
-                      # > (Van Rantwijk, mwmatching.py, line 699)
-                      add_blossom(base, k)
-                    end
-
-                  elsif @label[w] == LBL_FREE
-                    log(4, "tight edge (C3)")
-
-                    # > w is inside a T-blossom, but w itself has not
-                    # > yet been reached from outside the blossom;
-                    # > mark it as reached (we need this to relabel
-                    # > during T-blossom expansion).
-                    # > (Van Rantwijk, mwmatching.py, line 709)
-                    #
-                    assert_label(@in_blossom[w], LBL_T)
-                    @label[w] = LBL_T
-                    @label_end[w] = p ^ 1
-
-                  end # free blossom
-
+                  augmented = consider_tight_edge(k, w, p, v)
+                  break if augmented
                 elsif @label[@in_blossom[w]] == LBL_S
                   log(4, "loose edge (L1)")
                   # > keep track of the least-slack non-allowable edge to
@@ -682,6 +611,83 @@ module GraphMatching
         unless bd == tbd
           raise 'Assertion failed'
         end
+      end
+
+      # > If we scan the S-vertex *i* and consider the edge (i,j),
+      # > there are two cases:
+      # >
+      # > * (C1) j is free; or
+      # > * (C2) j is an S-vertex
+      # >
+      # > C2 cannot occur in the bipartite case.  The case in
+      # > which j is a T-vertex is discarded.
+      # > (Galil, 1986, p. 26-27)
+      #
+      def consider_tight_edge(k, w, p, v)
+        augmented = false
+
+        if @label[@in_blossom[w]] == LBL_FREE
+          log(4, "tight edge (C1)")
+
+          # > (C1) w is a free vertex;
+          # > label w with T and label its mate with S (R12).
+          # > (Van Rantwijk, mwmatching.py, line 690)
+          #
+          # > In case C1 we apply R12. (Galil, 1986, p. 27)
+          #
+          # > * (R1) If (i, j) is not matched and i is an S-person
+          # >   and j a free (unlabeled) person then label j by T; and
+          # > * (R2) If (i, j) is matched and j is a T-person
+          # >   and i a free person, then label i by S.
+          # >
+          # > Modified from (Galil, 1986, p. 25) as follows:
+          #
+          # > Any time R1 is used and j is labeled by T, R2 is
+          # > immediately used to label the spouse of j with S.
+          # > (Since j was not labeled before, it must be married
+          # > and its spouse must be unlabeled.)  We call this
+          # > rule R12. (Galil, 1986, p. 26)
+          #
+          assign_label(w, LBL_T, p ^ 1)
+
+        elsif @label[@in_blossom[w]] == LBL_S
+          log(4, "tight edge (C2)")
+
+          # > (C2) w is an S-vertex (not in the same blossom);
+          # > follow back-links to discover either an
+          # > augmenting path or a new blossom.
+          # > (Van Rantwijk, mwmatching.py, line 694)
+          #
+          base = scan_blossom(v, w)
+          if base.nil?
+            # > Found an augmenting path; augment the
+            # > matching and end this stage.
+            # > (Van Rantwijk, mwmatching.py, line 703)
+            augment_matching(k)
+            augmented = true
+          else
+            # > Found a new blossom; add it to the blossom
+            # > bookkeeping and turn it into an S-blossom.
+            # > (Van Rantwijk, mwmatching.py, line 699)
+            add_blossom(base, k)
+          end
+
+        elsif @label[w] == LBL_FREE
+          log(4, "tight edge (C3)")
+
+          # > w is inside a T-blossom, but w itself has not
+          # > yet been reached from outside the blossom;
+          # > mark it as reached (we need this to relabel
+          # > during T-blossom expansion).
+          # > (Van Rantwijk, mwmatching.py, line 709)
+          #
+          assert_label(@in_blossom[w], LBL_T)
+          @label[w] = LBL_T
+          @label_end[w] = p ^ 1
+
+        end
+
+        augmented
       end
 
       # > Expand the given top-level blossom.
