@@ -41,6 +41,16 @@ RSpec.describe GraphMatching::Algorithm::MWMBipartite do
         expect(m.vertexes).to match_array([1,3])
         expect(m.weight(g)).to eq(2)
       end
+
+      it 'supports negative weights' do
+        g = graph_class[
+          [1, 2, -1],
+          [1, 3, -3]
+        ]
+        m = described_class.new(g).match
+        expect(m.vertexes).to match_array([1,2])
+        expect(m.weight(g)).to eq(-1)
+      end
     end
 
     context 'bigraph with two connected components' do

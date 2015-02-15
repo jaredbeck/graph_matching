@@ -47,7 +47,6 @@ module GraphMatching
           g.init_weights
           args.each do |edge|
             i, j, weight = edge[0] - 1, edge[1] - 1, edge[2]
-            raise 'Invalid weight' unless weight >= 0
             g.weight[i][j] = weight
             g.weight[j][i] = weight
           end

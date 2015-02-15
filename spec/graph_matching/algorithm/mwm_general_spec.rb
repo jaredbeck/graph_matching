@@ -139,5 +139,23 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       expect(m.weight(g)).to be_within(0.00001).of(Math.sqrt(2.0) + Math.exp(1))
     end
 
+    it "passes Van Rantwijk test 16: negative weights" do
+      g = graph_class[
+        [1, 2, 2],
+        [1, 3, -2],
+        [2, 3, 1],
+        [2, 4, -1],
+        [3, 4, -6]
+      ]
+      m = described_class.new(g).match(false)
+      expect(m.vertexes).to match_array([1, 2])
+      expect(m.weight(g)).to eq(2)
+      m = described_class.new(g).match(true)
+      expect(m.vertexes).to match_array([1, 2, 3, 4])
+      expect(m.has_edge?([1, 3])).to eq(true)
+      expect(m.has_edge?([2, 4])).to eq(true)
+      expect(m.weight(g)).to eq(-3)
+    end
+
   end
 end
