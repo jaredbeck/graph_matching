@@ -27,177 +27,8 @@ module GraphMatching
       def initialize(graph)
         assert(graph).is_a(Graph::WeightedGraph)
         super
-
-        # The size of the array (or part of an array) used for
-        # vertexes (as opposed to blossoms) throughout this
-        # algorithm.  It is *not*, as one might assume from the
-        # name, the number of vertexes in the graph.
-        @nvertex = g.max_v.to_i + 1
-
-        # Make a local copy of the edges.  We'll refer to edges
-        # by number throughout throughout the algorithm and it's
-        # important that the order be consistent.
-        @edges = g.edges.to_a
-
-        # In Joris van Rantwijk's implementation, there seems to be
-        # a concept of "edge numbers".  His `endpoint` array has two
-        # elements for each edge.  His `mate` array "points to" his
-        # `endpoint` array.  (See below)  I'm sure there's a reason,
-        # but I don't understand yet.
-        #
-        # > If p is an edge endpoint,
-        # > endpoint[p] is the vertex to which endpoint p is attached.
-        # > Not modified by the algorithm.
-        # > (Van Rantwijk, mwmatching.py, line 93)
-        #
-        @endpoint = @edges.map { |e| [e.source, e.target] }.flatten
-        log(0, "endpoints: #{@endpoint}")
-
-        # > If v is a vertex,
-        # > neighbend[v] is the list of remote endpoints of the edges attached to v.
-        # > Not modified by the algorithm.
-        # > (Van Rantwijk, mwmatching.py, line 98)
-        @neighb_end = Array.new(@nvertex) { [] }
-        @edges.each_with_index do |e, k|
-          @neighb_end[e.source].push(2 * k + 1)
-          @neighb_end[e.target].push(2 * k)
-        end
-
-        # > If v is a vertex,
-        # > mate[v] is the remote endpoint of its matched edge, or -1 if it is single
-        # > (i.e. endpoint[mate[v]] is v's partner vertex).
-        # > Initially all vertices are single; updated during augmentation.
-        # > (Van Rantwijk, mwmatching.py)
-        #
-        @mate = Array.new(@nvertex, nil)
-
-        # > If b is a top-level blossom,
-        # > label[b] is 0 if b is unlabeled (free);
-        # >             1 if b is an S-vertex/blossom;
-        # >             2 if b is a T-vertex/blossom.
-        # > The label of a vertex is found by looking at the label of its
-        # > top-level containing blossom.
-        # > If v is a vertex inside a T-blossom,
-        # > label[v] is 2 iff v is reachable from an S-vertex outside the blossom.
-        # > Labels are assigned during a stage and reset after each augmentation.
-        # > (Van Rantwijk, mwmatching.py)
-        #
-        @label = rantwijk_array(LBL_FREE)
-
-        # > If b is a labeled top-level blossom,
-        # > labelend[b] is the remote endpoint of the edge through which b obtained
-        # > its label, or -1 if b's base vertex is single.
-        # > If v is a vertex inside a T-blossom and label[v] == 2,
-        # > labelend[v] is the remote endpoint of the edge through which v is
-        # > reachable from outside the blossom.
-        # > (Van Rantwijk, mwmatching.py)
-        #
-        @label_end = rantwijk_array(nil)
-
-        # > If v is a vertex,
-        # > inblossom[v] is the top-level blossom to which v belongs.
-        # > If v is a top-level vertex, v is itself a blossom (a trivial blossom)
-        # > and inblossom[v] == v.
-        # > Initially all vertices are top-level trivial blossoms.
-        # > (Van Rantwijk, mwmatching.py)
-        #
-        @in_blossom = (0 ... @nvertex).to_a
-
-        # > If b is a sub-blossom,
-        # > blossomparent[b] is its immediate parent (sub-)blossom.
-        # > If b is a top-level blossom, blossomparent[b] is -1.
-        # > (Van Rantwijk, mwmatching.py)
-        #
-        @blossom_parent = rantwijk_array(nil)
-
-        # A 2D array representing a tree of blossoms.
-        #
-        # > The blossom structure of a graph is represented by a
-        # > *blossom tree*.  Its nodes are the graph G, the blossoms
-        # > of G, and all vertices included in blossoms.  The root is
-        # > G, whose children are the maximal blossoms.  ..  Any
-        # > vertex is a leaf.
-        # > (Gabow, 1985, p. 91)
-        #
-        # Van Rantwijk implements the blossom tree with an array in
-        # two halves.  The first half is "trivial" blossoms, vertexes,
-        # the leaves of the tree.  The second half are non-trivial blossoms.
-        #
-        # > Vertices are numbered 0 .. (nvertex-1).
-        # > Non-trivial blossoms are numbered nvertex .. (2*nvertex-1)
-        # > (Van Rantwijk, mwmatching.py, line 58)
-        #
-        # > If b is a non-trivial (sub-)blossom,
-        # > blossomchilds[b] is an ordered list of its sub-blossoms, starting with
-        # > the base and going round the blossom.
-        # > (Van Rantwijk, mwmatching.py, line 144)
-        #
-        @blossom_children = rantwijk_array(nil)
-
-        # > If b is a (sub-)blossom,
-        # > blossombase[b] is its base VERTEX (i.e. recursive sub-blossom).
-        # > (Van Rantwijk, mwmatching.py, line 153)
-        #
-        @blossom_base = (0 ... @nvertex).to_a + Array.new(@nvertex, nil)
-
-        # > If b is a non-trivial (sub-)blossom,
-        # > blossomendps[b] is a list of endpoints on its connecting edges,
-        # > such that blossomendps[b][i] is the local endpoint of blossomchilds[b][i]
-        # > on the edge that connects it to blossomchilds[b][wrap(i+1)].
-        # > (Van Rantwijk, mwmatching.py, line 147)
-        #
-        @blossom_endps = rantwijk_array(nil)
-
-        # > If v is a free vertex (or an unreached vertex inside a T-blossom),
-        # > bestedge[v] is the edge to an S-vertex with least slack,
-        # > or -1 if there is no such edge.
-        # > If b is a (possibly trivial) top-level S-blossom,
-        # > bestedge[b] is the least-slack edge to a different S-blossom,
-        # > or -1 if there is no such edge.
-        # > This is used for efficient computation of delta2 and delta3.
-        # > (Van Rantwijk, mwmatching.py)
-        #
-        @best_edge = rantwijk_array(nil)
-
-        # > If b is a non-trivial top-level S-blossom,
-        # > blossombestedges[b] is a list of least-slack edges to neighbouring
-        # > S-blossoms, or None if no such list has been computed yet.
-        # > This is used for efficient computation of delta3.
-        # > (Van Rantwijk, mwmatching.py, line 168)
-        #
-        @blossom_best_edges = rantwijk_array(nil)
-
-        # > List of currently unused blossom numbers.
-        # > (Van Rantwijk, mwmatching.py, line 174)
-        @unused_blossoms = (@nvertex ... 2 * @nvertex).to_a
-
-        # > If v is a vertex,
-        # > dualvar[v] = 2 * u(v) where u(v) is the v's variable in the dual
-        # > optimization problem (multiplication by two ensures integer values
-        # > throughout the algorithm if all edge weights are integers).
-        # > If b is a non-trivial blossom,
-        # > dualvar[b] = z(b) where z(b) is b's variable in the dual optimization
-        # > problem.
-        # > (Van Rantwijk, mwmatching.py, line 177)
-        #
-        @dual = Array.new(@nvertex, g.max_w) + Array.new(@nvertex, 0)
-
-        # Optimization: Cache of tight (zero slack) edges.  *Tight*
-        # is a term I attribute to Gabow, though it may be earlier.
-        #
-        # > Edge ij is *tight* if equality holds in [its dual
-        # > value function]. (Gabow, 1985, p. 91)
-        #
-        # Van Rantwijk calls this cache `allowedge`, denoting its use
-        # in the algorithm.
-        #
-        # > If allowedge[k] is true, edge k has zero slack in the optimization
-        # > problem; if allowedge[k] is false, the edge's slack may or may not
-        # > be zero.
-        @tight_edge = Array.new(g.num_edges, false)
-
-        # Queue of newly discovered S-vertices.
-        @queue = []
+        init_graph_structures
+        init_algorithm_structures
       end
 
       # > As in Problem 3, the algorithm consists of O(n) *stages*.
@@ -950,6 +781,191 @@ module GraphMatching
           t = @blossom_parent[t]
         end
         t
+      end
+
+      # Data structures used throughout the algorithm.
+      def init_algorithm_structures
+
+        # > If v is a vertex,
+        # > mate[v] is the remote endpoint of its matched edge, or -1 if it is single
+        # > (i.e. endpoint[mate[v]] is v's partner vertex).
+        # > Initially all vertices are single; updated during augmentation.
+        # > (Van Rantwijk, mwmatching.py)
+        #
+        @mate = Array.new(@nvertex, nil)
+
+        # > If b is a top-level blossom,
+        # > label[b] is 0 if b is unlabeled (free);
+        # >             1 if b is an S-vertex/blossom;
+        # >             2 if b is a T-vertex/blossom.
+        # > The label of a vertex is found by looking at the label of its
+        # > top-level containing blossom.
+        # > If v is a vertex inside a T-blossom,
+        # > label[v] is 2 iff v is reachable from an S-vertex outside the blossom.
+        # > Labels are assigned during a stage and reset after each augmentation.
+        # > (Van Rantwijk, mwmatching.py)
+        #
+        @label = rantwijk_array(LBL_FREE)
+
+        # > If b is a labeled top-level blossom,
+        # > labelend[b] is the remote endpoint of the edge through which b obtained
+        # > its label, or -1 if b's base vertex is single.
+        # > If v is a vertex inside a T-blossom and label[v] == 2,
+        # > labelend[v] is the remote endpoint of the edge through which v is
+        # > reachable from outside the blossom.
+        # > (Van Rantwijk, mwmatching.py)
+        #
+        @label_end = rantwijk_array(nil)
+
+        # > If v is a vertex,
+        # > inblossom[v] is the top-level blossom to which v belongs.
+        # > If v is a top-level vertex, v is itself a blossom (a trivial blossom)
+        # > and inblossom[v] == v.
+        # > Initially all vertices are top-level trivial blossoms.
+        # > (Van Rantwijk, mwmatching.py)
+        #
+        @in_blossom = (0 ... @nvertex).to_a
+
+        # > If b is a sub-blossom,
+        # > blossomparent[b] is its immediate parent (sub-)blossom.
+        # > If b is a top-level blossom, blossomparent[b] is -1.
+        # > (Van Rantwijk, mwmatching.py)
+        #
+        @blossom_parent = rantwijk_array(nil)
+
+        # A 2D array representing a tree of blossoms.
+        #
+        # > The blossom structure of a graph is represented by a
+        # > *blossom tree*.  Its nodes are the graph G, the blossoms
+        # > of G, and all vertices included in blossoms.  The root is
+        # > G, whose children are the maximal blossoms.  ..  Any
+        # > vertex is a leaf.
+        # > (Gabow, 1985, p. 91)
+        #
+        # Van Rantwijk implements the blossom tree with an array in
+        # two halves.  The first half is "trivial" blossoms, vertexes,
+        # the leaves of the tree.  The second half are non-trivial blossoms.
+        #
+        # > Vertices are numbered 0 .. (nvertex-1).
+        # > Non-trivial blossoms are numbered nvertex .. (2*nvertex-1)
+        # > (Van Rantwijk, mwmatching.py, line 58)
+        #
+        # > If b is a non-trivial (sub-)blossom,
+        # > blossomchilds[b] is an ordered list of its sub-blossoms, starting with
+        # > the base and going round the blossom.
+        # > (Van Rantwijk, mwmatching.py, line 144)
+        #
+        @blossom_children = rantwijk_array(nil)
+
+        # > If b is a (sub-)blossom,
+        # > blossombase[b] is its base VERTEX (i.e. recursive sub-blossom).
+        # > (Van Rantwijk, mwmatching.py, line 153)
+        #
+        @blossom_base = (0 ... @nvertex).to_a + Array.new(@nvertex, nil)
+
+        # > If b is a non-trivial (sub-)blossom,
+        # > blossomendps[b] is a list of endpoints on its connecting edges,
+        # > such that blossomendps[b][i] is the local endpoint of blossomchilds[b][i]
+        # > on the edge that connects it to blossomchilds[b][wrap(i+1)].
+        # > (Van Rantwijk, mwmatching.py, line 147)
+        #
+        @blossom_endps = rantwijk_array(nil)
+
+        # > If v is a free vertex (or an unreached vertex inside a T-blossom),
+        # > bestedge[v] is the edge to an S-vertex with least slack,
+        # > or -1 if there is no such edge.
+        # > If b is a (possibly trivial) top-level S-blossom,
+        # > bestedge[b] is the least-slack edge to a different S-blossom,
+        # > or -1 if there is no such edge.
+        # > This is used for efficient computation of delta2 and delta3.
+        # > (Van Rantwijk, mwmatching.py)
+        #
+        @best_edge = rantwijk_array(nil)
+
+        # > If b is a non-trivial top-level S-blossom,
+        # > blossombestedges[b] is a list of least-slack edges to neighbouring
+        # > S-blossoms, or None if no such list has been computed yet.
+        # > This is used for efficient computation of delta3.
+        # > (Van Rantwijk, mwmatching.py, line 168)
+        #
+        @blossom_best_edges = rantwijk_array(nil)
+
+        # > List of currently unused blossom numbers.
+        # > (Van Rantwijk, mwmatching.py, line 174)
+        @unused_blossoms = (@nvertex ... 2 * @nvertex).to_a
+
+        # > If v is a vertex,
+        # > dualvar[v] = 2 * u(v) where u(v) is the v's variable in the dual
+        # > optimization problem (multiplication by two ensures integer values
+        # > throughout the algorithm if all edge weights are integers).
+        # > If b is a non-trivial blossom,
+        # > dualvar[b] = z(b) where z(b) is b's variable in the dual optimization
+        # > problem.
+        # > (Van Rantwijk, mwmatching.py, line 177)
+        #
+        @dual = Array.new(@nvertex, g.max_w) + Array.new(@nvertex, 0)
+
+        # Optimization: Cache of tight (zero slack) edges.  *Tight*
+        # is a term I attribute to Gabow, though it may be earlier.
+        #
+        # > Edge ij is *tight* if equality holds in [its dual
+        # > value function]. (Gabow, 1985, p. 91)
+        #
+        # Van Rantwijk calls this cache `allowedge`, denoting its use
+        # in the algorithm.
+        #
+        # > If allowedge[k] is true, edge k has zero slack in the optimization
+        # > problem; if allowedge[k] is false, the edge's slack may or may not
+        # > be zero.
+        @tight_edge = Array.new(g.num_edges, false)
+
+        # Queue of newly discovered S-vertices.
+        @queue = []
+      end
+
+      # Builds data structures about the graph.  These structures
+      # are not modified by the algorithm.
+      def init_graph_structures
+
+        # The size of the array (or part of an array) used for
+        # vertexes (as opposed to blossoms) throughout this
+        # algorithm.  It is *not*, as one might assume from the
+        # name, the number of vertexes in the graph.
+        @nvertex = g.max_v.to_i + 1
+
+        # Make a local copy of the edges.  We'll refer to edges
+        # by number throughout throughout the algorithm and it's
+        # important that the order be consistent.
+        @edges = g.edges.to_a
+
+        # In Joris van Rantwijk's implementation, there seems to be
+        # a concept of "edge numbers".  His `endpoint` array has two
+        # elements for each edge.  His `mate` array "points to" his
+        # `endpoint` array.  (See below)  I'm sure there's a reason,
+        # but I don't understand yet.
+        #
+        # > If p is an edge endpoint,
+        # > endpoint[p] is the vertex to which endpoint p is attached.
+        # > Not modified by the algorithm.
+        # > (Van Rantwijk, mwmatching.py, line 93)
+        #
+        @endpoint = @edges.map { |e| [e.source, e.target] }.flatten
+        log(0, "endpoints: #{@endpoint}")
+
+        # > If v is a vertex,
+        # > neighbend[v] is the list of remote endpoints of the edges attached to v.
+        # > Not modified by the algorithm.
+        # > (Van Rantwijk, mwmatching.py, line 98)
+        @neighb_end = init_neighb_end(@nvertex, @edges)
+      end
+
+      def init_neighb_end(nvertex, edges)
+        neighb_end = Array.new(nvertex) { [] }
+        edges.each_with_index do |e, k|
+          neighb_end[e.source].push(2 * k + 1)
+          neighb_end[e.target].push(2 * k)
+        end
+        neighb_end
       end
 
       def init_stage
