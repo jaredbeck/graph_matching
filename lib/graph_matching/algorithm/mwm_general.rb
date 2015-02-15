@@ -53,48 +53,16 @@ module GraphMatching
           while true do
             log(1, "substage. duals: #{@dual}")
 
-            # > The search is conducted by scanning the S-vertices in turn.
-            # > Scanning a vertex means considering in turn all its edges
-            # > except the matched edge. (There will be at most one).
-            # > (Galil, 1986, p. 26)
+            # > The search is conducted by scanning the S-vertices
+            # > in turn. (Galil, 1986, p. 26)
             until augmented || @queue.empty?
-              v = @queue.pop
-              log(2, "scan #{v}")
-              assert_label(@in_blossom[v], LBL_S)
-
-              @neighb_end[v].each do |p|
-                k = p / 2 # note: floor division
-                w = @endpoint[p]
-                log(3, "neighbor #{w}")
-
-                if @in_blossom[v] == @in_blossom[w]
-                  # > this edge is internal to a blossom; ignore it
-                  # > (Van Rantwijk, mwmatching.py, line 681)
-                  next
-                end
-
-                # Calculate slack of `k`'s edge and update tight_edge cache.
-                kslack = calc_slack(k)
-
-                # > .. we only use edges with π<sub>ij</sub> = 0.
-                # > (Galil, 1986, p. 32)
-                if @tight_edge[k]
-                  augmented = consider_tight_edge(k, w, p, v)
-                  break if augmented
-                elsif @label[@in_blossom[w]] == LBL_S
-                  consider_loose_edge_to_s_blossom(v, k, kslack)
-                elsif @label[w] == LBL_FREE
-                  consider_loose_edge_to_free_vertex(w, k, kslack)
-                end
-              end
+              augmented = scan_vertex(@queue.pop)
             end
 
             break if augmented
 
             # > There is no augmenting path under these constraints;
             # > compute delta and reduce slack in the optimization problem.
-            # > (Note that our vertex dual variables, edge slacks and delta's
-            # > are pre-multiplied by two.)
             # > (Van Rantwijk, mwmatching.py, line 732)
             delta, delta_type, delta_edge, delta_blossom = calc_delta(max_cardinality)
             update_duals(delta)
@@ -1130,6 +1098,43 @@ module GraphMatching
       # the idea may come from Gabow (1985) or earlier.
       def rantwijk_array(fill)
         Array.new(2 * @nvertex, fill)
+      end
+
+      # > Scanning a vertex means considering in turn all its edges
+      # > except the matched edge. (There will be at most one).
+      # > (Galil, 1986, p. 26)
+      def scan_vertex(v)
+        log(2, "scan #{v}")
+        assert_label(@in_blossom[v], LBL_S)
+        augmented = false
+
+        @neighb_end[v].each do |p|
+          k = p / 2 # floor division
+          w = @endpoint[p]
+          log(3, "neighbor #{w}")
+
+          if @in_blossom[v] == @in_blossom[w]
+            # > this edge is internal to a blossom; ignore it
+            # > (Van Rantwijk, mwmatching.py, line 681)
+            next
+          end
+
+          # Calculate slack of `k`'s edge and update tight_edge cache.
+          kslack = calc_slack(k)
+
+          # > .. we only use edges with π<sub>ij</sub> = 0.
+          # > (Galil, 1986, p. 32)
+          if @tight_edge[k]
+            augmented = consider_tight_edge(k, w, p, v)
+            break if augmented
+          elsif @label[@in_blossom[w]] == LBL_S
+            consider_loose_edge_to_s_blossom(v, k, kslack)
+          elsif @label[w] == LBL_FREE
+            consider_loose_edge_to_free_vertex(w, k, kslack)
+          end
+        end
+
+        augmented
       end
 
       # Van Rantwijk's implementation of slack does not match Galil's.
