@@ -896,7 +896,7 @@ module GraphMatching
         # > If allowedge[k] is true, edge k has zero slack in the optimization
         # > problem; if allowedge[k] is false, the edge's slack may or may not
         # > be zero.
-        @tight_edge = Array.new(g.num_edges, false)
+        @tight_edge = Array.new(@edges.length, false)
 
         # Queue of newly discovered S-vertices.
         @queue = []
@@ -957,7 +957,7 @@ module GraphMatching
       def init_stage_caches
         @best_edge = rantwijk_array(nil)
         @blossom_best_edges.fill(nil, @nvertex)
-        @tight_edge = Array.new(g.num_edges, false)
+        @tight_edge = Array.new(@edges.length, false)
       end
 
       # > We start by labeling all single persons S
