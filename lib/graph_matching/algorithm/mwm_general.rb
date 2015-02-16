@@ -11,8 +11,10 @@ module GraphMatching
     # general graphs.
     class MWMGeneral < MatchingAlgorithm
 
-      # Debugging flag
-      CHECK_DELTA = true
+      # > Check delta2/delta3 computation after every substage;
+      # > only works on integer weights, slows down the algorithm to O(n^4).
+      # > (Van Rantwijk, mwmatching.py, line 34)
+      CHECK_DELTA = false
 
       # If b is a top-level blossom,
       # label[b] is 0 if b is unlabeled (free);
