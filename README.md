@@ -103,15 +103,8 @@ m.weight(g)
 #=> 11
 ```
 
-Unfortunately, the first draft of the ruby port performs
-poorly compared to Van Rantwijk's original.  No effort has
-been made yet to investigate this discrepancy.
-
-![MWM in Ruby vs. Python][27]
-
-The ruby implementation does perform in the expected
-O(mn log n) described by Galil (1986) p. 34, so that's
-some comfort.
+The algorithm performs in O(mn log n) as described by 
+Galil (1986) p. 34.
 
 ![MWM is O(mn log n)][26]
 
@@ -210,4 +203,3 @@ and non-bipartite graphs (pdf)][10]
 [24]: http://www.graphviz.org/
 [25]: https://github.com/jaredbeck/graph_matching/wiki/Benchmarking-MWM-in-Complete-Graphs
 [26]: https://github.com/jaredbeck/graph_matching/blob/master/benchmark/mwm_general/complete_graphs/plot.png
-[27]: https://github.com/jaredbeck/graph_matching/blob/master/benchmark/mwm_general/complete_graphs/plot_py.png
