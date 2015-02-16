@@ -905,6 +905,7 @@ module GraphMatching
       # Builds data structures about the graph.  These structures
       # are not modified by the algorithm.
       def init_graph_structures
+        @weight = g.weight
 
         # The size of the array (or part of an array) used for
         # vertexes (as opposed to blossoms) throughout this
@@ -1127,7 +1128,7 @@ module GraphMatching
       #
       def slack(k)
         i, j = @edges[k].to_a
-        @dual[i] + @dual[j] - 2 * g.w([i, j])
+        @dual[i] + @dual[j] - 2 * @weight[i - 1][j - 1]
       end
 
       def top_level_blossom?(b)
