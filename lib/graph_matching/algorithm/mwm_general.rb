@@ -916,7 +916,7 @@ module GraphMatching
         # Make a local copy of the edges.  We'll refer to edges
         # by number throughout throughout the algorithm and it's
         # important that the order be consistent.
-        @edges = g.edges.to_a
+        @edges = g.edges.map { |e| [e.source, e.target] }
 
         # In Joris van Rantwijk's implementation, there seems to be
         # a concept of "edge numbers".  His `endpoint` array has two
@@ -929,7 +929,7 @@ module GraphMatching
         # > Not modified by the algorithm.
         # > (Van Rantwijk, mwmatching.py, line 93)
         #
-        @endpoint = @edges.map { |e| [e.source, e.target] }.flatten
+        @endpoint = @edges.flatten
 
         # > If v is a vertex,
         # > neighbend[v] is the list of remote endpoints of the edges attached to v.
@@ -940,9 +940,9 @@ module GraphMatching
 
       def init_neighb_end(nvertex, edges)
         neighb_end = Array.new(nvertex) { [] }
-        edges.each_with_index do |e, k|
-          neighb_end[e.source].push(2 * k + 1)
-          neighb_end[e.target].push(2 * k)
+        edges.each_with_index do |(i,j), k|
+          neighb_end[i].push(2 * k + 1)
+          neighb_end[j].push(2 * k)
         end
         neighb_end
       end
