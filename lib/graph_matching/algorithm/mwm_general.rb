@@ -75,14 +75,7 @@ module GraphMatching
           # > (Van Rantwijk, mwmatching.py)
           break unless augmented
 
-          # > End of a stage; expand all S-blossoms which have dualvar = 0.
-          # > (Van Rantwijk, mwmatching.py)
-          (@nvertex ... 2 * @nvertex).each do |b|
-            if top_level_blossom?(b) && @label[b] == LBL_S && @dual[b] == 0
-              expand_blossom(b, true)
-            end
-          end
-
+          expand_tight_s_blossoms
         end
 
         # The stages are complete, and hopefully so is the matching!
@@ -750,6 +743,16 @@ module GraphMatching
           end
 
           j += jstep
+        end
+      end
+
+      # > End of a stage; expand all S-blossoms which have dualvar = 0.
+      # > (Van Rantwijk, mwmatching.py)
+      def expand_tight_s_blossoms
+        (@nvertex ... 2 * @nvertex).each do |b|
+          if top_level_blossom?(b) && @label[b] == LBL_S && @dual[b] == 0
+            expand_blossom(b, true)
+          end
         end
       end
 
