@@ -67,36 +67,9 @@ module GraphMatching
             # > (Van Rantwijk, mwmatching.py, line 732)
             delta, delta_type, delta_edge, delta_blossom = calc_delta(max_cardinality)
             update_duals(delta)
-
-            # > Take action at the point where minimum delta occurred.
-            # > (Van Rantwijk, mwmatching.py)
-            case delta_type
-            when 1
-              # > No further improvement possible; optimum reached.
-              break
-            when 2
-              # > Use the least-slack edge to continue the search.
-              @tight_edge[delta_edge] = true
-              i, j = @edges[delta_edge].to_a
-              if @label[@in_blossom[i]] == LBL_FREE
-                i, j = j, i
-              end
-              assert_label(@in_blossom[i], LBL_S)
-              @queue.push(i)
-            when 3
-              # > Use the least-slack edge to continue the search.
-              @tight_edge[delta_edge] = true
-              i, j = @edges[delta_edge].to_a
-              assert_label(@in_blossom[i], LBL_S)
-              @queue.push(i)
-            when 4
-              # > Expand the least-z blossom.
-              expand_blossom(delta_blossom, false)
-            else
-              raise "Invalid delta_type: #{delta_type}"
-            end
-
-          end # sub-stage
+            optimum = act_on_minimum_delta(delta_type, delta_edge, delta_blossom)
+            break if optimum
+          end
 
           # > Stop when no more augmenting path can be found.
           # > (Van Rantwijk, mwmatching.py)
@@ -110,7 +83,7 @@ module GraphMatching
             end
           end
 
-        end # stage
+        end
 
         # The stages are complete, and hopefully so is the matching!
         matching = Matching.new
@@ -121,6 +94,38 @@ module GraphMatching
       end
 
       private
+
+      # > Take action at the point where minimum delta occurred.
+      # > (Van Rantwijk, mwmatching.py)
+      def act_on_minimum_delta(delta_type, delta_edge, delta_blossom)
+        optimum = false
+        case delta_type
+        when 1
+          # > No further improvement possible; optimum reached.
+          optimum = true
+        when 2
+          # > Use the least-slack edge to continue the search.
+          @tight_edge[delta_edge] = true
+          i, j = @edges[delta_edge].to_a
+          if @label[@in_blossom[i]] == LBL_FREE
+            i, j = j, i
+          end
+          assert_label(@in_blossom[i], LBL_S)
+          @queue.push(i)
+        when 3
+          # > Use the least-slack edge to continue the search.
+          @tight_edge[delta_edge] = true
+          i, j = @edges[delta_edge].to_a
+          assert_label(@in_blossom[i], LBL_S)
+          @queue.push(i)
+        when 4
+          # > Expand the least-z blossom.
+          expand_blossom(delta_blossom, false)
+        else
+          raise "Invalid delta_type: #{delta_type}"
+        end
+        optimum
+      end
 
       # > Construct a new blossom with given base, containing edge
       # > k which connects a pair of S vertices. Label the new
