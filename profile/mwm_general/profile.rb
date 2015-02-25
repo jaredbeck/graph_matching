@@ -1,6 +1,6 @@
 # No shebang here.  Run with:
 #
-# ruby -I lib profile/mwm_general.rb
+# ruby -I lib profile/mwm_general/profile.rb
 
 require 'graph_matching'
 require 'ruby-prof'
