@@ -25,6 +25,25 @@ module GraphMatching
       m
     end
 
+    # Van Rantwijk's matching is constructed from two arrays,
+    # `mate` and `endpoint`.
+    #
+    # - `endpoint` is an array where each edge is represented by
+    #   two consecutive elements, which are vertex numbers.
+    # - `mate` is an array whose indexes are vertex numbers, and
+    #   whose values are `endpoint` indexes, or `nil` if the vertex
+    #   is single (unmatched).
+    #
+    # A matched vertex `v`'s partner is `endpoint[mate[v]]`.
+    #
+    def self.from_endpoints(endpoint, mate)
+      m = Matching.new
+      mate.each do |p|
+        m.add([endpoint[p], endpoint[p ^ 1]]) unless p.nil?
+      end
+      m
+    end
+
     def self.[](*edges)
       new.tap { |m| edges.each { |e| m.add(e) } }
     end

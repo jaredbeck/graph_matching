@@ -78,12 +78,7 @@ module GraphMatching
           expand_tight_s_blossoms
         end
 
-        # The stages are complete, and hopefully so is the matching!
-        matching = Matching.new
-        @mate.each do |p|
-          matching.add([@endpoint[p], @endpoint[p ^ 1]]) unless p.nil?
-        end
-        matching
+        Matching.from_endpoints(@endpoint, @mate)
       end
 
       private
