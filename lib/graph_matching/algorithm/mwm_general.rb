@@ -973,7 +973,7 @@ module GraphMatching
       def init_stage_labels
         @label = rantwijk_array(LBL_FREE)
         (0 ... @nvertex).each do |v|
-          if single?(v) && @label[@in_blossom[v]] == LBL_FREE
+          if @mate[v].nil? && @label[@in_blossom[v]] == LBL_FREE
             assign_label(v, LBL_S)
           end
         end
@@ -1064,12 +1064,6 @@ module GraphMatching
         path.each do |b| @label[b] = LBL_S end
 
         base
-      end
-
-      # Returns false if vertex `i` is matched in `mate`.
-      # TODO: Optimize by de-normalizing.
-      def single?(i)
-        @mate[i].nil?
       end
 
       # Trace a path around a blossom, from sub-blossom `bx` to
