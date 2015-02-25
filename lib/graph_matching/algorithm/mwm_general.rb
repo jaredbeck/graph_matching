@@ -1132,7 +1132,7 @@ module GraphMatching
       # > (Van Rantwijk, mwmatching.py, line 194)
       #
       def slack(k)
-        i, j = @edges[k].to_a
+        i, j = @edges[k]
         @dual[i] + @dual[j] - 2 * @weight[i - 1][j - 1]
       end
 
