@@ -479,9 +479,11 @@ module GraphMatching
         if @tight_edge[k]
           nil
         else
-          slack(k).tap { |kslack|
-            @tight_edge[k] = true if kslack <= 0
-          }
+          kslack = slack(k)
+          if kslack <= 0
+            @tight_edge[k] = true
+          end
+          kslack
         end
       end
 
