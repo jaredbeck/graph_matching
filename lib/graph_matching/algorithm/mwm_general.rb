@@ -11,11 +11,6 @@ module GraphMatching
     # general graphs.
     class MWMGeneral < MatchingAlgorithm
 
-      # > Check delta2/delta3 computation after every substage;
-      # > only works on integer weights, slows down the algorithm to O(n^4).
-      # > (Van Rantwijk, mwmatching.py, line 34)
-      CHECK_DELTA = false
-
       # If b is a top-level blossom,
       # label[b] is 0 if b is unlabeled (free);
       #             1 if b is an S-vertex/blossom;
@@ -405,13 +400,6 @@ module GraphMatching
         delta_edge = nil
         delta_blossom = nil
 
-        # > Verify data structures for delta2/delta3 computation.
-        # > (Van Rantwijk, mwmatching.py, line 739)
-        if CHECK_DELTA
-          check_delta2
-          check_delta3
-        end
-
         # > Compute delta1: the minumum value of any vertex dual.
         # > (Van Rantwijk, mwmatching.py)
         if !max_cardinality
@@ -484,78 +472,6 @@ module GraphMatching
             @tight_edge[k] = true
           end
           kslack
-        end
-      end
-
-      # > Check optimized delta2 against a trivial computation.
-      # > (Van Rantwijk, mwmatching.py, line 580)
-      def check_delta2
-        (0 ... @nvertex).each do |v|
-          if @label[@in_blossom[v]] == LBL_FREE
-            bd = nil
-            bk = nil
-            @neighb_end[v].each do |p|
-              k = p / 2 # Note: floor division
-              w = @endpoint[p]
-              if @label[@in_blossom[w]] == LBL_S
-                d = slack(k)
-                if bk.nil? || d < bd
-                  bk = k
-                  bd = d
-                end
-              end
-            end
-            option1 = bk.nil? && @best_edge[v].nil?
-            option2 = !@best_edge[v].nil? && bd == slack(@best_edge[v])
-            unless option1 || option2
-              raise "Assertion failed: Free vertex #{v}"
-            end
-          end
-        end
-      end
-
-      # > Check optimized delta3 against a trivial computation.
-      # > (Van Rantwijk, mwmatching.py, line 598)
-      def check_delta3
-        bk = nil
-        bd = nil
-        tbk = nil
-        tbd = nil
-        (0 ... 2 * @nvertex).each do |b|
-          if @blossom_parent[b].nil? && @label[b] == LBL_S
-            blossom_leaves(b).each do |v|
-              @neighb_end[v].each do |p|
-                k = p / 2 # Note: floor division
-                w = @endpoint[p]
-                if @in_blossom[w] != b && @label[@in_blossom[w]] == LBL_S
-                  d = slack(k)
-                  if bk.nil? || d < bd
-                    bk = k
-                    bd = d
-                  end
-                end
-              end
-            end
-            if !@best_edge[b].nil?
-              i, j = @edges[@best_edge[b]].to_a
-              unless @in_blossom[i] == b || @in_blossom[j] == b
-                raise 'Assertion failed'
-              end
-              unless @in_blossom[i] != b || @in_blossom[j] != b
-                raise 'Assertion failed'
-              end
-              unless @label[@in_blossom[i]] == LBL_S && @label[@in_blossom[j]] == LBL_S
-                raise 'Assertion failed'
-              end
-              if tbk.nil? || slack(@best_edge[b]) < tbd
-                tbk = @best_edge[b]
-                tbd = slack(@best_edge[b])
-              end
-            end
-          end
-        end
-        unless bd == tbd
-          raise 'Assertion failed'
         end
       end
 
@@ -1160,6 +1076,14 @@ module GraphMatching
           end
         end
       end
+
+      # Uncomment to enable assertions.  Slows down the algorithm
+      # to O(n^4), but useful during development.
+      #
+      # require_relative 'mwmg_delta_assertions'
+      # include MWMGDeltaAssertions
+      # alias_method :calc_delta_without_assertions, :calc_delta
+      # alias_method :calc_delta, :calc_delta_with_assertions
 
     end
   end
