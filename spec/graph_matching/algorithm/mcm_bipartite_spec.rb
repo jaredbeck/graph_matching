@@ -32,7 +32,7 @@ RSpec.describe GraphMatching::Algorithm::MCMBipartite do
 
     context 'single vertex' do
       it 'returns empty set' do
-        g.add_vertex('alice')
+        g.add_vertex(0)
         expect(described_class.new(g).match).to be_empty
       end
     end

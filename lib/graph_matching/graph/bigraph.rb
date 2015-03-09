@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require 'rgl/traversal'
+require 'rgl/bipartite'
 require_relative 'graph'
 require_relative '../algorithm/mcm_bipartite'
 
@@ -17,45 +17,23 @@ module GraphMatching
       end
 
       # `partition` either returns two disjoint (complementary)
-      # proper subsets of vertexes or raises a NotBipartiteError.
-      # The bigraph can be disconnected. (http://bit.ly/1rEOgEi)
+      # proper subsets of vertexes or raises a NotBipartite error.
+      #
+      # An empty graph is partitioned into two empty sets.  This
+      # seems natural, but unfortunately is not the behavior of
+      # RGL's new `bipartite_sets` function.  So, we have to check
+      # for the empty case, but at least we don't have to implement
+      # the algorithm ourselves anymore!
+      #
       def partition
-        u = Set.new
-        v = Set.new
-        return [u,v] if empty?
-        each_connected_component do |component|
-          i = RGL::BFSIterator.new(self, component.first)
-          i.set_examine_edge_event_handler do |from, to|
-            examine_edge_for_partition(from, to, u, v)
-          end
-          i.set_to_end # does the search
-        end
-        assert_disjoint(u, v) # sanity check
-        [u, v]
-      end
-
-      private
-
-      def add_to_set(set, vertex, fail_if_in)
-        raise NotBipartite if fail_if_in.include?(vertex)
-        set.add(vertex)
-      end
-
-      def assert_disjoint(u, v)
-        raise 'Expected sets to be disjoint' unless u.disjoint?(v)
-      end
-
-      def examine_edge_for_partition(from, to, u, v)
-        if u.include?(from)
-          add_to_set(v, to, u)
-        elsif v.include?(from)
-          add_to_set(u, to, v)
+        if empty?
+          [Set.new, Set.new]
         else
-          u.add(from)
-          v.add(to)
+          arrays = bipartite_sets
+          raise NotBipartite if arrays.nil?
+          [Set.new(arrays[0]), Set.new(arrays[1])]
         end
       end
-
     end
   end
 end

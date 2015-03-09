@@ -21,6 +21,16 @@ RSpec.describe GraphMatching::Graph::Bigraph do
       end
     end
 
+    context 'graph with single vertex v' do
+      it 'returns two sets, one with v' do
+        v = 0
+        g.add_vertex(v)
+        p = g.partition
+        expect(p[0]).to eq(Set[v])
+        expect(p[1]).to eq(Set[])
+      end
+    end
+
     context 'graph with single edge' do
       it 'returns two disjoint sets, each with one vertex' do
         e = ['alice', 'bob']
