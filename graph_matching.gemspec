@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 1.9.3'
 
-  spec.add_runtime_dependency 'rgl', '~> 0.4.0'
+  spec.add_runtime_dependency 'rgl', '>= 0.4.0'
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rspec-core', '~> 3.2'
