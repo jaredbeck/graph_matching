@@ -38,7 +38,7 @@ module GraphMatching
       # supports both maximum cardinality maximum weight matching
       # and MWM irrespective of cardinality.
       def match(max_cardinality)
-        return Matching.new if g.size < 2
+        return Matching.new if g.num_edges == 0
 
         # Iterative *stages*.  Each stage augments the matching.
         # There can be at most n stages, where n is num. vertexes.

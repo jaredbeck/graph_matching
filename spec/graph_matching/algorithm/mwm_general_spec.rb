@@ -55,6 +55,16 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       end
     end
 
+    context 'two vertexes, but no edge' do
+      it 'returns empty matching' do
+        g = graph_class.new
+        g.add_vertex(0)
+        g.add_vertex(1)
+        m = described_class.new(g).match(true)
+        expect(m).to be_empty
+      end
+    end
+
     context 'two vertexes' do
       it 'returns matching of size 1' do
         g = graph_class[[0, 1, 7]]
