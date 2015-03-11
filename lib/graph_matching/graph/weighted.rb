@@ -97,7 +97,9 @@ module GraphMatching
       # graph with `.[]` is not convenient.
       def set_w(edge, weight)
         raise ArgumentError, "Invalid edge: #{edge}" if edge[0].nil? || edge[1].nil?
-        raise TypeError unless weight.is_a?(Integer)
+        unless weight.is_a?(Integer)
+          raise TypeError, "Edge weight must be integer"
+        end
         init_weights if @weight.nil?
         i, j = edge[0] - 1, edge[1] - 1
         raise "Edge not found: #{edge}" unless has_edge?(*edge)
