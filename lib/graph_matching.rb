@@ -9,5 +9,7 @@ require 'graph_matching/errors'
 require 'graph_matching/version'
 require 'graph_matching/visualize'
 
+# Efficient algorithms for maximum cardinality and weighted
+# matchings in undirected graphs.
 module GraphMatching
 end

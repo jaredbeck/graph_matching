@@ -2,7 +2,6 @@
 
 module GraphMatching
   module Graph
-
     # The `Weighted` module is mixed into undirected graphs to
     # support edge weights.  Directed graphs are not supported.
     #
@@ -26,7 +25,6 @@ module GraphMatching
     # coupled to this data structure due to optimizations.
     #
     module Weighted
-
       def self.included(base)
         base.extend ClassMethods
         base.class_eval do
@@ -34,8 +32,8 @@ module GraphMatching
         end
       end
 
+      # no-doc
       module ClassMethods
-
         # `.[]` is the recommended, convenient constructor for
         # weighted graphs.  Each argument should be an array with
         # three integers; the first two represent the edge, the
@@ -57,9 +55,8 @@ module GraphMatching
         # whose elements are all arrays of exactly three elements.
         # (The first two represent the edge, the third, the weight)
         def assert_weighted_edges(ary)
-          unless ary.is_a?(Array) && ary.all?(&method(:weighted_edge?))
-            raise 'Invalid array of weighted edges'
-          end
+          return if ary.is_a?(Array) && ary.all?(&method(:weighted_edge?))
+          fail 'Invalid array of weighted edges'
         end
 
         # `weighted_edge?` returns true if `e` is an array whose
@@ -86,8 +83,8 @@ module GraphMatching
       # clarity outweighs performance.
       def w(edge)
         i, j = edge
-        raise ArgumentError, "Invalid edge: #{edge}" if i.nil? || j.nil?
-        raise "Edge not found: #{edge}" unless has_edge?(*edge)
+        fail ArgumentError, "Invalid edge: #{edge}" if i.nil? || j.nil?
+        fail "Edge not found: #{edge}" unless has_edge?(*edge)
         init_weights if @weight.nil?
         @weight[i - 1][j - 1]
       end
@@ -96,20 +93,20 @@ module GraphMatching
       # only provided for situations where constructing the entire
       # graph with `.[]` is not convenient.
       def set_w(edge, weight)
-        raise ArgumentError, "Invalid edge: #{edge}" if edge[0].nil? || edge[1].nil?
+        if edge[0].nil? || edge[1].nil?
+          fail ArgumentError, "Invalid edge: #{edge}"
+        end
         unless weight.is_a?(Integer)
-          raise TypeError, "Edge weight must be integer"
+          fail TypeError, "Edge weight must be integer"
         end
         init_weights if @weight.nil?
         i, j = edge[0] - 1, edge[1] - 1
-        raise "Edge not found: #{edge}" unless has_edge?(*edge)
+        fail "Edge not found: #{edge}" unless has_edge?(*edge)
         @weight[i] ||= []
         @weight[j] ||= []
         @weight[i][j] = weight
         @weight[j][i] = weight
       end
-
     end
   end
-
 end

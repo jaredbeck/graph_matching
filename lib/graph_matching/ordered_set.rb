@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 module GraphMatching
-
   # An `OrderedSet` acts like a `Set`, but preserves insertion order.
   # Internally, a `Hash` is used because, as of Ruby 1.9, it
   # preserves insertion order.  The Set library happens to be built
@@ -16,7 +15,7 @@ module GraphMatching
     end
 
     def initialize
-      @hash = Hash.new
+      @hash = {}
     end
 
     # `add` `o` unless it already exists, preserving inserting order.
@@ -31,7 +30,7 @@ module GraphMatching
     end
 
     def each
-      @hash.each do |k,v| yield k end
+      @hash.each do |k, _v| yield k end
     end
 
     def empty?
@@ -56,6 +55,5 @@ module GraphMatching
     def push(*args)
       merge(args)
     end
-
   end
 end

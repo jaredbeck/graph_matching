@@ -87,12 +87,14 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       end
     end
 
-    context 'five vertexes, one blossom, three complete matchings with diff. weights' do
-      it 'returns the matching with max. weight' do
+    context 'greatest weight edge cannot be used in complete matching' do
+      it 'returns the complete matching with max. weight' do
+        # In the following graph, edge 1=3 has the greatest weight,
+        # but that edge cannot be used in a complete matching.
         g = graph_class[
           [0, 1, 2],
           [1, 2, 0],
-          [1, 3, 6], # highest weight edge, but cannot be used in a complete matching
+          [1, 3, 6],
           [2, 3, 4],
           [3, 4, 2]
         ]
@@ -423,7 +425,6 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
           [8, 10, 10],
           [4, 9, 30]
         ]
-        #), [ -1, 2, 1, 5, 9, 3, 7, 6, 10, 4, 8 ])
         m = described_class.new(g).match(false)
         expect(m).to match_edges [
           [1, 2],
@@ -434,6 +435,5 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
         ]
       end
     end
-
   end
 end

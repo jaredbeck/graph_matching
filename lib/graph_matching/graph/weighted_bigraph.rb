@@ -5,6 +5,7 @@ require_relative '../algorithm/mwm_bipartite'
 
 module GraphMatching
   module Graph
+    # A bigraph whose edges have weights.  See `Weighted`.
     class WeightedBigraph < Bigraph
       include Weighted
 

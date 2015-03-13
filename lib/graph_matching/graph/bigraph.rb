@@ -6,12 +6,10 @@ require_relative '../algorithm/mcm_bipartite'
 
 module GraphMatching
   module Graph
-
     # A bipartite graph (or bigraph) is a graph whose vertices can
     # be divided into two disjoint sets U and V such that every
     # edge connects a vertex in U to one in V.
     class Bigraph < Graph
-
       def maximum_cardinality_matching
         Algorithm::MCMBipartite.new(self).match
       end
@@ -30,7 +28,7 @@ module GraphMatching
           [Set.new, Set.new]
         else
           arrays = bipartite_sets
-          raise NotBipartite if arrays.nil?
+          fail NotBipartite if arrays.nil?
           [Set.new(arrays[0]), Set.new(arrays[1])]
         end
       end

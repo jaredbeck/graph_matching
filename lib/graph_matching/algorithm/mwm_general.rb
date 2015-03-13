@@ -105,7 +105,7 @@ module GraphMatching
           # > Expand the least-z blossom.
           expand_blossom(delta_blossom, false)
         else
-          raise "Invalid delta_type: #{delta_type}"
+          fail "Invalid delta_type: #{delta_type}"
         end
         optimum
       end
@@ -223,7 +223,7 @@ module GraphMatching
         s = @label[b] == LBL_S
         m = @label_end[b] == @mate[@blossom_base[b]]
         unless t || s && m
-          raise <<-EOS
+          fail <<-EOS
               Assertion failed: Expected either:
               1. Current Bv to be a T-blossom, or
               2. Bv is an S-blossom and its base is matched to @label_end[bv]
@@ -233,7 +233,7 @@ module GraphMatching
 
       def assert_label(ix, lbl)
         unless @label[ix] == lbl
-          raise "Expected label at #{ix} to be #{LBL_NAMES[lbl]}"
+          fail "Expected label at #{ix} to be #{LBL_NAMES[lbl]}"
         end
       end
 
@@ -258,7 +258,7 @@ module GraphMatching
           # with an external mate.)
           base = @blossom_base[b]
           if @mate[base].nil?
-            raise "Expected blossom #{b}'s base (#{base}) to be matched"
+            fail "Expected blossom #{b}'s base (#{base}) to be matched"
           end
 
           # Assign label S to the mate of blossom b's base.
@@ -268,7 +268,7 @@ module GraphMatching
           base_edge_endpoints = [@mate[base], @mate[base] ^ 1]
           assign_label(@endpoint[base_edge_endpoints[0]], LBL_S, base_edge_endpoints[1])
         else
-          raise ArgumentError, "Unexpected label: #{t}"
+          fail ArgumentError, "Unexpected label: #{t}"
         end
       end
 
@@ -402,7 +402,7 @@ module GraphMatching
 
         # > Compute delta1: the minumum value of any vertex dual.
         # > (Van Rantwijk, mwmatching.py)
-        if !max_cardinality
+        unless max_cardinality
           delta_type = 1
           delta = @dual[0, @nvertex].min
         end
@@ -685,7 +685,6 @@ module GraphMatching
 
       # Data structures used throughout the algorithm.
       def init_algorithm_structures
-
         # > If v is a vertex,
         # > mate[v] is the remote endpoint of its matched edge, or -1 if it is single
         # > (i.e. endpoint[mate[v]] is v's partner vertex).
@@ -750,8 +749,8 @@ module GraphMatching
         # > Non-trivial blossoms are numbered nvertex .. (2*nvertex-1)
         # > (Van Rantwijk, mwmatching.py, line 58)
         #
-        # > If b is a non-trivial (sub-)blossom,
-        # > blossomchilds[b] is an ordered list of its sub-blossoms, starting with
+        # > If b is a non-trivial (sub-)blossom, blossomchilds[b]
+        # > is an ordered list of its sub-blossoms, starting with
         # > the base and going round the blossom.
         # > (Van Rantwijk, mwmatching.py, line 144)
         #
@@ -765,8 +764,9 @@ module GraphMatching
 
         # > If b is a non-trivial (sub-)blossom,
         # > blossomendps[b] is a list of endpoints on its connecting edges,
-        # > such that blossomendps[b][i] is the local endpoint of blossomchilds[b][i]
-        # > on the edge that connects it to blossomchilds[b][wrap(i+1)].
+        # > such that blossomendps[b][i] is the local endpoint of
+        # > blossomchilds[b][i] on the edge that connects it to
+        # > blossomchilds[b][wrap(i+1)].
         # > (Van Rantwijk, mwmatching.py, line 147)
         #
         @blossom_endps = rantwijk_array(nil)
@@ -798,10 +798,9 @@ module GraphMatching
         # > dualvar[v] = 2 * u(v) where u(v) is the v's variable in the dual
         # > optimization problem (multiplication by two ensures integer values
         # > throughout the algorithm if all edge weights are integers).
-        # > If b is a non-trivial blossom,
-        # > dualvar[b] = z(b) where z(b) is b's variable in the dual optimization
-        # > problem.
-        # > (Van Rantwijk, mwmatching.py, line 177)
+        # > If b is a non-trivial blossom, dualvar[b] = z(b)
+        # > where z(b) is b's variable in the dual optimization
+        # > problem. (Van Rantwijk, mwmatching.py, line 177)
         #
         @dual = Array.new(@nvertex, g.max_w) + Array.new(@nvertex, 0)
 
@@ -845,23 +844,20 @@ module GraphMatching
         # `endpoint` array.  (See below)  I'm sure there's a reason,
         # but I don't understand yet.
         #
-        # > If p is an edge endpoint,
-        # > endpoint[p] is the vertex to which endpoint p is attached.
-        # > Not modified by the algorithm.
-        # > (Van Rantwijk, mwmatching.py, line 93)
-        #
+        # > If p is an edge endpoint, endpoint[p] is the vertex to
+        # > which endpoint p is attached.  Not modified by the
+        # > algorithm. (Van Rantwijk, mwmatching.py, line 93)
         @endpoint = @edges.flatten
 
-        # > If v is a vertex,
-        # > neighbend[v] is the list of remote endpoints of the edges attached to v.
-        # > Not modified by the algorithm.
-        # > (Van Rantwijk, mwmatching.py, line 98)
+        # > If v is a vertex, neighbend[v] is the list of remote
+        # > endpoints of the edges attached to v.  Not modified by
+        # > the algorithm. (Van Rantwijk, mwmatching.py, line 98)
         @neighb_end = init_neighb_end(@nvertex, @edges)
       end
 
       def init_neighb_end(nvertex, edges)
         neighb_end = Array.new(nvertex) { [] }
-        edges.each_with_index do |(i,j), k|
+        edges.each_with_index do |(i, j), k|
           neighb_end[i].push(2 * k + 1)
           neighb_end[j].push(2 * k)
         end
@@ -975,11 +971,12 @@ module GraphMatching
             v, w = w, v
           end
         end
-
-        # > Remove breadcrumbs
-        path.each do |b| @label[b] = LBL_S end
-
+        remove_breadcrumbs(path)
         base
+      end
+
+      def remove_breadcrumbs(path)
+        path.each do |b| @label[b] = LBL_S end
       end
 
       # Trace a path around a blossom, from sub-blossom `bx` to
@@ -1084,7 +1081,6 @@ module GraphMatching
       # include MWMGDeltaAssertions
       # alias_method :calc_delta_without_assertions, :calc_delta
       # alias_method :calc_delta, :calc_delta_with_assertions
-
     end
   end
 end

@@ -1,6 +1,5 @@
 module GraphMatching
   module Algorithm
-
     # Can be mixed into MWMGeneral to add runtime assertions
     # about the data structures used for delta2/delta3 calculations.
     #
@@ -9,7 +8,6 @@ module GraphMatching
     # > (Van Rantwijk, mwmatching.py, line 34)
     #
     module MWMGDeltaAssertions
-
       def calc_delta_with_assertions(*args)
         # > Verify data structures for delta2/delta3 computation.
         # > (Van Rantwijk, mwmatching.py, line 739)
@@ -39,7 +37,7 @@ module GraphMatching
             option1 = bk.nil? && @best_edge[v].nil?
             option2 = !@best_edge[v].nil? && bd == slack(@best_edge[v])
             unless option1 || option2
-              raise "Assertion failed: Free vertex #{v}"
+              fail "Assertion failed: Free vertex #{v}"
             end
           end
         end
@@ -58,7 +56,8 @@ module GraphMatching
               @neighb_end[v].each do |p|
                 k = p / 2 # Note: floor division
                 w = @endpoint[p]
-                if @in_blossom[w] != b && @label[@in_blossom[w]] == MWMGeneral::LBL_S
+                if @in_blossom[w] != b &&
+                    @label[@in_blossom[w]] == MWMGeneral::LBL_S
                   d = slack(k)
                   if bk.nil? || d < bd
                     bk = k
@@ -67,17 +66,17 @@ module GraphMatching
                 end
               end
             end
-            if !@best_edge[b].nil?
+            unless @best_edge[b].nil?
               i, j = @edges[@best_edge[b]].to_a
               unless @in_blossom[i] == b || @in_blossom[j] == b
-                raise 'Assertion failed'
+                fail 'Assertion failed'
               end
               unless @in_blossom[i] != b || @in_blossom[j] != b
-                raise 'Assertion failed'
+                fail 'Assertion failed'
               end
               unless @label[@in_blossom[i]] == MWMGeneral::LBL_S &&
                   @label[@in_blossom[j]] == MWMGeneral::LBL_S
-                raise 'Assertion failed'
+                fail 'Assertion failed'
               end
               if tbk.nil? || slack(@best_edge[b]) < tbd
                 tbk = @best_edge[b]
@@ -87,10 +86,9 @@ module GraphMatching
           end
         end
         unless bd == tbd
-          raise 'Assertion failed'
+          fail 'Assertion failed'
         end
       end
-
     end
   end
 end

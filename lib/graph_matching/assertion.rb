@@ -1,13 +1,11 @@
 # encoding: utf-8
 
 module GraphMatching
-
   # Provides expressive methods for common runtime assertions, e.g.
   #
   #   assert(banana).is_a(Fruit)
   #
   class Assertion
-
     attr_reader :obj
 
     def initialize(obj)
@@ -16,27 +14,28 @@ module GraphMatching
 
     def eq(other)
       unless obj == other
-        raise "Expected #{other}, got #{obj}"
+        fail "Expected #{other}, got #{obj}"
       end
     end
 
     def gte(other)
       unless obj >= other
-        raise "Expected #{obj} to be >= #{other}"
+        fail "Expected #{obj} to be >= #{other}"
       end
     end
 
+    # rubocop:disable Style/PredicateName
     def is_a(klass)
       unless obj.is_a?(klass)
-        raise TypeError, "Expected #{klass}, got #{obj.class}"
+        fail TypeError, "Expected #{klass}, got #{obj.class}"
       end
     end
+    # rubocop:enable Style/PredicateName
 
     def not_nil
       if obj.nil?
-        raise "Unexpected nil"
+        fail "Unexpected nil"
       end
     end
-
   end
 end

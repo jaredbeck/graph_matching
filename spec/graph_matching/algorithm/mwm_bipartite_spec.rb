@@ -79,5 +79,4 @@ RSpec.describe GraphMatching::Algorithm::MWMBipartite do
       end
     end
   end
-
 end

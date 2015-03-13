@@ -3,9 +3,10 @@
 require_relative 'path'
 
 module GraphMatching
-
+  # > In .. graph theory, a matching .. in a graph is a set of
+  # > edges without common vertices.
+  # > https://en.wikipedia.org/wiki/Matching_%28graph_theory%29
   class Matching
-
     # Gabow (1976) uses a simple array to store his matching.  It
     # has one element for each vertex in the graph.  The value of
     # each element is either the number of another vertex (Gabow
@@ -15,11 +16,10 @@ module GraphMatching
     def self.gabow(mate)
       m = new
       mate.each_with_index do |n1, ix|
-        if !n1.nil? && n1 != 0
-          n2 = mate[n1]
-          if n2 == ix
-            m.add([n1, n2])
-          end
+        next if n1.nil? || n1 == 0
+        n2 = mate[n1]
+        if n2 == ix
+          m.add([n1, n2])
         end
       end
       m
@@ -78,12 +78,12 @@ module GraphMatching
       @ary.all?(&:nil?)
     end
 
-    def has_edge?(e)
+    def edge?(e)
       i, j = e
       !@ary[i].nil? && @ary[i] == j && @ary[j] == i
     end
 
-    def has_vertex?(v)
+    def vertex?(v)
       @ary.include?(v)
     end
 
@@ -118,6 +118,5 @@ module GraphMatching
     def vertexes
       @ary.compact
     end
-
   end
 end

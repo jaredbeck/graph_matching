@@ -15,9 +15,9 @@ RSpec.describe GraphMatching::Algorithm::MCMBipartite do
     it 'augments the matching' do
       mcm = described_class.new(g)
       m = [nil, nil, 3, 2]
-      m = mcm.send(:augment, m, [1,2,3,4])
+      m = mcm.send(:augment, m, [1, 2, 3, 4])
       expect(m).to eq([nil, 2, 1, 4, 3])
-      m = mcm.send(:augment, m, [1,2,4,5,6,7])
+      m = mcm.send(:augment, m, [1, 2, 4, 5, 6, 7])
       expect(m).to eq([nil, 2, 1, nil, 5, 4, 7, 6])
     end
   end
@@ -43,20 +43,20 @@ RSpec.describe GraphMatching::Algorithm::MCMBipartite do
         g.add_edge(*e)
         m = described_class.new(g).match
         expect(m.size).to eq(1)
-        expect(m).to have_edge(e)
+        expect(m.edge?(e)).to eq(true)
       end
     end
 
     context 'complete bigraph with four vertexes' do
-      let(:edges) { [[1,3], [1,4], [2,3], [2,4]] }
+      let(:edges) { [[1, 3], [1, 4], [2, 3], [2, 4]] }
 
       it 'returns one of the two correct results' do
         edges.each { |e| g.add_edge(*e) }
         m = described_class.new(g).match
         expect(m.size).to eq(2)
         outcomes = [
-          RGL::AdjacencyGraph[1,3, 2,4],
-          RGL::AdjacencyGraph[1,4, 2,3]
+          RGL::AdjacencyGraph[1, 3, 2, 4],
+          RGL::AdjacencyGraph[1, 4, 2, 3]
         ]
         reconstructed = RGL::AdjacencyGraph.new
         m.to_a.each { |edge| reconstructed.add_edge(*edge) }
@@ -69,12 +69,12 @@ RSpec.describe GraphMatching::Algorithm::MCMBipartite do
     context 'incomplete bigraph with twelve vertexes' do
       let(:edges) {
         [
-          [1,8],
-          [2,9], [2,10],
-          [3,7], [3,9], [3,12],
-          [4,8], [4,10],
-          [5,10], [5,11],
-          [6,11]
+          [1, 8],
+          [2, 9], [2, 10],
+          [3, 7], [3, 9], [3, 12],
+          [4, 8], [4, 10],
+          [5, 10], [5, 11],
+          [6, 11]
         ]
       }
 
@@ -83,11 +83,11 @@ RSpec.describe GraphMatching::Algorithm::MCMBipartite do
         m = described_class.new(g).match
         expect(m.size).to eq(5)
         outcomes = [
-          RGL::AdjacencyGraph[1,8, 2,9, 3,7, 5,10, 6,11],
-          RGL::AdjacencyGraph[1,8, 2,9, 3,7, 4,10, 5,11],
-          RGL::AdjacencyGraph[1,8, 2,9, 3,7, 4,10, 6,11],
-          RGL::AdjacencyGraph[1,8, 2,9, 3,12, 4,10, 5,11],
-          RGL::AdjacencyGraph[2,9, 3,7, 4,8, 5,10, 6,11]
+          RGL::AdjacencyGraph[1, 8, 2, 9, 3, 7, 5, 10, 6, 11],
+          RGL::AdjacencyGraph[1, 8, 2, 9, 3, 7, 4, 10, 5, 11],
+          RGL::AdjacencyGraph[1, 8, 2, 9, 3, 7, 4, 10, 6, 11],
+          RGL::AdjacencyGraph[1, 8, 2, 9, 3, 12, 4, 10, 5, 11],
+          RGL::AdjacencyGraph[2, 9, 3, 7, 4, 8, 5, 10, 6, 11]
         ]
         reconstructed = RGL::AdjacencyGraph.new
         m.to_a.each { |edge| reconstructed.add_edge(*edge) }

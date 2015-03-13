@@ -33,7 +33,7 @@ RSpec.describe GraphMatching::Graph::Bigraph do
 
     context 'graph with single edge' do
       it 'returns two disjoint sets, each with one vertex' do
-        e = ['alice', 'bob']
+        e = [0, 1]
         g.add_edge(*e)
         p = g.partition
         expect(p.map(&:first)).to match_array(e)
@@ -56,16 +56,16 @@ RSpec.describe GraphMatching::Graph::Bigraph do
         g.add_edge(1, 4)
         g.add_edge(2, 3)
         g.add_edge(2, 4)
-        p = g.partition.map(&:sort).sort_by { |v| v.first }
-        expect(p).to match_array([[1,2], [3,4]])
+        p = g.partition.map(&:sort).sort_by(&:first)
+        expect(p).to match_array([[1, 2], [3, 4]])
       end
     end
 
     context 'disconnected, yet bipartite graph' do
       it 'returns one of the the expected disjoint sets' do
-        g = described_class[1,3, 2,4]
-        p = g.partition.map(&:sort).sort_by { |v| v.first }
-        permutations = [[[1,2], [3,4]], [[1,4], [2,3]]]
+        g = described_class[1, 3, 2, 4]
+        p = g.partition.map(&:sort).sort_by(&:first)
+        permutations = [[[1, 2], [3, 4]], [[1, 4], [2, 3]]]
         expect(permutations).to include(p)
       end
     end

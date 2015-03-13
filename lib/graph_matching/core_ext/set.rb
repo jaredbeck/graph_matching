@@ -9,13 +9,15 @@ require 'set'
 
 unless Set.instance_methods.include?(:intersect?)
 
+  # no-doc
   class Set
-
     # Returns true if the set and the given set have at least one
     # element in common.
     # http://www.ruby-doc.org/stdlib-2.2.0/libdoc/set/rdoc/Set.html#method-i-intersect-3F
     def intersect?(set)
-      set.is_a?(Set) or raise ArgumentError, "value must be a set"
+      unless set.is_a?(Set)
+        fail ArgumentError, "value must be a set"
+      end
       if size < set.size
         any? { |o| set.include?(o) }
       else
@@ -29,7 +31,6 @@ unless Set.instance_methods.include?(:intersect?)
     def disjoint?(set)
       !intersect?(set)
     end
-
   end
 
 end

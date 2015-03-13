@@ -1,18 +1,16 @@
 # encoding: utf-8
 
 module GraphMatching
+  # Converts the vertices of a graph to integers.  Many graph
+  # matching algorithms require integer vertexes.
   module IntegerVertexes
-
-    # `to_integers` converts the vertices of `graph` to integers.
+    # Converts the vertices of `graph` to integers.
     # For example, given a graph (a=b), returns a new graph (1=2).
     # It also returns a legend, which maps the integers to the
     # original vertexes.
     #
-    # This function is useful because many graph matching algorithms
-    # require integral (integer) vertexes.
-    #
     def self.to_integers(graph)
-      raise ArgumentError unless graph.is_a?(RGL::MutableGraph)
+      fail ArgumentError unless graph.is_a?(RGL::MutableGraph)
       legend = {}
       reverse_legend = {}
       new_graph = graph.class.new
@@ -27,6 +25,5 @@ module GraphMatching
       end
       return new_graph, legend
     end
-
   end
 end

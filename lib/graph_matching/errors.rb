@@ -1,10 +1,10 @@
 # encoding: utf-8
 
 module GraphMatching
-
   class GraphMatchingError < StandardError
   end
 
+  # no-doc
   class InvalidVertexNumbering < GraphMatchingError
     def initialize(msg = nil)
       msg ||= <<-EOS
@@ -20,5 +20,4 @@ starting with zero
 
   class NotBipartite < GraphMatchingError
   end
-
 end

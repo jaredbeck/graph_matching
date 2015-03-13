@@ -4,10 +4,8 @@ require 'open3'
 require 'rgl/rdot'
 
 module GraphMatching
-
+  # Renders `GraphMatching::Graph` objects using `graphviz`.
   class Visualize
-
-    GRAPHVIZ_EDGE_DELIMITER = '--'
     TMP_DIR = '/tmp/graph_matching'
     USR_BIN_ENV = '/usr/bin/env'
 
@@ -35,15 +33,17 @@ module GraphMatching
     private
 
     def check_that_dot_is_installed
-      unless dot_installed?
-        $stderr.puts "The graphviz executable named dot is not installed"
-        $stderr.puts "Please install graphviz"
-        exit(1)
-      end
+      return if dot_installed?
+      $stderr.puts "Executable not found: dot"
+      $stderr.puts "Please install graphviz"
+      exit(1)
     end
 
     def dot_edge(u, v, label)
-      RGL::DOT::Edge.new({ 'from' => u, 'to' => v, 'label' => label }, ['label'])
+      RGL::DOT::Edge.new(
+        { 'from' => u, 'to' => v, 'label' => label },
+        ['label']
+      )
     end
 
     def dot_edges
@@ -55,10 +55,9 @@ module GraphMatching
     end
 
     def assert_usr_bin_env_exists
-      unless File.exists?(USR_BIN_ENV)
-        $stderr.puts "File not found: #{USR_BIN_ENV}"
-        exit(1)
-      end
+      return if File.exist?(USR_BIN_ENV)
+      $stderr.puts "File not found: #{USR_BIN_ENV}"
+      exit(1)
     end
 
     # `dot_installed?` returns true if `dot` is installed, otherwise
@@ -70,7 +69,7 @@ module GraphMatching
     end
 
     def mk_tmp_dir
-      Dir.mkdir(TMP_DIR) unless Dir.exists?(TMP_DIR)
+      Dir.mkdir(TMP_DIR) unless Dir.exist?(TMP_DIR)
     end
 
     def safe_vertex(v)
@@ -84,14 +83,11 @@ module GraphMatching
     end
 
     def write_png(abs_path)
-      so, se, st = Open3.capture3("dot -T png > #{abs_path}", stdin_data: dot)
-      if st.exitstatus != 0
-        $stderr.puts "Failed to generate .png"
-        $stderr.puts se
-        exit(1)
-      end
+      _so, se, st = Open3.capture3("dot -T png > #{abs_path}", stdin_data: dot)
+      return if st.success?
+      $stderr.puts "Failed to generate .png"
+      $stderr.puts se
+      exit(1)
     end
-
   end
-
 end

@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 module GraphMatching
-
   # A `DirectedEdgeSet` is simply a set of directed edges in a
   # graph.  Whether the graph is actually directed or not is
   # irrelevant, we can still discuss directed edges in an undirected
@@ -13,7 +12,6 @@ module GraphMatching
   # of vertexes adjacent to i.
   #
   class DirectedEdgeSet
-
     def initialize(graph_size)
       @edges = Array.new(graph_size + 1) { [] }
     end
@@ -29,6 +27,5 @@ module GraphMatching
     private
 
     attr_reader :edges
-
   end
 end

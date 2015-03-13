@@ -13,7 +13,6 @@ RSpec.describe GraphMatching::Algorithm::MCMGeneral do
   end
 
   describe '#match' do
-
     def complete_graph(n)
       g = graph_class.new
       1.upto(n - 1) do |i|
@@ -38,7 +37,7 @@ RSpec.describe GraphMatching::Algorithm::MCMGeneral do
     end
 
     context 'two vertexes' do
-      let(:g) { graph_class[1,2] }
+      let(:g) { graph_class[1, 2] }
 
       it 'returns one edge' do
         m = described_class.new(g).match
@@ -48,19 +47,31 @@ RSpec.describe GraphMatching::Algorithm::MCMGeneral do
     end
 
     context 'complete graph with four vertexes' do
-      let(:g) { graph_class[1,2, 1,3, 1,4, 2,3, 2,4, 3,4] }
-
       it 'returns two disjoint edges' do
+        g = graph_class[
+          1, 2,
+          1, 3,
+          1, 4,
+          2, 3,
+          2, 4,
+          3, 4
+        ]
         m = described_class.new(g).match
         expect(m.size).to eq(2)
-        expect(m.vertexes).to match_array([1,2,3,4])
+        expect(m.vertexes).to match_array([1, 2, 3, 4])
       end
     end
 
     context 'graph with stem (123) and blossom (456)' do
-      let(:g) { graph_class[1,2, 2,3, 3,4, 4,5, 5,6, 6,4] }
-
       it 'returns an expected result' do
+        g = graph_class[
+          1, 2,
+          2, 3,
+          3, 4,
+          4, 5,
+          5, 6,
+          6, 4
+        ]
         m = described_class.new(g).match
         expect(m.size).to eq(3)
         expect(m).to match_edges [[1, 2], [3, 4], [5, 6]]
@@ -78,23 +89,55 @@ RSpec.describe GraphMatching::Algorithm::MCMGeneral do
     end
 
     it 'simple example: graph with blossom (234)' do
-      g = graph_class[1,2, 2,3, 2,4, 3,4, 4,5, 5,6]
+      g = graph_class[
+        1, 2,
+        2, 3,
+        2, 4,
+        3, 4,
+        4, 5,
+        5, 6
+      ]
       m = described_class.new(g).match
       expect(m.size).to eq(3)
       expect(m).to match_edges [[1, 2], [3, 4], [5, 6]]
     end
 
     it 'example from West\'s Introduction to Graph Theory, p. 143' do
-      g = graph_class[1,2, 1,8, 2,3, 3,4, 3,7, 4,5, 4,7, 5,6, 7,9, 8,9, 10,8]
+      g = graph_class[
+        1, 2,
+        1, 8,
+        2, 3,
+        3, 4,
+        3, 7,
+        4, 5,
+        4, 7,
+        5, 6,
+        7, 9,
+        8, 9,
+        10, 8
+      ]
       m = described_class.new(g).match
       expect(m.size).to eq(5)
       expect(m).to match_edges [[1, 2], [3, 4], [5, 6], [7, 9], [8, 10]]
     end
 
     it 'example from Gabow (1976)' do
-      g = graph_class[1,2, 2,3, 1,3, 1,10, 3,9, 3,4, 4,7, 4,8, 7,8, 9,5, 5,6, 6,7]
+      g = graph_class[
+        1, 2,
+        2, 3,
+        1, 3,
+        1, 10,
+        3, 9,
+        3, 4,
+        4, 7,
+        4, 8,
+        7, 8,
+        9, 5,
+        5, 6,
+        6, 7
+      ]
       m = described_class.new(g).match
-      expect(m).to match_edges [[10,1], [2,3], [4,8], [7,6], [5,9]]
+      expect(m).to match_edges [[10, 1], [2, 3], [4, 8], [7, 6], [5, 9]]
     end
 
     it 'various complete graphs' do

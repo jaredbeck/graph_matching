@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe GraphMatching::Graph::Weighted do
-
+  # no-doc
   class MyGraph < RGL::AdjacencyGraph
     include GraphMatching::Graph::Weighted
   end
@@ -11,8 +11,8 @@ RSpec.describe GraphMatching::Graph::Weighted do
   describe '.[]' do
     it 'sets weights' do
       g = MyGraph[[1, 2, 100], [1, 3, 101]]
-      expect(g.w([1,2])).to eq(100)
-      expect(g.w([1,3])).to eq(101)
+      expect(g.w([1, 2])).to eq(100)
+      expect(g.w([1, 3])).to eq(101)
     end
   end
 
@@ -26,5 +26,4 @@ RSpec.describe GraphMatching::Graph::Weighted do
       expect(g.w(edge)).to eq(weight)
     end
   end
-
 end

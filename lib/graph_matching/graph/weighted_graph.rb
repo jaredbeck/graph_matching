@@ -5,6 +5,7 @@ require_relative '../algorithm/mwm_general'
 
 module GraphMatching
   module Graph
+    # A graph whose edges have weights.  See `Weighted`.
     class WeightedGraph < Graph
       include Weighted
 

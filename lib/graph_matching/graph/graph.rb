@@ -10,8 +10,8 @@ autoload(:SecureRandom, 'securerandom')
 
 module GraphMatching
   module Graph
+    # Base class for all graphs.
     class Graph < RGL::AdjacencyGraph
-
       def self.[](*args)
         super.tap(&:vertexes_must_be_integers)
       end
@@ -33,7 +33,7 @@ module GraphMatching
 
       def connected?
         count = 0
-        each_connected_component { |c| count += 1 }
+        each_connected_component { count += 1 }
         count == 1
       end
 
@@ -55,11 +55,9 @@ module GraphMatching
       end
 
       def vertexes_must_be_integers
-        if vertices.any? { |v| !v.is_a?(Integer) }
-          raise ArgumentError, 'All vertexes must be integers'
-        end
+        return if vertices.none? { |v| !v.is_a?(Integer) }
+        fail ArgumentError, 'All vertexes must be integers'
       end
-
     end
   end
 end
