@@ -8,9 +8,9 @@ set output data_dir."/plot_compare.png"
 set linetype 1 pointtype 7 linecolor rgb "#FF0000"
 set linetype 2 pointtype 7 linecolor rgb "#00B800"
 
-set xlabel 'Number of Vertexes (n)' tc lt 1
-set ytics autofreq tc lt 1
-set ylabel 'Time (s)' tc lt 1
+set xlabel 'Number of Vertexes (n)' textcolor rgb "black"
+set ytics autofreq textcolor rgb "black"
+set ylabel 'Time (s)' textcolor rgb "black"
 
 plot \
 data_dir."/time.data" \
