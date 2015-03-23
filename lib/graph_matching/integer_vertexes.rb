@@ -4,7 +4,7 @@ module GraphMatching
   # Converts the vertices of a graph to integers.  Many graph
   # matching algorithms require integer vertexes.
   module IntegerVertexes
-    # Converts the vertices of `graph` to integers.
+    # Converts the vertices of `graph` to positive nonzero integers.
     # For example, given a graph (a=b), returns a new graph (1=2).
     # It also returns a legend, which maps the integers to the
     # original vertexes.

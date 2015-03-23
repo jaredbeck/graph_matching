@@ -1,7 +1,8 @@
 # encoding: utf-8
 
 # No shebang here.  Usage:
-# ruby -I lib benchmark/mcm_bipartite/complete_bigraphs/benchmark.rb
+# BM_DIR='benchmark/mcm_bipartite/complete_bigraphs'
+# ruby -I lib "$BM_DIR/benchmark.rb" > "$BM_DIR/time.data"
 
 require 'benchmark'
 require 'graph_matching'

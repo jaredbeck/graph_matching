@@ -98,13 +98,17 @@ module GraphMatching
       end
 
       def matched_adjacent(from, except, g, m)
-        g.adjacent_vertices(from).select { |i| i != except && m[from] == i }
+        g.adjacent_vertices(from).select { |i|
+          i != except && m[from] == i
+        }
       end
 
-      # `unlabeled_across_unmatched_edges_from` simply looks across
-      # unmatched edges from `v` to find vertexes not labeled by `t`.
+      # Look across unmatched edges from `v` to find vertexes
+      # not labeled `t`.
       def unlabeled_across_unmatched_edges_from(v, g, m, t)
-        g.adjacent_vertices(v).select { |i| m[v] != i && !t.include?(i) }
+        g.adjacent_vertices(v).select { |i|
+          m[v] != i && !t.include?(i)
+        }
       end
 
     end
