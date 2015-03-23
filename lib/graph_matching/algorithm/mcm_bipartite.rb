@@ -28,7 +28,7 @@ module GraphMatching
 
           # Label unmatched vertexes in U with label R.  These R-vertexes
           # are candidates for the start of an augmenting path.
-          unmarked = r = u.select { |i| m[i].nil? }
+          unmarked = r = u.select { |i| m[i] == nil }
 
           # While there are unmarked R-vertexes
           while aug_path.nil? && start = unmarked.pop
@@ -68,23 +68,25 @@ module GraphMatching
 
       private
 
-      def augment(m, path)
-        ap = Path.new(path)
-        augmenting_path_edges = ap.edges
-        raise "invalid augmenting path: must have odd length" unless augmenting_path_edges.length.odd?
-        ap.vertexes.each do |v|
-          w = m[v]
-          unless w.nil?
-            m[v] = nil
-            m[w] = nil
-          end
+      def assert_valid_aug_path(path)
+        unless path.length >= 2 && path.length.even?
+          raise "Invalid augmenting path"
         end
-        augmenting_path_edges.each_with_index do |edge, ix|
-          if ix.even?
-            i, j = edge
-            m[i] = j
-            m[j] = i
-          end
+      end
+
+      def augment(m, path)
+        assert_valid_aug_path(path)
+        ix = 0
+        while ix < path.length
+          i = path[ix]
+          j = path[ix + 1]
+          mi = m[i]
+          mj = m[j]
+          m[mi] = nil unless mi == nil
+          m[mj] = nil unless mj == nil
+          m[i] = j
+          m[j] = i
+          ix += 2
         end
         m
       end

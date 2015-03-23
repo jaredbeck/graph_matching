@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-require_relative 'path'
-
 module GraphMatching
   # > In .. graph theory, a matching .. in a graph is a set of
   # > edges without common vertices.
