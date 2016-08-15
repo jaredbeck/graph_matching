@@ -34,8 +34,8 @@ module GraphMatching
 
     def check_that_dot_is_installed
       return if dot_installed?
-      $stderr.puts "Executable not found: dot"
-      $stderr.puts "Please install graphviz"
+      $stderr.puts 'Executable not found: dot'
+      $stderr.puts 'Please install graphviz'
       exit(1)
     end
 
@@ -85,7 +85,7 @@ module GraphMatching
     def write_png(abs_path)
       _so, se, st = Open3.capture3("dot -T png > #{abs_path}", stdin_data: dot)
       return if st.success?
-      $stderr.puts "Failed to generate .png"
+      $stderr.puts 'Failed to generate .png'
       $stderr.puts se
       exit(1)
     end

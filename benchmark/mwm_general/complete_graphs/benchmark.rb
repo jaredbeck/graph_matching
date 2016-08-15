@@ -13,7 +13,7 @@ $stdout.sync = true
 
 def complete_graph(n)
   g = GraphMatching::Graph::WeightedGraph.new
-  n_edges = (1 .. n - 1).reduce(:+)
+  n_edges = (1..n - 1).reduce(:+)
   0.upto(n - 2) do |i|
     (i + 1).upto(n - 1) do |j|
       g.add_edge(i, j)

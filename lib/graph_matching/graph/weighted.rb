@@ -97,7 +97,7 @@ module GraphMatching
           fail ArgumentError, "Invalid edge: #{edge}"
         end
         unless weight.is_a?(Integer)
-          fail TypeError, "Edge weight must be integer"
+          fail TypeError, 'Edge weight must be integer'
         end
         init_weights if @weight.nil?
         i, j = edge[0] - 1, edge[1] - 1

@@ -2,3 +2,8 @@ inherit_from: .rubocop_todo.yml
 
 AllCops:
   TargetRubyVersion: 2.0
+
+# Avoid postfix conditionals, except on very short lines. Never use postfix conditionals
+# after variable assignment, regardless of line length.
+Style/WhileUntilModifier:
+  Enabled: false

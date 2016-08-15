@@ -19,7 +19,7 @@ module GraphMatching
       # > Check optimized delta2 against a trivial computation.
       # > (Van Rantwijk, mwmatching.py, line 580)
       def check_delta2
-        (0 ... @nvertex).each do |v|
+        (0...@nvertex).each do |v|
           if @label[@in_blossom[v]] == MWMGeneral::LBL_FREE
             bd = nil
             bk = nil
@@ -50,7 +50,7 @@ module GraphMatching
         bd = nil
         tbk = nil
         tbd = nil
-        (0 ... 2 * @nvertex).each do |b|
+        (0...2 * @nvertex).each do |b|
           if @blossom_parent[b].nil? && @label[b] == MWMGeneral::LBL_S
             blossom_leaves(b).each do |v|
               @neighb_end[v].each do |p|

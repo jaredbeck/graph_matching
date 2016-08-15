@@ -42,12 +42,12 @@ module GraphMatching
 
         # Iterative *stages*.  Each stage augments the matching.
         # There can be at most n stages, where n is num. vertexes.
-        while true do
+        while true
           init_stage
 
           # *sub-stages* either augment or scale the duals.
           augmented = false
-          while true do
+          while true
 
             # > The search is conducted by scanning the S-vertices
             # > in turn. (Galil, 1986, p. 26)
@@ -410,7 +410,7 @@ module GraphMatching
         # > Compute delta2: the minimum slack on any edge between
         # > an S-vertex and a free vertex.
         # > (Van Rantwijk, mwmatching.py)
-        (0 ... @nvertex).each do |v|
+        (0...@nvertex).each do |v|
           if @label[@in_blossom[v]] == LBL_FREE && !@best_edge[v].nil?
             d = slack(@best_edge[v])
             if delta_type == nil || d < delta
@@ -424,7 +424,7 @@ module GraphMatching
         # > Compute delta3: half the minimum slack on any edge between
         # > a pair of S-blossoms.
         # > (Van Rantwijk, mwmatching.py)
-        (0 ... 2 * @nvertex).each do |b|
+        (0...2 * @nvertex).each do |b|
           if @blossom_parent[b].nil? && @label[b] == LBL_S && !@best_edge[b].nil?
             kslack = slack(@best_edge[b])
             d = kslack / 2 # Van Rantwijk had some type checking here.  Why?
@@ -438,7 +438,7 @@ module GraphMatching
 
         # > Compute delta4: minimum z variable of any T-blossom.
         # > (Van Rantwijk, mwmatching.py)
-        (@nvertex ... 2 * @nvertex).each do |b|
+        (@nvertex...2 * @nvertex).each do |b|
           top_t_blossom = top_level_blossom?(b) && @label[b] == LBL_T
           if top_t_blossom && (delta_type.nil? || @dual[b] < delta)
             delta = @dual[b]
@@ -662,7 +662,7 @@ module GraphMatching
       # > End of a stage; expand all S-blossoms which have dualvar = 0.
       # > (Van Rantwijk, mwmatching.py)
       def expand_tight_s_blossoms
-        (@nvertex ... 2 * @nvertex).each do |b|
+        (@nvertex...2 * @nvertex).each do |b|
           if top_level_blossom?(b) && @label[b] == LBL_S && @dual[b] == 0
             expand_blossom(b, true)
           end
@@ -723,7 +723,7 @@ module GraphMatching
         # > Initially all vertices are top-level trivial blossoms.
         # > (Van Rantwijk, mwmatching.py)
         #
-        @in_blossom = (0 ... @nvertex).to_a
+        @in_blossom = (0...@nvertex).to_a
 
         # > If b is a sub-blossom,
         # > blossomparent[b] is its immediate parent (sub-)blossom.
@@ -760,7 +760,7 @@ module GraphMatching
         # > blossombase[b] is its base VERTEX (i.e. recursive sub-blossom).
         # > (Van Rantwijk, mwmatching.py, line 153)
         #
-        @blossom_base = (0 ... @nvertex).to_a + Array.new(@nvertex, nil)
+        @blossom_base = (0...@nvertex).to_a + Array.new(@nvertex, nil)
 
         # > If b is a non-trivial (sub-)blossom,
         # > blossomendps[b] is a list of endpoints on its connecting edges,
@@ -792,7 +792,7 @@ module GraphMatching
 
         # > List of currently unused blossom numbers.
         # > (Van Rantwijk, mwmatching.py, line 174)
-        @unused_blossoms = (@nvertex ... 2 * @nvertex).to_a
+        @unused_blossoms = (@nvertex...2 * @nvertex).to_a
 
         # > If v is a vertex,
         # > dualvar[v] = 2 * u(v) where u(v) is the v's variable in the dual
@@ -884,7 +884,7 @@ module GraphMatching
       # > the queue. (Van Rantwijk, mwmatching.py, line 649)
       def init_stage_labels
         @label = rantwijk_array(LBL_FREE)
-        (0 ... @nvertex).each do |v|
+        (0...@nvertex).each do |v|
           if @mate[v].nil? && @label[@in_blossom[v]] == LBL_FREE
             assign_label(v, LBL_S)
           end
@@ -1050,7 +1050,7 @@ module GraphMatching
       # > .. we make the following changes in the dual
       # > variables. (Galil, 1986, p. 32)
       def update_duals(delta)
-        (0 ... @nvertex).each do |v|
+        (0...@nvertex).each do |v|
           case @label[@in_blossom[v]]
           when LBL_S
             @dual[v] -= delta
@@ -1060,7 +1060,7 @@ module GraphMatching
             # No change to free vertexes
           end
         end
-        (@nvertex ... 2 * @nvertex).each do |b|
+        (@nvertex...2 * @nvertex).each do |b|
           if top_level_blossom?(b)
             case @label[b]
             when LBL_S

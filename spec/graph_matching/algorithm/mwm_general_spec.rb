@@ -7,7 +7,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
 
   describe '.new' do
     it 'requires a WeightedGraph' do
-      expect { described_class.new("banana") }.to raise_error(TypeError)
+      expect { described_class.new('banana') }.to raise_error(TypeError)
     end
   end
 
@@ -104,14 +104,14 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       end
     end
 
-    it "passes Van Rantwijk test 12" do
+    it 'passes Van Rantwijk test 12' do
       g = graph_class[[1, 2, 10], [2, 3, 11]]
       m = described_class.new(g).match(false)
       expect(m).to match_edges [[2, 3]]
       expect(m.weight(g)).to eq(11)
     end
 
-    it "passes Van Rantwijk test 13" do
+    it 'passes Van Rantwijk test 13' do
       g = graph_class[
         [1, 2, 5],
         [2, 3, 11],
@@ -122,7 +122,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       expect(m.weight(g)).to eq(11)
     end
 
-    it "passes Van Rantwijk test 14: max. cardinality" do
+    it 'passes Van Rantwijk test 14: max. cardinality' do
       g = graph_class[
         [1, 2, 5],
         [2, 3, 11],
@@ -133,7 +133,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       expect(m.weight(g)).to eq(10)
     end
 
-    it "passes Van Rantwijk test 15: floating-point weights" do
+    it 'passes Van Rantwijk test 15: floating-point weights' do
       g = graph_class[
         [1, 2, Math::PI],
         [2, 3, Math.exp(1)],
@@ -145,7 +145,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       expect(m.weight(g)).to be_within(0.00001).of(Math.sqrt(2.0) + Math.exp(1))
     end
 
-    it "passes Van Rantwijk test 16: negative weights" do
+    it 'passes Van Rantwijk test 16: negative weights' do
       g = graph_class[
         [1, 2, 2],
         [1, 3, -2],
@@ -161,8 +161,8 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       expect(m.weight(g)).to eq(-3)
     end
 
-    context "Van Rantwijk test 20: Uses S-blossom for augmentation" do
-      it "passes test 20-A" do
+    context 'Van Rantwijk test 20: Uses S-blossom for augmentation' do
+      it 'passes test 20-A' do
         g = graph_class[
           [1, 2, 8],
           [1, 3, 9],
@@ -174,7 +174,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
         expect(m.weight(g)).to eq(15)
       end
 
-      it "passes test 20-B" do
+      it 'passes test 20-B' do
         g = graph_class[
           [1, 2, 8],
           [1, 3, 9],
@@ -190,8 +190,8 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
     end
 
     # Van Rantwijk test 21
-    context "create S-blossom, relabel as T-blossom, use for augmentation" do
-      it "passes test 21-A" do
+    context 'create S-blossom, relabel as T-blossom, use for augmentation' do
+      it 'passes test 21-A' do
         g = graph_class[
           [1, 2, 9],
           [1, 3, 8],
@@ -204,7 +204,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
         expect(m).to match_edges [[1, 6], [2, 3], [4, 5]]
       end
 
-      it "passes test 21-B" do
+      it 'passes test 21-B' do
         g = graph_class[
           [1, 2, 9],
           [1, 3, 8],
@@ -217,7 +217,7 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
         expect(m).to match_edges [[1, 6], [2, 3], [4, 5]]
       end
 
-      it "passes test 21-C" do
+      it 'passes test 21-C' do
         g = graph_class[
           [1, 2, 9],
           [1, 3, 8],
@@ -231,8 +231,8 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       end
     end
 
-    context "Van Rantwijk test 22" do
-      it "creates nested S-blossom, uses for augmentation" do
+    context 'Van Rantwijk test 22' do
+      it 'creates nested S-blossom, uses for augmentation' do
         g = graph_class[
           [1, 2, 9],
           [1, 3, 9],
@@ -247,8 +247,8 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       end
     end
 
-    context "Van Rantwijk test 23" do
-      it "create S-blossom, relabel as S, include in nested S-blossom" do
+    context 'Van Rantwijk test 23' do
+      it 'create S-blossom, relabel as S, include in nested S-blossom' do
         g = graph_class[
           [1, 2, 10],
           [1, 7, 10],
@@ -265,8 +265,8 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       end
     end
 
-    context "Van Rantwijk test 24" do
-      it "create nested S-blossom, augment, expand recursively" do
+    context 'Van Rantwijk test 24' do
+      it 'create nested S-blossom, augment, expand recursively' do
         g = graph_class[
           [1, 2, 8],
           [1, 3, 8],
@@ -284,8 +284,8 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       end
     end
 
-    context "Van Rantwijk test 25" do
-      it "create S-blossom, relabel as T, expand" do
+    context 'Van Rantwijk test 25' do
+      it 'create S-blossom, relabel as T, expand' do
         g = graph_class[
           [1, 2, 23],
           [1, 5, 22],
@@ -301,8 +301,8 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       end
     end
 
-    context "Van Rantwijk test 26" do
-      it "create nested S-blossom, relabel as T, expand" do
+    context 'Van Rantwijk test 26' do
+      it 'create nested S-blossom, relabel as T, expand' do
         g = graph_class[
           [1, 2, 19],
           [1, 3, 20],
@@ -319,8 +319,8 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       end
     end
 
-    context "Van Rantwijk test 30" do
-      it "create blossom, relabel as T in more than one way, expand, augment" do
+    context 'Van Rantwijk test 30' do
+      it 'create blossom, relabel as T in more than one way, expand, augment' do
         g = graph_class[
           [1, 2, 45],
           [1, 5, 45],
@@ -338,8 +338,8 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       end
     end
 
-    context "Van Rantwijk test 31" do
-      it "similar to test 30, but slightly different" do
+    context 'Van Rantwijk test 31' do
+      it 'similar to test 30, but slightly different' do
         g = graph_class[
           [1, 2, 45],
           [1, 5, 45],
@@ -357,10 +357,10 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       end
     end
 
-    context "Van Rantwijk test 32" do
+    context 'Van Rantwijk test 32' do
       # create blossom, relabel as T, expand such that a new
       # least-slack S-to-free edge is produced, augment
-      it "see comment" do
+      it 'see comment' do
         g = graph_class[
           [1, 2, 45],
           [1, 5, 45],
@@ -378,11 +378,11 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       end
     end
 
-    context "Van Rantwijk test 33" do
+    context 'Van Rantwijk test 33' do
       # create nested blossom, relabel as T in more than one way,
       # expand outer blossom such that inner blossom ends up on
       # an augmenting path
-      it "see comment" do
+      it 'see comment' do
         g = graph_class[
           [1, 2, 45],
           [1, 7, 45],
@@ -410,8 +410,8 @@ RSpec.describe GraphMatching::Algorithm::MWMGeneral do
       end
     end
 
-    context "Van Rantwijk test 34: nest, relabel, expand" do
-      it "create nested S-blossom, relabel as S, expand recursively" do
+    context 'Van Rantwijk test 34: nest, relabel, expand' do
+      it 'create nested S-blossom, relabel as S, expand recursively' do
         g = graph_class[
           [1, 2, 40],
           [1, 3, 40],

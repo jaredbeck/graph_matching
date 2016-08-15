@@ -28,7 +28,7 @@ module GraphMatching
         u = init_duals(cats, dogs)
 
         # For each stage
-        while true do
+        while true
 
           # Clear all labels and marks
           # Label all single dogs with S
@@ -39,11 +39,11 @@ module GraphMatching
           q = s.dup.to_a
 
           # While searching
-          while aug_path.nil? && i = q.pop do
+          while aug_path.nil? && i = q.pop
 
             # Follow the unmatched edges (if any) to free (unlabeled)
             # cats.  Only consider edges with slack (π) of 0.
-            unlabeled_across_unmatched_edges_from(i, g, m ,t).each do |j|
+            unlabeled_across_unmatched_edges_from(i, g, m, t).each do |j|
               if π(u, i, j) == 0
                 t << j
                 predecessors[j] = i

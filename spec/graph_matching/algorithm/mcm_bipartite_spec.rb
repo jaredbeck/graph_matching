@@ -7,7 +7,7 @@ RSpec.describe GraphMatching::Algorithm::MCMBipartite do
 
   describe '.new' do
     it 'requires a Bigraph' do
-      expect { described_class.new("banana") }.to raise_error(TypeError)
+      expect { described_class.new('banana') }.to raise_error(TypeError)
     end
   end
 

@@ -35,7 +35,7 @@ module GraphMatching
 
             # Follow the unmatched edges (if any) to vertexes in V
             # ignoring any V-vertexes already labeled T
-            unlabeled_across_unmatched_edges_from(start, g, m ,t).each do |vi|
+            unlabeled_across_unmatched_edges_from(start, g, m, t).each do |vi|
               t << vi
               predecessors[vi] = start
 
@@ -70,7 +70,7 @@ module GraphMatching
 
       def assert_valid_aug_path(path)
         unless path.length >= 2 && path.length.even?
-          raise "Invalid augmenting path"
+          raise 'Invalid augmenting path'
         end
       end
 

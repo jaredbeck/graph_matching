@@ -34,7 +34,7 @@ module GraphMatching
 
     def not_nil
       if obj.nil?
-        fail "Unexpected nil"
+        fail 'Unexpected nil'
       end
     end
   end

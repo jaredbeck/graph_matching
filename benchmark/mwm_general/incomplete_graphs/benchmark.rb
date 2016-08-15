@@ -17,7 +17,7 @@ $stdout.sync = true
 def incomplete_graph(n, completeness)
   g = GraphMatching::Graph::WeightedGraph.new
   0.upto(n - 1) do |i| g.add_vertex(i) end
-  max_weight = ((1 .. n - 1).reduce(:+).to_f * completeness).to_i + 1
+  max_weight = ((1..n - 1).reduce(:+).to_f * completeness).to_i + 1
   0.upto(n - 2) do |i|
     (i + 1).upto(n - 1) do |j|
       if rand < completeness

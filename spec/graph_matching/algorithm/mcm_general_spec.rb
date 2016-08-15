@@ -8,7 +8,7 @@ RSpec.describe GraphMatching::Algorithm::MCMGeneral do
 
   describe '.new' do
     it 'requires a Graph' do
-      expect { described_class.new("banana") }.to raise_error(TypeError)
+      expect { described_class.new('banana') }.to raise_error(TypeError)
     end
   end
 
