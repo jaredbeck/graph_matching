@@ -25,11 +25,11 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'rgl', '~> 0.5.0'
 
-  spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'pry'
-  spec.add_development_dependency 'pry-nav'
+  spec.add_development_dependency 'bundler', '~> 1.12'
+  spec.add_development_dependency 'pry-nav', '~> 0.2.4'
   spec.add_development_dependency 'rspec-core', '~> 3.2'
   spec.add_development_dependency 'rspec-expectations', '~> 3.2'
   spec.add_development_dependency 'rspec-mocks', '~> 3.2'
-  spec.add_development_dependency 'rubocop'
+  spec.add_development_dependency 'rake', '~> 11.2'
+  spec.add_development_dependency 'rubocop', '~> 0.42.0'
 end
