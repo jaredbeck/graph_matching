@@ -4,6 +4,7 @@
 .bundle
 .config
 .idea
+.ruby-version
 .yardoc
 Gemfile.lock
 InstalledFiles
