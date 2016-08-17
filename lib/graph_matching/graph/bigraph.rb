@@ -28,7 +28,7 @@ module GraphMatching
           [Set.new, Set.new]
         else
           arrays = bipartite_sets
-          fail NotBipartite if arrays.nil?
+          raise NotBipartite if arrays.nil?
           [Set.new(arrays[0]), Set.new(arrays[1])]
         end
       end

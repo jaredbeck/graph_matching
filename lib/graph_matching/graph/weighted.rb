@@ -44,7 +44,9 @@ module GraphMatching
           g = super(*weightless_edges.flatten)
           g.init_weights
           args.each do |edge|
-            i, j, weight = edge[0] - 1, edge[1] - 1, edge[2]
+            i = edge[0] - 1
+            j = edge[1] - 1
+            weight = edge[2]
             g.weight[i][j] = weight
             g.weight[j][i] = weight
           end
@@ -56,7 +58,7 @@ module GraphMatching
         # (The first two represent the edge, the third, the weight)
         def assert_weighted_edges(ary)
           return if ary.is_a?(Array) && ary.all?(&method(:weighted_edge?))
-          fail 'Invalid array of weighted edges'
+          raise 'Invalid array of weighted edges'
         end
 
         # `weighted_edge?` returns true if `e` is an array whose
@@ -83,8 +85,8 @@ module GraphMatching
       # clarity outweighs performance.
       def w(edge)
         i, j = edge
-        fail ArgumentError, "Invalid edge: #{edge}" if i.nil? || j.nil?
-        fail "Edge not found: #{edge}" unless has_edge?(*edge)
+        raise ArgumentError, "Invalid edge: #{edge}" if i.nil? || j.nil?
+        raise "Edge not found: #{edge}" unless has_edge?(*edge)
         init_weights if @weight.nil?
         @weight[i - 1][j - 1]
       end
@@ -94,14 +96,15 @@ module GraphMatching
       # graph with `.[]` is not convenient.
       def set_w(edge, weight)
         if edge[0].nil? || edge[1].nil?
-          fail ArgumentError, "Invalid edge: #{edge}"
+          raise ArgumentError, "Invalid edge: #{edge}"
         end
         unless weight.is_a?(Integer)
-          fail TypeError, 'Edge weight must be integer'
+          raise TypeError, 'Edge weight must be integer'
         end
         init_weights if @weight.nil?
-        i, j = edge[0] - 1, edge[1] - 1
-        fail "Edge not found: #{edge}" unless has_edge?(*edge)
+        i = edge[0] - 1
+        j = edge[1] - 1
+        raise "Edge not found: #{edge}" unless has_edge?(*edge)
         @weight[i] ||= []
         @weight[j] ||= []
         @weight[i][j] = weight

@@ -19,8 +19,7 @@ module GraphMatching
         u, v = g.partition
         m = []
 
-        while true
-
+        loop do
           # Begin each stage by clearing all labels and marks
           t = []
           predecessors = {}
@@ -93,7 +92,7 @@ module GraphMatching
 
       def backtrack_from(end_vertex, predecessors)
         augmenting_path = [end_vertex]
-        while predecessors.has_key?(augmenting_path.last)
+        while predecessors.key?(augmenting_path.last)
           augmenting_path.push(predecessors[augmenting_path.last])
         end
         augmenting_path

@@ -20,11 +20,10 @@ def incomplete_graph(n, completeness)
   max_weight = ((1..n - 1).reduce(:+).to_f * completeness).to_i + 1
   0.upto(n - 2) do |i|
     (i + 1).upto(n - 1) do |j|
-      if rand < completeness
-        g.add_edge(i, j)
-        w = rand(max_weight)
-        g.set_w([i, j], w)
-      end
+      next unless rand < completeness
+      g.add_edge(i, j)
+      w = rand(max_weight)
+      g.set_w([i, j], w)
     end
   end
   g

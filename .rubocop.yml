@@ -3,6 +3,24 @@ inherit_from: .rubocop_todo.yml
 AllCops:
   TargetRubyVersion: 2.0
 
+# Avoid postfix conditionals, except on the shortest of lines. Never use postfix
+# conditional after an assignment.
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/MultilineOperationIndentation:
+  EnforcedStyle: indented
+
+# For this project, where performance matters, do not use the nil predicate method
+# (`nil?`), as it is slower than the `==` operator.
+Style/NilComparison:
+  Enabled: false
+
+# For this project, where performance matters, do not use numeric predicate methods like
+# `zero?`, as they are about 25% slower than optimized operators like `==`.
+Style/NumericPredicate:
+  Enabled: false
+
 # Avoid postfix conditionals, except on very short lines. Never use postfix conditionals
 # after variable assignment, regardless of line length.
 Style/WhileUntilModifier:

@@ -19,7 +19,7 @@ module GraphMatching
       LBL_S = 1
       LBL_T = 2
       LBL_CRUMB = 5
-      LBL_NAMES = %w(Free S T Crumb)
+      LBL_NAMES = %w(Free S T Crumb).freeze
 
       def initialize(graph)
         assert(graph).is_a(Graph::WeightedGraph)
@@ -42,13 +42,12 @@ module GraphMatching
 
         # Iterative *stages*.  Each stage augments the matching.
         # There can be at most n stages, where n is num. vertexes.
-        while true
+        loop do
           init_stage
 
           # *sub-stages* either augment or scale the duals.
           augmented = false
-          while true
-
+          loop do
             # > The search is conducted by scanning the S-vertices
             # > in turn. (Galil, 1986, p. 26)
             until augmented || @queue.empty?
@@ -105,7 +104,7 @@ module GraphMatching
           # > Expand the least-z blossom.
           expand_blossom(delta_blossom, false)
         else
-          fail "Invalid delta_type: #{delta_type}"
+          raise "Invalid delta_type: #{delta_type}"
         end
         optimum
       end
@@ -194,9 +193,7 @@ module GraphMatching
                 i, j = j, i
               end
               bj = @in_blossom[j]
-              if bj != b &&
-                  @label[bj] == LBL_S &&
-                  (best_edge_to[bj] == nil || slack(k) < slack(best_edge_to[bj]))
+              if better_edge_to?(bj, k, b, best_edge_to)
                 best_edge_to[bj] = k
               end
             end
@@ -223,7 +220,7 @@ module GraphMatching
         s = @label[b] == LBL_S
         m = @label_end[b] == @mate[@blossom_base[b]]
         unless t || s && m
-          fail <<-EOS
+          raise <<-EOS
               Assertion failed: Expected either:
               1. Current Bv to be a T-blossom, or
               2. Bv is an S-blossom and its base is matched to @label_end[bv]
@@ -233,7 +230,7 @@ module GraphMatching
 
       def assert_label(ix, lbl)
         unless @label[ix] == lbl
-          fail "Expected label at #{ix} to be #{LBL_NAMES[lbl]}"
+          raise "Expected label at #{ix} to be #{LBL_NAMES[lbl]}"
         end
       end
 
@@ -258,7 +255,7 @@ module GraphMatching
           # with an external mate.)
           base = @blossom_base[b]
           if @mate[base].nil?
-            fail "Expected blossom #{b}'s base (#{base}) to be matched"
+            raise "Expected blossom #{b}'s base (#{base}) to be matched"
           end
 
           # Assign label S to the mate of blossom b's base.
@@ -268,7 +265,7 @@ module GraphMatching
           base_edge_endpoints = [@mate[base], @mate[base] ^ 1]
           assign_label(@endpoint[base_edge_endpoints[0]], LBL_S, base_edge_endpoints[1])
         else
-          fail ArgumentError, "Unexpected label: #{t}"
+          raise ArgumentError, "Unexpected label: #{t}"
         end
       end
 
@@ -329,7 +326,7 @@ module GraphMatching
           # > until we find a single vertex, swapping matched and unmatched
           # > edges as we go.
           # > (Van Rantwijk, mwmatching.py, line 504)
-          while true
+          loop do
             bs = @in_blossom[s]
             assert_label(bs, LBL_S)
             assert(@label_end[bs]).eq(@mate[@blossom_base[bs]])
@@ -359,6 +356,12 @@ module GraphMatching
             p = @label_end[bt] ^ 1
           end
         end
+      end
+
+      def better_edge_to?(bj, k, b, best_edge_to)
+        bj != b &&
+          @label[bj] == LBL_S &&
+          (best_edge_to[bj] == nil || slack(k) < slack(best_edge_to[bj]))
       end
 
       # TODO: Optimize by returning lazy iterator
@@ -391,7 +394,7 @@ module GraphMatching
           jstep = -1
           endptrick = 1
         end
-        return j, jstep, endptrick
+        [j, jstep, endptrick]
       end
 
       def calc_delta(max_cardinality)
@@ -411,40 +414,37 @@ module GraphMatching
         # > an S-vertex and a free vertex.
         # > (Van Rantwijk, mwmatching.py)
         (0...@nvertex).each do |v|
-          if @label[@in_blossom[v]] == LBL_FREE && !@best_edge[v].nil?
-            d = slack(@best_edge[v])
-            if delta_type == nil || d < delta
-              delta = d
-              delta_type = 2
-              delta_edge = @best_edge[v]
-            end
-          end
+          next unless @label[@in_blossom[v]] == LBL_FREE && !@best_edge[v].nil?
+          d = slack(@best_edge[v])
+          next unless delta_type == nil || d < delta
+          delta = d
+          delta_type = 2
+          delta_edge = @best_edge[v]
         end
 
         # > Compute delta3: half the minimum slack on any edge between
         # > a pair of S-blossoms.
         # > (Van Rantwijk, mwmatching.py)
         (0...2 * @nvertex).each do |b|
-          if @blossom_parent[b].nil? && @label[b] == LBL_S && !@best_edge[b].nil?
-            kslack = slack(@best_edge[b])
-            d = kslack / 2 # Van Rantwijk had some type checking here.  Why?
-            if delta_type.nil? || d < delta
-              delta = d
-              delta_type = 3
-              delta_edge = @best_edge[b]
-            end
+          unless @blossom_parent[b].nil? && @label[b] == LBL_S && !@best_edge[b].nil?
+            next
           end
+          kslack = slack(@best_edge[b])
+          d = kslack / 2 # Van Rantwijk had some type checking here.  Why?
+          next unless delta_type.nil? || d < delta
+          delta = d
+          delta_type = 3
+          delta_edge = @best_edge[b]
         end
 
         # > Compute delta4: minimum z variable of any T-blossom.
         # > (Van Rantwijk, mwmatching.py)
         (@nvertex...2 * @nvertex).each do |b|
           top_t_blossom = top_level_blossom?(b) && @label[b] == LBL_T
-          if top_t_blossom && (delta_type.nil? || @dual[b] < delta)
-            delta = @dual[b]
-            delta_type = 4
-            delta_blossom = b
-          end
+          next unless top_t_blossom && (delta_type.nil? || @dual[b] < delta)
+          delta = @dual[b]
+          delta_type = 4
+          delta_blossom = b
         end
 
         if delta_type.nil?
@@ -457,7 +457,7 @@ module GraphMatching
           delta = [0, @dual[0, @nvertex].min].max
         end
 
-        return delta, delta_type, delta_edge, delta_blossom
+        [delta, delta_type, delta_edge, delta_blossom]
       end
 
       # Returns nil if `k` is known to be an endpoint of a tight
@@ -1061,15 +1061,14 @@ module GraphMatching
           end
         end
         (@nvertex...2 * @nvertex).each do |b|
-          if top_level_blossom?(b)
-            case @label[b]
-            when LBL_S
-              @dual[b] += delta
-            when LBL_T
-              @dual[b] -= delta
-            else
-              # No change to free blossoms
-            end
+          next unless top_level_blossom?(b)
+          case @label[b]
+          when LBL_S
+            @dual[b] += delta
+          when LBL_T
+            @dual[b] -= delta
+          else
+            # No change to free blossoms
           end
         end
       end

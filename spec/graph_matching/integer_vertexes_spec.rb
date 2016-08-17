@@ -7,7 +7,7 @@ require 'graph_matching/integer_vertexes'
 RSpec.describe GraphMatching::IntegerVertexes do
   describe '.to_integers' do
     it 'returns new graph with vertexes converted to integers, and a legend' do
-      e = %w[a b]
+      e = %w(a b)
       g1 = RGL::AdjacencyGraph[*e]
       g2, legend = described_class.to_integers(g1)
       expect(g2.size).to eq(g1.size)

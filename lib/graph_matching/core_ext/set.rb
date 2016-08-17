@@ -16,7 +16,7 @@ unless Set.instance_methods.include?(:intersect?)
     # http://www.ruby-doc.org/stdlib-2.2.0/libdoc/set/rdoc/Set.html#method-i-intersect-3F
     def intersect?(set)
       unless set.is_a?(Set)
-        fail ArgumentError, 'value must be a set'
+        raise ArgumentError, 'value must be a set'
       end
       if size < set.size
         any? { |o| set.include?(o) }

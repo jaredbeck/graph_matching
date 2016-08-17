@@ -14,27 +14,27 @@ module GraphMatching
 
     def eq(other)
       unless obj == other
-        fail "Expected #{other}, got #{obj}"
+        raise "Expected #{other}, got #{obj}"
       end
     end
 
     def gte(other)
       unless obj >= other
-        fail "Expected #{obj} to be >= #{other}"
+        raise "Expected #{obj} to be >= #{other}"
       end
     end
 
     # rubocop:disable Style/PredicateName
     def is_a(klass)
       unless obj.is_a?(klass)
-        fail TypeError, "Expected #{klass}, got #{obj.class}"
+        raise TypeError, "Expected #{klass}, got #{obj.class}"
       end
     end
     # rubocop:enable Style/PredicateName
 
     def not_nil
       if obj.nil?
-        fail 'Unexpected nil'
+        raise 'Unexpected nil'
       end
     end
   end

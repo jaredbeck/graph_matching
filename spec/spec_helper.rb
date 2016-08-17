@@ -12,8 +12,8 @@ end
 
 RSpec::Matchers.define(:match_edges) do |expected|
   match do |matching|
-    fail TypeError unless matching.is_a?(GraphMatching::Matching)
-    fail TypeError unless expected.is_a?(Array)
+    raise TypeError unless matching.is_a?(GraphMatching::Matching)
+    raise TypeError unless expected.is_a?(Array)
     se = Set.new(expected.map { |e| RGL::Edge::UnDirectedEdge.new(*e) })
     sa = Set.new(matching.undirected_edges)
     se == sa

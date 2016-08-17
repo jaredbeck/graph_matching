@@ -6,8 +6,8 @@ require 'rgl/rdot'
 module GraphMatching
   # Renders `GraphMatching::Graph` objects using `graphviz`.
   class Visualize
-    TMP_DIR = '/tmp/graph_matching'
-    USR_BIN_ENV = '/usr/bin/env'
+    TMP_DIR = '/tmp/graph_matching'.freeze
+    USR_BIN_ENV = '/usr/bin/env'.freeze
 
     attr_reader :graph
 

@@ -10,7 +10,7 @@ module GraphMatching
     # original vertexes.
     #
     def self.to_integers(graph)
-      fail ArgumentError unless graph.is_a?(RGL::MutableGraph)
+      raise ArgumentError unless graph.is_a?(RGL::MutableGraph)
       legend = {}
       reverse_legend = {}
       new_graph = graph.class.new
@@ -23,7 +23,7 @@ module GraphMatching
         target = reverse_legend[edge.target]
         new_graph.add_edge(source, target)
       end
-      return new_graph, legend
+      [new_graph, legend]
     end
   end
 end

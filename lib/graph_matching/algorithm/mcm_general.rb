@@ -57,7 +57,7 @@ module GraphMatching
         # assign a start label and begin a new search)
         # set LABEL(u) = FIRST(u) = 0
 
-        while true
+        loop do
           u += 1
           break if u > g.size
           if mate[u] != 0
@@ -275,7 +275,7 @@ module GraphMatching
           r(x, y, label, mate)
           r(y, x, label, mate)
         else
-          fail "Vertex #{v} has an unexpected label type"
+          raise "Vertex #{v} has an unexpected label type"
         end
       end
 

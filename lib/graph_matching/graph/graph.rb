@@ -56,7 +56,7 @@ module GraphMatching
 
       def vertexes_must_be_integers
         return if vertices.none? { |v| !v.is_a?(Integer) }
-        fail ArgumentError, 'All vertexes must be integers'
+        raise ArgumentError, 'All vertexes must be integers'
       end
     end
   end

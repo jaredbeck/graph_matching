@@ -28,8 +28,7 @@ module GraphMatching
         u = init_duals(cats, dogs)
 
         # For each stage
-        while true
-
+        loop do
           # Clear all labels and marks
           # Label all single dogs with S
           aug_path = nil
@@ -44,24 +43,23 @@ module GraphMatching
             # Follow the unmatched edges (if any) to free (unlabeled)
             # cats.  Only consider edges with slack (π) of 0.
             unlabeled_across_unmatched_edges_from(i, g, m, t).each do |j|
-              if π(u, i, j) == 0
-                t << j
-                predecessors[j] = i
+              next unless slack(u, i, j) == 0
+              t << j
+              predecessors[j] = i
 
-                # If there are matched edges, follow each to a dog and
-                # label the dog with S.  Otherwise, backtrack to
-                # construct an augmenting path.
-                m_dogs = matched_adjacent(j, i, g, m)
+              # If there are matched edges, follow each to a dog and
+              # label the dog with S.  Otherwise, backtrack to
+              # construct an augmenting path.
+              m_dogs = matched_adjacent(j, i, g, m)
 
-                m_dogs.each do |md|
-                  s << md
-                  predecessors[md] = j
-                end
+              m_dogs.each do |md|
+                s << md
+                predecessors[md] = j
+              end
 
-                if m_dogs.empty?
-                  aug_path = backtrack_from(j, predecessors)
-                  break
-                end
+              if m_dogs.empty?
+                aug_path = backtrack_from(j, predecessors)
+                break
               end
             end
           end
@@ -116,7 +114,7 @@ module GraphMatching
         s.each do |s_dog|
           g.each_adjacent(s_dog) do |cat|
             unless t.include?(cat)
-              slacks.push π(u, s_dog, cat)
+              slacks.push slack(u, s_dog, cat)
             end
           end
         end
@@ -138,10 +136,9 @@ module GraphMatching
 
       # Returns the "slack" of an edge (Galil, 1986, p.30), the
       # difference between an edge's duals and its weight.
-      def π(u, i, j)
+      def slack(u, i, j)
         u[i] + u[j] - @weight[i - 1][j - 1]
       end
-
     end
   end
 end
