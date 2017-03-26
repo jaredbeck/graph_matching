@@ -12,15 +12,6 @@ module GraphMatching
   module Graph
     # Base class for all graphs.
     class Graph < RGL::AdjacencyGraph
-      def self.[](*args)
-        super.tap(&:vertexes_must_be_integers)
-      end
-
-      def initialize(*args)
-        super
-        vertexes_must_be_integers
-      end
-
       # `adjacent_vertex_set` is the same as `adjacent_vertices`
       # except it returns a `Set` instead of an `Array`.  This is
       # an optimization, performing in O(n), whereas passing
@@ -52,11 +43,6 @@ module GraphMatching
 
       def vertexes
         to_a
-      end
-
-      def vertexes_must_be_integers
-        return if vertices.none? { |v| !v.is_a?(Integer) }
-        raise ArgumentError, 'All vertexes must be integers'
       end
     end
   end
