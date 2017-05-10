@@ -54,7 +54,8 @@ module GraphMatching
             @neighb_end[v].each do |p|
               k = p / 2 # Note: floor division
               w = @endpoint[p]
-              unless @in_blossom[w] != b && @label[@in_blossom[w]] == MWMGeneral::LBL_S
+              unless @in_blossom[w] != b &&
+                  @label[@in_blossom[w]] == MWMGeneral::LBL_S
                 next
               end
               d = slack(k)

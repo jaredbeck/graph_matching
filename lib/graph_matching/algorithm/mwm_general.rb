@@ -59,9 +59,9 @@ module GraphMatching
             # > There is no augmenting path under these constraints;
             # > compute delta and reduce slack in the optimization problem.
             # > (Van Rantwijk, mwmatching.py, line 732)
-            delta, delta_type, delta_edge, delta_blossom = calc_delta(max_cardinality)
+            delta, d_type, d_edge, d_blossom = calc_delta(max_cardinality)
             update_duals(delta)
-            optimum = act_on_minimum_delta(delta_type, delta_edge, delta_blossom)
+            optimum = act_on_minimum_delta(d_type, d_edge, d_blossom)
             break if optimum
           end
 
@@ -180,7 +180,7 @@ module GraphMatching
             # > slack edges.  Get the information from the vertices.
             nblists = blossom_leaves(child).map { |leaf|
               @neighb_end[leaf].map { |p|
-                p / 2 # floor division
+                p / 2 # Intentional floor division
               }
             }
           else
@@ -267,7 +267,11 @@ module GraphMatching
           # The bitwise XOR is very clever. `mate[x]` and `mate[x] ^ 1`
           # are connected "endpoints".
           base_edge_endpoints = [@mate[base], @mate[base] ^ 1]
-          assign_label(@endpoint[base_edge_endpoints[0]], LBL_S, base_edge_endpoints[1])
+          assign_label(
+            @endpoint[base_edge_endpoints[0]],
+            LBL_S,
+            base_edge_endpoints[1]
+          )
         else
           raise ArgumentError, "Unexpected label: #{t}"
         end
@@ -430,7 +434,9 @@ module GraphMatching
         # > a pair of S-blossoms.
         # > (Van Rantwijk, mwmatching.py)
         (0...2 * @nvertex).each do |b|
-          unless @blossom_parent[b].nil? && @label[b] == LBL_S && !@best_edge[b].nil?
+          unless @blossom_parent[b].nil? &&
+              @label[b] == LBL_S &&
+              !@best_edge[b].nil?
             next
           end
           kslack = slack(@best_edge[b])
@@ -613,16 +619,20 @@ module GraphMatching
 
           # > Relabel the T-sub-blossom.
           @label[@endpoint[p ^ 1]] = LBL_FREE
-          @label[@endpoint[@blossom_endps[b][j - endptrick] ^ endptrick ^ 1]] = LBL_FREE
+          @label[
+            @endpoint[@blossom_endps[b][j - endptrick] ^ endptrick ^ 1]
+          ] = LBL_FREE
           assign_label(@endpoint[p ^ 1], LBL_T, p)
 
           # > Step to the next S-sub-blossom and note its forward endpoint.
-          @tight_edge[@blossom_endps[b][j - endptrick] / 2] = true # floor division
+          # Intentional floor division
+          @tight_edge[@blossom_endps[b][j - endptrick] / 2] = true
           j += jstep
           p = @blossom_endps[b][j - endptrick] ^ endptrick
 
           # > Step to the next T-sub-blossom.
-          @tight_edge[p / 2] = true # floor division
+          # Intentional floor division
+          @tight_edge[p / 2] = true
           j += jstep
         end
 
@@ -690,11 +700,10 @@ module GraphMatching
       # Data structures used throughout the algorithm.
       def init_algorithm_structures
         # > If v is a vertex,
-        # > mate[v] is the remote endpoint of its matched edge, or -1 if it is single
-        # > (i.e. endpoint[mate[v]] is v's partner vertex).
+        # > mate[v] is the remote endpoint of its matched edge, or -1 if it is
+        # > single (i.e. endpoint[mate[v]] is v's partner vertex).
         # > Initially all vertices are single; updated during augmentation.
         # > (Van Rantwijk, mwmatching.py)
-        #
         @mate = Array.new(@nvertex, nil)
 
         # > If b is a top-level blossom,
@@ -703,37 +712,29 @@ module GraphMatching
         # >             2 if b is a T-vertex/blossom.
         # > The label of a vertex is found by looking at the label of its
         # > top-level containing blossom.
-        # > If v is a vertex inside a T-blossom,
-        # > label[v] is 2 iff v is reachable from an S-vertex outside the blossom.
-        # > Labels are assigned during a stage and reset after each augmentation.
+        # > If v is a vertex inside a T-blossom, label[v] is 2 iff v is
+        # > reachable from an S-vertex outside the blossom. Labels are assigned
+        # > during a stage and reset after each augmentation.
         # > (Van Rantwijk, mwmatching.py)
-        #
         @label = rantwijk_array(LBL_FREE)
 
-        # > If b is a labeled top-level blossom,
-        # > labelend[b] is the remote endpoint of the edge through which b obtained
-        # > its label, or -1 if b's base vertex is single.
-        # > If v is a vertex inside a T-blossom and label[v] == 2,
-        # > labelend[v] is the remote endpoint of the edge through which v is
-        # > reachable from outside the blossom.
-        # > (Van Rantwijk, mwmatching.py)
-        #
+        # > If b is a labeled top-level blossom, labelend[b] is the remote
+        # > endpoint of the edge through which b obtained its label, or -1 if
+        # > b's base vertex is single. If v is a vertex inside a T-blossom and
+        # > label[v] == 2, labelend[v] is the remote endpoint of the edge
+        # > through which v is reachable from outside the blossom. (Van
+        # > Rantwijk, mwmatching.py)
         @label_end = rantwijk_array(nil)
 
-        # > If v is a vertex,
-        # > inblossom[v] is the top-level blossom to which v belongs.
-        # > If v is a top-level vertex, v is itself a blossom (a trivial blossom)
-        # > and inblossom[v] == v.
-        # > Initially all vertices are top-level trivial blossoms.
-        # > (Van Rantwijk, mwmatching.py)
-        #
+        # > If v is a vertex, inblossom[v] is the top-level blossom to which v
+        # > belongs. If v is a top-level vertex, v is itself a blossom (a
+        # > trivial blossom) and inblossom[v] == v. Initially all vertices are
+        # > top-level trivial blossoms. (Van Rantwijk, mwmatching.py)
         @in_blossom = (0...@nvertex).to_a
 
-        # > If b is a sub-blossom,
-        # > blossomparent[b] is its immediate parent (sub-)blossom.
-        # > If b is a top-level blossom, blossomparent[b] is -1.
+        # > If b is a sub-blossom, blossomparent[b] is its immediate parent
+        # > (sub-)blossom. If b is a top-level blossom, blossomparent[b] is -1.
         # > (Van Rantwijk, mwmatching.py)
-        #
         @blossom_parent = rantwijk_array(nil)
 
         # A 2D array representing a tree of blossoms.
@@ -1010,7 +1011,7 @@ module GraphMatching
         augmented = false
 
         @neighb_end[v].each do |p|
-          k = p / 2 # floor division
+          k = p / 2 # Intentional floor division
           w = @endpoint[p]
 
           if @in_blossom[v] == @in_blossom[w]
