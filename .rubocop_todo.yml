@@ -1,11 +1,6 @@
 # Remove these configuration records
 # one by one as the offenses are removed from the code base.
 
-# Offense count: 7
-Lint/ShadowingOuterLocalVariable:
-  Exclude:
-    - 'lib/graph_matching/algorithm/mwm_general.rb'
-
 # Offense count: 4
 Lint/UselessAssignment:
   Exclude:

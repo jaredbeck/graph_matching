@@ -137,19 +137,19 @@ module GraphMatching
         #
         @blossom_children[b] = []
         @blossom_endps[b] = []
-        trace_to_base(bv, bb) do |bv|
-          @blossom_parent[bv] = b
-          @blossom_children[b] << bv
-          @blossom_endps[b] << @label_end[bv]
+        trace_to_base(bv, bb) do |bv2|
+          @blossom_parent[bv2] = b
+          @blossom_children[b] << bv2
+          @blossom_endps[b] << @label_end[bv2]
         end
         @blossom_children[b] << bb
         @blossom_children[b].reverse!
         @blossom_endps[b].reverse!
         @blossom_endps[b] << 2 * k
-        trace_to_base(bw, bb) do |bw|
-          @blossom_parent[bw] = b
-          @blossom_children[b] << bw
-          @blossom_endps[b] << (@label_end[bw] ^ 1)
+        trace_to_base(bw, bb) do |bw2|
+          @blossom_parent[bw2] = b
+          @blossom_children[b] << bw2
+          @blossom_endps[b] << (@label_end[bw2] ^ 1)
         end
 
         # > Set label to S
@@ -161,56 +161,56 @@ module GraphMatching
         @dual[b] = 0
 
         # > Relabel vertices.
-        blossom_leaves(b).each do |v|
-          if @label[@in_blossom[v]] == LBL_T
+        blossom_leaves(b).each do |leaf|
+          if @label[@in_blossom[leaf]] == LBL_T
             # > This T-vertex now turns into an S-vertex because it
             # > becomes part of an S-blossom; add it to the queue.
-            @queue << v
+            @queue << leaf
           end
-          @in_blossom[v] = b
+          @in_blossom[leaf] = b
         end
 
         # > Compute blossombestedges[b].
         best_edge_to = rantwijk_array(nil)
-        @blossom_children[b].each do |bv|
-          if @blossom_best_edges[bv].nil?
+        @blossom_children[b].each do |child|
+          if @blossom_best_edges[child].nil?
             # > This subblossom [bv] does not have a list of least-
             # > slack edges.  Get the information from the vertices.
-            nblists = blossom_leaves(bv).map { |v|
-              @neighb_end[v].map { |p|
+            nblists = blossom_leaves(child).map { |leaf|
+              @neighb_end[leaf].map { |p|
                 p / 2 # floor division
               }
             }
           else
             # > Walk this subblossom's least-slack edges.
-            nblists = [@blossom_best_edges[bv]]
+            nblists = [@blossom_best_edges[child]]
           end
 
           nblists.each do |nblist|
-            nblist.each do |k|
-              i, j = @edges[k].to_a
+            nblist.each do |x|
+              i, j = @edges[x].to_a
               if @in_blossom[j] == b
                 i, j = j, i
               end
               bj = @in_blossom[j]
-              if better_edge_to?(bj, k, b, best_edge_to)
-                best_edge_to[bj] = k
+              if better_edge_to?(bj, x, b, best_edge_to)
+                best_edge_to[bj] = x
               end
             end
           end
 
           # > Forget about least-slack edges of the subblossom.
-          @blossom_best_edges[bv] = nil
-          @best_edge[bv] = nil
+          @blossom_best_edges[child] = nil
+          @best_edge[child] = nil
         end
 
         @blossom_best_edges[b] = best_edge_to.compact
 
         # > Select bestedge[b]
         @best_edge[b] = nil
-        @blossom_best_edges[b].each do |k|
-          if @best_edge[b].nil? || slack(k) < slack(@best_edge[b])
-            @best_edge[b] = k
+        @blossom_best_edges[b].each do |edge|
+          if @best_edge[b].nil? || slack(edge) < slack(@best_edge[b])
+            @best_edge[b] = edge
           end
         end
       end
