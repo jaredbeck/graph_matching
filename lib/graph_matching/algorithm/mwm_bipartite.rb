@@ -38,7 +38,10 @@ module GraphMatching
           q = s.dup.to_a
 
           # While searching
-          while aug_path.nil? && i = q.pop
+          loop do
+            break unless aug_path.nil?
+            i = q.pop
+            break unless i
 
             # Follow the unmatched edges (if any) to free (unlabeled)
             # cats.  Only consider edges with slack (π) of 0.

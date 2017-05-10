@@ -1,13 +1,6 @@
 # Remove these configuration records
 # one by one as the offenses are removed from the code base.
 
-# Offense count: 2
-# Configuration parameters: AllowSafeAssignment.
-Lint/AssignmentInCondition:
-  Exclude:
-    - 'lib/graph_matching/algorithm/mcm_bipartite.rb'
-    - 'lib/graph_matching/algorithm/mwm_bipartite.rb'
-
 # Offense count: 7
 Lint/ShadowingOuterLocalVariable:
   Exclude:

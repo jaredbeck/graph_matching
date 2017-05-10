@@ -30,7 +30,10 @@ module GraphMatching
           unmarked = r = u.select { |i| m[i] == nil }
 
           # While there are unmarked R-vertexes
-          while aug_path.nil? && start = unmarked.pop
+          loop do
+            break unless aug_path.nil?
+            start = unmarked.pop
+            break unless start
 
             # Follow the unmatched edges (if any) to vertexes in V
             # ignoring any V-vertexes already labeled T
