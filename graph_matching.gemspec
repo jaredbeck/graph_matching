@@ -27,5 +27,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec-expectations', '~> 3.6'
   spec.add_development_dependency 'rspec-mocks', '~> 3.6'
   spec.add_development_dependency 'rake', '~> 12.0'
-  spec.add_development_dependency 'rubocop', '~> 0.42.0'
+  spec.add_development_dependency 'rubocop', '~> 0.48.1'
 end

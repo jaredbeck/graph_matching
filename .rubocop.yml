@@ -3,6 +3,18 @@ inherit_from: .rubocop_todo.yml
 AllCops:
   TargetRubyVersion: 2.0
 
+# Not useful compared to metrics like AbcSize
+Metrics/BlockLength:
+  Enabled: false
+
+# Not useful compared to metrics like AbcSize
+Metrics/ClassLength:
+  Enabled: false
+
+# Not useful compared to metrics like AbcSize
+Metrics/MethodLength:
+  Enabled: false
+
 # Avoid postfix conditionals, except on the shortest of lines. Never use postfix
 # conditional after an assignment.
 Style/IfUnlessModifier:
