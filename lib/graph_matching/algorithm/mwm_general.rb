@@ -90,14 +90,16 @@ module GraphMatching
           @tight_edge[delta_edge] = true
           i, j = @edges[delta_edge].to_a
           if @label[@in_blossom[i]] == LBL_FREE
-            i, j = j, i
+            # Think of this as swapping i and j, but the corresponding
+            # assignment `j = i` happens to be unnecessary.
+            i = j
           end
           assert_label(@in_blossom[i], LBL_S)
           @queue.push(i)
         when 3
           # > Use the least-slack edge to continue the search.
           @tight_edge[delta_edge] = true
-          i, j = @edges[delta_edge].to_a
+          i = @edges[delta_edge].to_a[0]
           assert_label(@in_blossom[i], LBL_S)
           @queue.push(i)
         when 4
@@ -190,7 +192,9 @@ module GraphMatching
             nblist.each do |x|
               i, j = @edges[x].to_a
               if @in_blossom[j] == b
-                i, j = j, i
+                # Think of this as swapping i and j, but the corresponding
+                # assignment `i = j` happens to be unnecessary.
+                j = i
               end
               bj = @in_blossom[j]
               if better_edge_to?(bj, x, b, best_edge_to)

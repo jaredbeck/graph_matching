@@ -9,14 +9,13 @@ module GraphMatching
     # `MCMBipartite` implements Maximum Cardinality Matching in
     # bipartite graphs.
     class MCMBipartite < MatchingAlgorithm
-
       def initialize(graph)
         assert(graph).is_a(Graph::Bigraph)
         super
       end
 
       def match
-        u, v = g.partition
+        u = g.partition[0]
         m = []
 
         loop do

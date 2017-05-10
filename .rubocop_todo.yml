@@ -1,12 +1,6 @@
 # Remove these configuration records
 # one by one as the offenses are removed from the code base.
 
-# Offense count: 4
-Lint/UselessAssignment:
-  Exclude:
-    - 'lib/graph_matching/algorithm/mcm_bipartite.rb'
-    - 'lib/graph_matching/algorithm/mwm_general.rb'
-
 # Offense count: 24
 Metrics/AbcSize:
   Max: 75
