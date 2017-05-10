@@ -25,6 +25,6 @@ MIN_SIZE.upto(MAX_SIZE) do |v|
   print "%5d\t" % [v]
   g = complete_graph(v)
   GC.disable
-  puts Benchmark.realtime { g.maximum_cardinality_matching }
+  puts(Benchmark.realtime { g.maximum_cardinality_matching })
   GC.enable
 end

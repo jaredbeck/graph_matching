@@ -33,6 +33,6 @@ MIN_SIZE.upto(MAX_SIZE) do |v|
   print "%5d\t" % [v]
   g = incomplete_graph(v, COMPLETENESS)
   GC.disable
-  puts Benchmark.realtime { g.maximum_weighted_matching(true) }
+  puts(Benchmark.realtime { g.maximum_weighted_matching(true) })
   GC.enable
 end

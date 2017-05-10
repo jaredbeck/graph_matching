@@ -21,9 +21,5 @@ t = Set.new
 s = Set.new(dogs)
 
 GC.disable
-puts Benchmark.realtime {
-  100_000.times do
-    a.send(:calc_d2, s, t, u)
-  end
-}
+puts(Benchmark.realtime { 100_000.times { a.send(:calc_d2, s, t, u) } })
 GC.enable

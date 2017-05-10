@@ -1,16 +1,6 @@
 # Remove these configuration records
 # one by one as the offenses are removed from the code base.
 
-# Offense count: 6
-Lint/AmbiguousBlockAssociation:
-  Exclude:
-    - 'benchmark/mcm_bipartite/complete_bigraphs/benchmark.rb'
-    - 'benchmark/mcm_general/complete_graphs/benchmark.rb'
-    - 'benchmark/mwm_bipartite/complete_bigraphs/benchmark.rb'
-    - 'benchmark/mwm_bipartite/misc/calc_d2/benchmark.rb'
-    - 'benchmark/mwm_general/complete_graphs/benchmark.rb'
-    - 'benchmark/mwm_general/incomplete_graphs/benchmark.rb'
-
 # Offense count: 2
 # Configuration parameters: AllowSafeAssignment.
 Lint/AssignmentInCondition:

@@ -38,6 +38,6 @@ MIN_SIZE.upto(MAX_SIZE) do |v|
   print "%5d\t" % [v]
   g = complete_weighted_bigraph(v)
   GC.disable
-  puts Benchmark.realtime { g.maximum_weighted_matching }
+  puts(Benchmark.realtime { g.maximum_weighted_matching })
   GC.enable
 end
