@@ -15,16 +15,12 @@ Gem::Specification.new do |spec|
   EOS
   spec.homepage      = 'https://github.com/jaredbeck/graph_matching'
   spec.license       = 'MIT'
-
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
-
-  spec.required_ruby_version = '>= 2.0.0'
-
+  spec.required_ruby_version = '>= 2.2.0'
   spec.add_runtime_dependency 'rgl', '~> 0.5.0'
-
   spec.add_development_dependency 'bundler', '~> 1.12'
   spec.add_development_dependency 'pry-nav', '~> 0.2.4'
   spec.add_development_dependency 'rspec-core', '~> 3.2'
