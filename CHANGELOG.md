@@ -7,7 +7,7 @@ of [keepachangelog.com][2].
 
 ### Fixed
 
-- Reduce size of gem by omitting unnecessary files
+- Reduce size of gem from 9 MB to 32 kb by omitting unnecessary files
 
 ## 0.1.0 (2017-05-10)
 
