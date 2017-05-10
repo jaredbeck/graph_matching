@@ -3,6 +3,12 @@
 This project follows [semver 2.0.0][1] and the recommendations
 of [keepachangelog.com][2].
 
+## 0.1.1 (2017-05-10)
+
+### Fixed
+
+- Reduce size of gem by omitting unnecessary files
+
 ## 0.1.0 (2017-05-10)
 
 ### Breaking Changes
