@@ -14,7 +14,7 @@ RSpec.describe GraphMatching::IntegerVertexes do
       expect(g2.vertices).to eq(1.upto(g1.size).to_a)
       expect(g2.num_edges).to eq(g1.num_edges)
       legend.keys.map(&:class).uniq.each do |klass|
-        expect(klass).to be < Integer
+        expect(klass).to(be <= ::Integer)
       end
     end
   end
