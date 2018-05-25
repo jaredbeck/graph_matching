@@ -64,7 +64,7 @@ and Galil (1986), which performs in O(n ^ (3/4) m log N).
 
 ```ruby
 require 'graph_matching'
-g = GraphMatching::Graph::WeightedGraph[
+g = GraphMatching::Graph::WeightedBigraph[
   [1, 2, 10],
   [1, 3, 11]
 ]
