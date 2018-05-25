@@ -64,7 +64,7 @@ and Galil (1986), which performs in O(n ^ (3/4) m log N).
 
 ```ruby
 require 'graph_matching'
-g = GraphMatching::Graph::WeightedGraph[
+g = GraphMatching::Graph::WeightedBigraph[
   [1, 2, 10],
   [1, 3, 11]
 ]
@@ -94,13 +94,20 @@ will be considered.
 require 'graph_matching'
 g = GraphMatching::Graph::WeightedGraph[
   [1, 2, 10],
-  [1, 3, 11]
+  [2, 3, 21],
+  [3, 4, 10]
 ]
 m = g.maximum_weighted_matching(false)
 m.edges
-#=> [[3, 1]]
+#=> [[3, 2]]
 m.weight(g)
-#=> 11
+#=> 21
+
+m = g.maximum_weighted_matching(true)
+m.edges
+#=> [[2, 1], [4, 3]]
+m.weight(g)
+#=> 20
 ```
 
 The algorithm performs in O(mn log n) as described by 
