@@ -68,7 +68,7 @@ module GraphMatching
           e.is_a?(Array) &&
             e.length == 3 &&
             e[0, 2].all? { |i| i.is_a?(Integer) } &&
-            e[2].is_a?(Integer) || e[2].is_a?(Float)
+            e[2].is_a?(Numeric)
         end
       end
 
