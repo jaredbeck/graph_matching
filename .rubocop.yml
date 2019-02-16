@@ -42,6 +42,10 @@ Style/BlockDelimiters:
 Style/IfUnlessModifier:
   Enabled: false
 
+# Too subtle to lint. Definitely use guard clauses though, they're great.
+Style/GuardClause:
+  Enabled: false
+
 # For this project, where performance matters, do not use the nil predicate method
 # (`nil?`), as it is slower than the `==` operator.
 Style/NilComparison:

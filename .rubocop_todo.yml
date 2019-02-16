@@ -62,16 +62,6 @@ Style/EmptyElse:
   Exclude:
     - 'lib/graph_matching/algorithm/mwm_general.rb'
 
-# Configuration parameters: MinBodyLength.
-Style/GuardClause:
-  Exclude:
-    - 'lib/graph_matching/algorithm/mcm_bipartite.rb'
-    - 'lib/graph_matching/algorithm/mcm_general.rb'
-    - 'lib/graph_matching/algorithm/mwm_bipartite.rb'
-    - 'lib/graph_matching/algorithm/mwm_general.rb'
-    - 'lib/graph_matching/algorithm/mwmg_delta_assertions.rb'
-    - 'lib/graph_matching/assertion.rb'
-
 Style/MultipleComparison:
   Exclude:
     - 'lib/graph_matching/algorithm/mwmg_delta_assertions.rb'
