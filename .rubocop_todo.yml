@@ -62,10 +62,6 @@ Style/EmptyElse:
   Exclude:
     - 'lib/graph_matching/algorithm/mwm_general.rb'
 
-Style/MultipleComparison:
-  Exclude:
-    - 'lib/graph_matching/algorithm/mwmg_delta_assertions.rb'
-
 # Cop supports --auto-correct.
 # Configuration parameters: PreferredDelimiters.
 Style/PercentLiteralDelimiters:
