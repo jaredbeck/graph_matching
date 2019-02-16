@@ -48,23 +48,6 @@ Style/Alias:
   Exclude:
     - 'lib/graph_matching/ordered_set.rb'
 
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, ProceduralMethods, FunctionalMethods, IgnoredMethods.
-# SupportedStyles: line_count_based, semantic, braces_for_chaining
-# ProceduralMethods: benchmark, bm, bmbm, create, each_with_object, measure, new, realtime, tap, with_object
-# FunctionalMethods: let, let!, subject, watch
-# IgnoredMethods: lambda, proc, it
-Style/BlockDelimiters:
-  Exclude:
-    - 'benchmark/mwm_general/incomplete_graphs/benchmark.rb'
-    - 'lib/graph_matching/algorithm/mcm_bipartite.rb'
-    - 'lib/graph_matching/algorithm/mwm_bipartite.rb'
-    - 'lib/graph_matching/algorithm/mwm_general.rb'
-    - 'lib/graph_matching/graph/graph.rb'
-    - 'lib/graph_matching/matching.rb'
-    - 'lib/graph_matching/ordered_set.rb'
-    - 'spec/graph_matching/algorithm/mcm_bipartite_spec.rb'
-
 Style/CommentedKeyword:
   Exclude:
     - 'lib/graph_matching/algorithm/mcm_general.rb'

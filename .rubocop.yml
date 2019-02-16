@@ -33,6 +33,10 @@ Style/AsciiComments:
     - π
     - ≠
 
+# Too subtle to lint. Favor semantic style.
+Style/BlockDelimiters:
+  Enabled: false
+
 # Avoid postfix conditionals, except on the shortest of lines. Never use postfix
 # conditional after an assignment.
 Style/IfUnlessModifier:
