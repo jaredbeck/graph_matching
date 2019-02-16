@@ -2,7 +2,7 @@
 
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'graph_matching'
-require 'pry'
+require 'byebug'
 
 RSpec.configure do |config|
   config.disable_monkey_patching!
