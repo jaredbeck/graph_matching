@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 module GraphMatching
   # > In .. graph theory, a matching .. in a graph is a set of

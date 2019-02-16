@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 module GraphMatching
   # An `OrderedSet` acts like a `Set`, but preserves insertion order.

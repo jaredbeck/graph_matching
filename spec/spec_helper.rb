@@ -1,8 +1,8 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'graph_matching'
-require 'pry'
+require 'byebug'
 
 RSpec.configure do |config|
   config.disable_monkey_patching!

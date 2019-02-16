@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 # No shebang here.  Usage:
 # ruby -I lib benchmark/mwm_general/complete_graphs/benchmark.rb
@@ -24,7 +24,7 @@ def complete_graph(n)
 end
 
 MIN_SIZE.upto(MAX_SIZE) do |v|
-  print "%5d\t" % [v]
+  print format("%5d\t", v)
   g = complete_graph(v)
   GC.disable
   puts(Benchmark.realtime { g.maximum_weighted_matching(true) })

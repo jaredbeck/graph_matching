@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GraphMatching
   module Algorithm
     # Can be mixed into MWMGeneral to add runtime assertions
@@ -67,7 +69,7 @@ module GraphMatching
           end
           next if @best_edge[b].nil?
           i, j = @edges[@best_edge[b]].to_a
-          unless @in_blossom[i] == b || @in_blossom[j] == b
+          unless @in_blossom.values_at(i, j).include?(b)
             raise 'Assertion failed'
           end
           unless @in_blossom[i] != b || @in_blossom[j] != b

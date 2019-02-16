@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 require 'graph_matching/core_ext/set'
 require 'graph_matching/graph/graph'

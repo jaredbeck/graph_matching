@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 # No shebang here.  Usage:
 # ruby -I lib benchmark/mwm_general/dense_graphs/benchmark.rb
@@ -30,7 +30,7 @@ def incomplete_graph(n, completeness)
 end
 
 MIN_SIZE.upto(MAX_SIZE) do |v|
-  print "%5d\t" % [v]
+  print format("%5d\t", v)
   g = incomplete_graph(v, COMPLETENESS)
   GC.disable
   puts(Benchmark.realtime { g.maximum_weighted_matching(true) })

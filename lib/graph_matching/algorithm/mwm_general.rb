@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 require_relative '../graph/weighted_graph'
 require_relative '../matching'
@@ -6,11 +6,9 @@ require_relative 'matching_algorithm'
 
 module GraphMatching
   module Algorithm
-
     # `MWMGeneral` implements Maximum Weighted Matching in
     # general graphs.
     class MWMGeneral < MatchingAlgorithm
-
       # If b is a top-level blossom,
       # label[b] is 0 if b is unlabeled (free);
       #             1 if b is an S-vertex/blossom;
@@ -19,7 +17,7 @@ module GraphMatching
       LBL_S = 1
       LBL_T = 2
       LBL_CRUMB = 5
-      LBL_NAMES = %w(Free S T Crumb).freeze
+      LBL_NAMES = %w[Free S T Crumb].freeze
 
       def initialize(graph)
         assert(graph).is_a(Graph::WeightedGraph)
