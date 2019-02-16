@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GraphMatching
   module Graph
     # The `Weighted` module is mixed into undirected graphs to

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rgl/adjacency'
 require 'rgl/connected_components'
 require 'set'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'set'
 
 # There are some methods we'd like to use which were not added

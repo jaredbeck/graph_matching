@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'weighted'
 require_relative '../algorithm/mwm_bipartite'
 

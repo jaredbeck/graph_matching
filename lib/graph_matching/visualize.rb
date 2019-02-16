@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 require 'open3'
 require 'rgl/rdot'
 
 module GraphMatching
   # Renders `GraphMatching::Graph` objects using `graphviz`.
   class Visualize
-    TMP_DIR = '/tmp/graph_matching'.freeze
-    USR_BIN_ENV = '/usr/bin/env'.freeze
+    TMP_DIR = '/tmp/graph_matching'
+    USR_BIN_ENV = '/usr/bin/env'
 
     attr_reader :graph
 

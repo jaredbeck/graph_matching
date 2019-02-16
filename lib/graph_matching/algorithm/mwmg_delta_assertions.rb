@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GraphMatching
   module Algorithm
     # Can be mixed into MWMGeneral to add runtime assertions

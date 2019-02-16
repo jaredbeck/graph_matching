@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # No shebang here.  Usage:
 # BM_DIR='benchmark/mcm_bipartite/complete_bigraphs'
 # ruby -I lib "$BM_DIR/benchmark.rb" > "$BM_DIR/time.data"

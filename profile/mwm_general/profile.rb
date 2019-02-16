@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # No shebang here.  Run with:
 #
 # ruby -I lib profile/mwm_general/profile.rb

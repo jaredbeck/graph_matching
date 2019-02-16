@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GraphMatching
   # Converts the vertices of a graph to integers.  Many graph
   # matching algorithms require integer vertexes.

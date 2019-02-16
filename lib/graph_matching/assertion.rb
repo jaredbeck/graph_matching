@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GraphMatching
   # Provides expressive methods for common runtime assertions, e.g.
   #

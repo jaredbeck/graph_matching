@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rgl/adjacency'
 require 'spec_helper'
 require 'graph_matching/integer_vertexes'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../graph/weighted_graph'
 require_relative '../matching'
 require_relative 'matching_algorithm'

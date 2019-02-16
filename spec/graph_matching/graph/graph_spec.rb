@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe GraphMatching::Graph::Graph do
-  ERR_MSG_INT_VERTEXES = 'All vertexes must be integers'.freeze
+  ERR_MSG_INT_VERTEXES = 'All vertexes must be integers'
 
   let(:g) { described_class.new }
 

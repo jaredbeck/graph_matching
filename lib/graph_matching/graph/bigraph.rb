@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rgl/bipartite'
 require_relative 'graph'
 require_relative '../algorithm/mcm_bipartite'

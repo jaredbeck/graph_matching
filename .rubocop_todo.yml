@@ -62,56 +62,6 @@ Style/EmptyElse:
   Exclude:
     - 'lib/graph_matching/algorithm/mwm_general.rb'
 
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: when_needed, always, never
-Style/FrozenStringLiteralComment:
-  Exclude:
-    - 'Gemfile'
-    - 'Rakefile'
-    - 'benchmark/mcm_bipartite/complete_bigraphs/benchmark.rb'
-    - 'benchmark/mcm_general/complete_graphs/benchmark.rb'
-    - 'benchmark/mwm_bipartite/complete_bigraphs/benchmark.rb'
-    - 'benchmark/mwm_bipartite/misc/calc_d2/benchmark.rb'
-    - 'benchmark/mwm_general/complete_graphs/benchmark.rb'
-    - 'benchmark/mwm_general/incomplete_graphs/benchmark.rb'
-    - 'graph_matching.gemspec'
-    - 'lib/graph_matching.rb'
-    - 'lib/graph_matching/algorithm/matching_algorithm.rb'
-    - 'lib/graph_matching/algorithm/mcm_bipartite.rb'
-    - 'lib/graph_matching/algorithm/mcm_general.rb'
-    - 'lib/graph_matching/algorithm/mwm_bipartite.rb'
-    - 'lib/graph_matching/algorithm/mwm_general.rb'
-    - 'lib/graph_matching/algorithm/mwmg_delta_assertions.rb'
-    - 'lib/graph_matching/assertion.rb'
-    - 'lib/graph_matching/core_ext/set.rb'
-    - 'lib/graph_matching/directed_edge_set.rb'
-    - 'lib/graph_matching/errors.rb'
-    - 'lib/graph_matching/graph/bigraph.rb'
-    - 'lib/graph_matching/graph/graph.rb'
-    - 'lib/graph_matching/graph/weighted.rb'
-    - 'lib/graph_matching/graph/weighted_bigraph.rb'
-    - 'lib/graph_matching/graph/weighted_graph.rb'
-    - 'lib/graph_matching/integer_vertexes.rb'
-    - 'lib/graph_matching/matching.rb'
-    - 'lib/graph_matching/ordered_set.rb'
-    - 'lib/graph_matching/version.rb'
-    - 'lib/graph_matching/visualize.rb'
-    - 'profile/mwm_general/profile.rb'
-    - 'spec/graph_matching/algorithm/matching_algorithm_spec.rb'
-    - 'spec/graph_matching/algorithm/mcm_bipartite_spec.rb'
-    - 'spec/graph_matching/algorithm/mcm_general_spec.rb'
-    - 'spec/graph_matching/algorithm/mwm_bipartite_spec.rb'
-    - 'spec/graph_matching/algorithm/mwm_general_spec.rb'
-    - 'spec/graph_matching/graph/bigraph_spec.rb'
-    - 'spec/graph_matching/graph/graph_spec.rb'
-    - 'spec/graph_matching/graph/weighted_spec.rb'
-    - 'spec/graph_matching/integer_vertexes_spec.rb'
-    - 'spec/graph_matching/matching_spec.rb'
-    - 'spec/graph_matching/visualize_spec.rb'
-    - 'spec/graph_matching_spec.rb'
-    - 'spec/spec_helper.rb'
-
 # Configuration parameters: MinBodyLength.
 Style/GuardClause:
   Exclude:

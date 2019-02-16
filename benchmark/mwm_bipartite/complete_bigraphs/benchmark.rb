@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # No shebang here.  Usage:
 # ruby -I lib benchmark/mwm_bipartite/complete_bigraphs/benchmark.rb
 

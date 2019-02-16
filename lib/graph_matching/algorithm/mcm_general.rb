@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../directed_edge_set'
 require_relative '../matching'
 require_relative 'matching_algorithm'
