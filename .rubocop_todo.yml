@@ -48,12 +48,6 @@ Style/Alias:
   Exclude:
     - 'lib/graph_matching/ordered_set.rb'
 
-# Configuration parameters: AllowedChars.
-Style/AsciiComments:
-  Exclude:
-    - 'lib/graph_matching/algorithm/mwm_bipartite.rb'
-    - 'lib/graph_matching/algorithm/mwm_general.rb'
-
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, ProceduralMethods, FunctionalMethods, IgnoredMethods.
 # SupportedStyles: line_count_based, semantic, braces_for_chaining

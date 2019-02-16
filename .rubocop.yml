@@ -26,6 +26,13 @@ Metrics/MethodLength:
 Naming/HeredocDelimiterNaming:
   Enabled: false
 
+# We use some mathematical symbols because those symbols are used in the papers
+# we reference.
+Style/AsciiComments:
+  AllowedChars:
+    - π
+    - ≠
+
 # Avoid postfix conditionals, except on the shortest of lines. Never use postfix
 # conditional after an assignment.
 Style/IfUnlessModifier:
