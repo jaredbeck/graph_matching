@@ -22,6 +22,10 @@ Metrics/ClassLength:
 Metrics/MethodLength:
   Enabled: false
 
+# Too subtle to lint
+Naming/HeredocDelimiterNaming:
+  Enabled: false
+
 # Avoid postfix conditionals, except on the shortest of lines. Never use postfix
 # conditional after an assignment.
 Style/IfUnlessModifier:
