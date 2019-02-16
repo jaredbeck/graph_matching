@@ -7,19 +7,6 @@
 # versions of RuboCop, may require this file to be generated again.
 
 # Cop supports --auto-correct.
-# Configuration parameters: TreatCommentsAsGroupSeparators, Include.
-# Include: **/*.gemspec
-Gemspec/OrderedDependencies:
-  Exclude:
-    - 'graph_matching.gemspec'
-
-# Configuration parameters: Include.
-# Include: **/*.gemspec
-Gemspec/RequiredRubyVersion:
-  Exclude:
-    - 'graph_matching.gemspec'
-
-# Cop supports --auto-correct.
 Layout/CommentIndentation:
   Exclude:
     - 'lib/graph_matching/algorithm/mcm_general.rb'
