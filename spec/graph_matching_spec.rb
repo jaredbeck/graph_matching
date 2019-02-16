@@ -3,7 +3,9 @@
 require 'spec_helper'
 
 RSpec.describe GraphMatching do
-  it 'should have a version number' do
-    expect(GraphMatching::VERSION).to_not be_nil
+  describe '.gem_version' do
+    it 'returns a Gem::Version' do
+      expect(GraphMatching.gem_version).to be_a(Gem::Version)
+    end
   end
 end

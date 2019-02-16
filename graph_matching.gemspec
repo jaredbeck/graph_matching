@@ -5,7 +5,7 @@ require 'graph_matching/version'
 
 Gem::Specification.new do |spec|
   spec.name = 'graph_matching'
-  spec.version = GraphMatching::VERSION
+  spec.version = GraphMatching.gem_version.to_s
   spec.authors = ['Jared Beck']
   spec.email = ['jared@jaredbeck.com']
   spec.summary = 'Finds maximum matchings in undirected graphs.'
