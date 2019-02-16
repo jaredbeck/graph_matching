@@ -24,13 +24,13 @@ module GraphMatching
       end
     end
 
-    # rubocop:disable Style/PredicateName
+    # rubocop:disable Naming/PredicateName
     def is_a(klass)
       unless obj.is_a?(klass)
         raise TypeError, "Expected #{klass}, got #{obj.class}"
       end
     end
-    # rubocop:enable Style/PredicateName
+    # rubocop:enable Naming/PredicateName
 
     def not_nil
       if obj.nil?
