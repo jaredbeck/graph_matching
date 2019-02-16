@@ -1,7 +1,10 @@
 inherit_from: .rubocop_todo.yml
 
 AllCops:
-  TargetRubyVersion: 2.0
+  TargetRubyVersion: 2.3
+
+Layout/MultilineOperationIndentation:
+  EnforcedStyle: indented
 
 # Not useful compared to metrics like AbcSize
 Metrics/BlockLength:
@@ -19,9 +22,6 @@ Metrics/MethodLength:
 # conditional after an assignment.
 Style/IfUnlessModifier:
   Enabled: false
-
-Style/MultilineOperationIndentation:
-  EnforcedStyle: indented
 
 # For this project, where performance matters, do not use the nil predicate method
 # (`nil?`), as it is slower than the `==` operator.

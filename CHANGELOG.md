@@ -3,6 +3,20 @@
 This project follows [semver 2.0.0][1] and the recommendations
 of [keepachangelog.com][2].
 
+## Unreleased
+
+## 0.2.0 (2019-02-15)
+
+### Breaking Changes
+
+- Drop support for ruby < 2.3
+- Removed `GraphMatching::VERSION`, use `GraphMatching.gem_version` instead
+
+### Fixed
+
+- [#7](https://github.com/jaredbeck/graph_matching/pull/7) -
+  An edge can be any `Numeric`
+
 ## 0.1.1 (2017-05-10)
 
 ### Fixed
