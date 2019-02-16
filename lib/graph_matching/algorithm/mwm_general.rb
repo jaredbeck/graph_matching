@@ -17,7 +17,7 @@ module GraphMatching
       LBL_S = 1
       LBL_T = 2
       LBL_CRUMB = 5
-      LBL_NAMES = %w(Free S T Crumb).freeze
+      LBL_NAMES = %w[Free S T Crumb].freeze
 
       def initialize(graph)
         assert(graph).is_a(Graph::WeightedGraph)
