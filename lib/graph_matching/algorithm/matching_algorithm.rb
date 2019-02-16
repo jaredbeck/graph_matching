@@ -4,7 +4,6 @@ require_relative '../assertion'
 
 module GraphMatching
   module Algorithm
-
     # All matching algorithms operate on a graph, hence the
     # common constructor.
     class MatchingAlgorithm
@@ -18,6 +17,5 @@ module GraphMatching
         Assertion.new(obj)
       end
     end
-
   end
 end

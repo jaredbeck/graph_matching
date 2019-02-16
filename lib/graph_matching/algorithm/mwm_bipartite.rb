@@ -6,12 +6,10 @@ require_relative 'matching_algorithm'
 
 module GraphMatching
   module Algorithm
-
     # `MWMBipartite` implements Maximum Weighted Matching in
     # bipartite graphs.  It extends Maximum Cardinality
     # Matching for `Weighted` graphs.
     class MWMBipartite < MCMBipartite
-
       def initialize(graph)
         assert(graph).is_a(Graph::WeightedBigraph)
         super

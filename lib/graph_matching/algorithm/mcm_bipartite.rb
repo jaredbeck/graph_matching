@@ -5,7 +5,6 @@ require_relative 'matching_algorithm'
 
 module GraphMatching
   module Algorithm
-
     # `MCMBipartite` implements Maximum Cardinality Matching in
     # bipartite graphs.
     class MCMBipartite < MatchingAlgorithm
@@ -113,7 +112,6 @@ module GraphMatching
           m[v] != i && !t.include?(i)
         }
       end
-
     end
   end
 end

@@ -6,11 +6,9 @@ require_relative 'matching_algorithm'
 
 module GraphMatching
   module Algorithm
-
     # `MWMGeneral` implements Maximum Weighted Matching in
     # general graphs.
     class MWMGeneral < MatchingAlgorithm
-
       # If b is a top-level blossom,
       # label[b] is 0 if b is unlabeled (free);
       #             1 if b is an S-vertex/blossom;

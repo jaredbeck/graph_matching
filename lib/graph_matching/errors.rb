@@ -7,9 +7,9 @@ module GraphMatching
   # no-doc
   class InvalidVertexNumbering < GraphMatchingError
     def initialize(msg = nil)
-      msg ||= <<-EOS
-Expected vertexes to be consecutive positive integers \
-starting with zero
+      msg ||= <<~EOS
+        Expected vertexes to be consecutive positive integers \
+        starting with zero
       EOS
       super(msg)
     end
