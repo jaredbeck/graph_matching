@@ -64,17 +64,6 @@ Style/EmptyElse:
 
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.
-# SupportedStyles: format, sprintf, percent
-Style/FormatString:
-  Exclude:
-    - 'benchmark/mcm_bipartite/complete_bigraphs/benchmark.rb'
-    - 'benchmark/mcm_general/complete_graphs/benchmark.rb'
-    - 'benchmark/mwm_bipartite/complete_bigraphs/benchmark.rb'
-    - 'benchmark/mwm_general/complete_graphs/benchmark.rb'
-    - 'benchmark/mwm_general/incomplete_graphs/benchmark.rb'
-
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
 # SupportedStyles: when_needed, always, never
 Style/FrozenStringLiteralComment:
   Exclude:

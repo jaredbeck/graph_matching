@@ -28,7 +28,7 @@ def incomplete_graph(n, completeness)
 end
 
 MIN_SIZE.upto(MAX_SIZE) do |v|
-  print "%5d\t" % [v]
+  print format("%5d\t", v)
   g = incomplete_graph(v, COMPLETENESS)
   GC.disable
   puts(Benchmark.realtime { g.maximum_weighted_matching(true) })
