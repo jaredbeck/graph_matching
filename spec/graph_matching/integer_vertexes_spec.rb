@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 require 'rgl/adjacency'
 require 'spec_helper'
 require 'graph_matching/integer_vertexes'

@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # no-doc
 module GraphMatching
   def self.gem_version

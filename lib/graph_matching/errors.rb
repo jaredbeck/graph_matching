@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 module GraphMatching
   class GraphMatchingError < StandardError
   end

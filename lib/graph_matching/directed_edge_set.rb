@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 module GraphMatching
   # A `DirectedEdgeSet` is simply a set of directed edges in a
   # graph.  Whether the graph is actually directed or not is

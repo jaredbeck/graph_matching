@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 module GraphMatching
   # Converts the vertices of a graph to integers.  Many graph
   # matching algorithms require integer vertexes.

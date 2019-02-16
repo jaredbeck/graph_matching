@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # No shebang here.  Usage:
 # ruby -I lib benchmark/mcm_general/complete_graphs/benchmark.rb
 

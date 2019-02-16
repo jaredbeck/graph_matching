@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 require 'rgl/bipartite'
 require_relative 'graph'
 require_relative '../algorithm/mcm_bipartite'

@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 module GraphMatching
   # > In .. graph theory, a matching .. in a graph is a set of
   # > edges without common vertices.

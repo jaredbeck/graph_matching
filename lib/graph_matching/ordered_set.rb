@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 module GraphMatching
   # An `OrderedSet` acts like a `Set`, but preserves insertion order.
   # Internally, a `Hash` is used because, as of Ruby 1.9, it

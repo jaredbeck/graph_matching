@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 module GraphMatching
   # Provides expressive methods for common runtime assertions, e.g.
   #

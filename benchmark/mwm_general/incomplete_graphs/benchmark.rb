@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # No shebang here.  Usage:
 # ruby -I lib benchmark/mwm_general/dense_graphs/benchmark.rb
 

@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 require 'set'
 
 # There are some methods we'd like to use which were not added

@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 module GraphMatching
   module Graph
     # The `Weighted` module is mixed into undirected graphs to
