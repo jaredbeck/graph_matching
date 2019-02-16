@@ -48,10 +48,6 @@ Style/Alias:
   Exclude:
     - 'lib/graph_matching/ordered_set.rb'
 
-Style/CommentedKeyword:
-  Exclude:
-    - 'lib/graph_matching/algorithm/mcm_general.rb'
-
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SingleLineConditionsOnly, IncludeTernaryExpressions.
 # SupportedStyles: assign_to_condition, assign_inside_condition

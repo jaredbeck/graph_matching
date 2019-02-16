@@ -137,7 +137,7 @@ module GraphMatching
               label[ix] = label[mate[ix]] = -1
             end
           end
-        end # while e0_loop
+        end
 
         Matching.gabow(mate)
       end
