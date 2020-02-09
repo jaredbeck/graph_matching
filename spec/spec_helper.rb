@@ -20,7 +20,6 @@ RSpec::Matchers.define(:match_edges) do |expected|
   end
 
   failure_message do |matching|
-    edges_desc = to_sentence(expected)
-    "expected #{matching.edges} to equal" + edges_desc
+    "expected #{matching.edges} to equal #{expected}"
   end
 end

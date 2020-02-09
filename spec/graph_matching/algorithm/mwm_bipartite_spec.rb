@@ -78,5 +78,50 @@ RSpec.describe GraphMatching::Algorithm::MWMBipartite do
         expect(m.weight(g)).to eq(6)
       end
     end
+
+    context 'complete graph with three vertexes' do
+      # A triangle cannot be bipartite, ie. it is not 2-colorable
+      it 'raises NotBipartite error' do
+        g = graph_class[
+          [1, 2, 1],
+          [2, 3, 1],
+          [3, 1, 1]
+        ]
+        expect {
+          described_class.new(g).match
+        }.to raise_error(GraphMatching::NotBipartite)
+      end
+    end
+
+    context 'complete bigraph with four vertexes' do
+      # An example of a cycle
+      it 'returns the expected matching' do
+        g = graph_class[
+          [1, 2, 2],
+          [2, 3, 1],
+          [3, 4, 1],
+          [4, 1, 1]
+        ]
+        m = described_class.new(g).match
+        expect(m).to match_edges [[1, 2], [3, 4]]
+        expect(m.weight(g)).to eq(3)
+      end
+    end
+
+    context 'issue 10' do
+      it 'should not hang forever' do
+        skip 'hangs forever'
+        g = graph_class[
+          [1, 2, 1],
+          [3, 2, 1],
+          [3, 4, 1],
+          [3, 5, 1],
+          [6, 2, 1],
+          [6, 4, 1],
+          [6, 5, 2]
+        ]
+        described_class.new(g).match
+      end
+    end
   end
 end
