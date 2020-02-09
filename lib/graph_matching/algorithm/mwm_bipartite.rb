@@ -9,6 +9,10 @@ module GraphMatching
     # `MWMBipartite` implements Maximum Weighted Matching in
     # bipartite graphs.  It extends Maximum Cardinality
     # Matching for `Weighted` graphs.
+    #
+    # > In each stage we look for an augmenting path, as in the simple algorithm
+    # > for Problem 1 [Maximum Cardinality Matching], except that we use only
+    # > edges with zero slack. (Galil, 1986, p. 30)
     class MWMBipartite < MCMBipartite
       def initialize(graph)
         assert(graph).is_a(Graph::WeightedBigraph)
@@ -48,13 +52,14 @@ module GraphMatching
               t << j
               predecessors[j] = i
 
-              # If there are matched edges, follow each to a dog and
-              # label the dog with S.  Otherwise, backtrack to
-              # construct an augmenting path.
+              # If `j` has matched edges (other than the one we just traversed,
+              # `i`) then follow each to a dog and label the dog with S.
+              # Otherwise, backtrack to construct an augmenting path.
               m_dogs = matched_adjacent(j, i, g, m)
 
               m_dogs.each do |md|
                 s << md
+                q << md
                 predecessors[md] = j
               end
 

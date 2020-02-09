@@ -94,5 +94,29 @@ RSpec.describe GraphMatching::Algorithm::MCMBipartite do
         expect(outcomes).to include(reconstructed)
       end
     end
+
+    context 'with 6 vertexes' do
+      it 'finds one of the two correct matchings' do
+        edges = [
+          [1, 2],
+          [3, 2],
+          [3, 4],
+          [3, 5],
+          [6, 2],
+          [6, 4],
+          [6, 5]
+        ].shuffle
+        edges.each { |e| g.add_edge(*e) }
+        m = described_class.new(g).match
+        outcomes = [
+          [[1, 2], [3, 4], [5, 6]],
+          [[1, 2], [3, 5], [4, 6]]
+        ].map { |outcome|
+          Set.new(outcome.map { |e| RGL::Edge::UnDirectedEdge.new(*e) })
+        }
+        actual = Set.new(m.undirected_edges)
+        expect(outcomes).to include(actual)
+      end
+    end
   end
 end

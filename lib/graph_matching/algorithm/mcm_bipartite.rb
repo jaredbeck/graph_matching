@@ -23,9 +23,11 @@ module GraphMatching
           predecessors = {}
           aug_path = nil
 
-          # Label unmatched vertexes in U with label R.  These R-vertexes
-          # are candidates for the start of an augmenting path.
-          unmarked = r = u.select { |i| m[i] == nil }
+          # Label unmatched vertexes in U with label R.
+          r = u.select { |i| m[i] == nil }
+
+          # These R-vertexes are candidates for the start of an augmenting path.
+          unmarked = r.dup.to_a
 
           # While there are unmarked R-vertexes
           loop do
@@ -46,6 +48,7 @@ module GraphMatching
 
               adj_u_in_m.each do |ui|
                 r << ui
+                unmarked << ui
                 predecessors[ui] = vi
               end
 
