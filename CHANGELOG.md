@@ -3,7 +3,12 @@
 This project follows [semver 2.0.0][1] and the recommendations
 of [keepachangelog.com][2].
 
-## Unreleased
+## 0.2.1 (2020-02-10)
+
+### Fixed
+
+- [#10](https://github.com/jaredbeck/graph_matching/pull/10) -
+   `WeightedBigraph#maximum_weighted_matching` hangs forever
 
 ## 0.2.0 (2019-02-15)
 
