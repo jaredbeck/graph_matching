@@ -42,7 +42,8 @@ module GraphMatching
           assert_weighted_edges(args)
           weightless_edges = args.map { |e| e.slice(0..1) }
           g = super(*weightless_edges.flatten)
-          g.init_weights
+          max_vertice_id = weightless_edges.map {|e| e.max}.max + 1
+          g.init_weights(max_vertice_id)
           args.each do |edge|
             i = edge[0] - 1
             j = edge[1] - 1
@@ -72,8 +73,8 @@ module GraphMatching
         end
       end
 
-      def init_weights
-        @weight = Array.new(num_vertices) { |_| Array.new(num_vertices) }
+      def init_weights(num=num_vertices)
+        @weight = Array.new(num) { |_| Array.new(num) }
       end
 
       def max_w
