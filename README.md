@@ -187,7 +187,7 @@ and non-bipartite graphs (pdf)][10]
 [1]: http://www.youtube.com/watch?v=ory4WMX0rDU "The Augmenting Path Algorithm for Bipartite Matching"
 [2]: http://www.youtube.com/watch?v=C9c8zEZXboA "The Augmenting Path Algorithm (Example)"
 [3]: http://en.wikipedia.org/wiki/Bipartite_graph
-[4]: http://rgl.rubyforge.org/rgl/index.html
+[4]: https://github.com/monora/rgl
 [5]: http://en.wikipedia.org/wiki/Matching_%28graph_theory%29#In_unweighted_bipartite_graphs
 [6]: http://en.wikipedia.org/wiki/Matching_%28graph_theory%29
 [7]: http://en.wikipedia.org/wiki/Graph_theory
