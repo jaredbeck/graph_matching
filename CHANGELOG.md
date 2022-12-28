@@ -3,6 +3,11 @@
 This project follows [semver 2.0.0][1] and the recommendations
 of [keepachangelog.com][2].
 
+## Unreleased
+
+- Drop support for EoL rubies, i.e. < 3.0. Ruby 2.7, specifically, reaches EoL
+  on 2023-03-31.
+
 ## 0.2.1 (2020-02-10)
 
 ### Fixed
